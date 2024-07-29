@@ -1,16 +1,15 @@
 {
   "files": {
-    "main.css": "/ap-tracker/static/css/main.f855e6bc.css",
-    "main.js": "/ap-tracker/static/js/main.8743b479.js",
-    "static/js/453.a061e05f.chunk.js": "/ap-tracker/static/js/453.a061e05f.chunk.js",
-    "static/media/logo.svg": "/ap-tracker/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "main.css": "/ap-tracker/static/css/main.dcdde551.css",
+    "main.js": "/ap-tracker/static/js/main.623faf6a.js",
+    "static/js/453.81066a78.chunk.js": "/ap-tracker/static/js/453.81066a78.chunk.js",
     "index.html": "/ap-tracker/index.html",
-    "main.f855e6bc.css.map": "/ap-tracker/static/css/main.f855e6bc.css.map",
-    "main.8743b479.js.map": "/ap-tracker/static/js/main.8743b479.js.map",
-    "453.a061e05f.chunk.js.map": "/ap-tracker/static/js/453.a061e05f.chunk.js.map"
+    "main.dcdde551.css.map": "/ap-tracker/static/css/main.dcdde551.css.map",
+    "main.623faf6a.js.map": "/ap-tracker/static/js/main.623faf6a.js.map",
+    "453.81066a78.chunk.js.map": "/ap-tracker/static/js/453.81066a78.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.8743b479.js"
+    "static/css/main.dcdde551.css",
+    "static/js/main.623faf6a.js"
   ]
 }
