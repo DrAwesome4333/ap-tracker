@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/ap-tracker/static/css/main.04d023b2.css",
-    "main.js": "/ap-tracker/static/js/main.f91a34b5.js",
+    "main.js": "/ap-tracker/static/js/main.8a6a8ecf.js",
     "index.html": "/ap-tracker/index.html",
     "main.04d023b2.css.map": "/ap-tracker/static/css/main.04d023b2.css.map",
-    "main.f91a34b5.js.map": "/ap-tracker/static/js/main.f91a34b5.js.map"
+    "main.8a6a8ecf.js.map": "/ap-tracker/static/js/main.8a6a8ecf.js.map"
   },
   "entrypoints": [
     "static/css/main.04d023b2.css",
-    "static/js/main.f91a34b5.js"
+    "static/js/main.8a6a8ecf.js"
   ]
 }
