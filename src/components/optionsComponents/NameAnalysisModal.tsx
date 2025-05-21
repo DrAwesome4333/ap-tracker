@@ -119,7 +119,8 @@ const NameAnalysisModal = ({
         if (
             mainTrackerParams &&
             previewTrackerManager.getTrackerInitParams()?.gameName !==
-                mainTrackerParams.gameName
+                mainTrackerParams.gameName &&
+            open
         ) {
             previewTrackerManager.initializeTracker(mainTrackerParams);
             previewLocationManager.pauseUpdateBroadcast();
@@ -131,7 +132,8 @@ const NameAnalysisModal = ({
             });
             previewLocationManager.resumeUpdateBroadcast();
         }
-        if (mainTrackerParams) {
+
+        if (mainTrackerParams && open) {
             const tracker = buildGenericGame(
                 mainTrackerParams.gameName,
                 services.locationManager,
@@ -153,7 +155,7 @@ const NameAnalysisModal = ({
                 tracker
             );
         }
-    }, [mainTrackerManager, tokenOptions, otherOptions]);
+    }, [mainTrackerManager, tokenOptions, otherOptions, open]);
 
     return (
         <Modal open={open}>
