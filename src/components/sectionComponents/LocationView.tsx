@@ -1,13 +1,10 @@
-import React, {
-    Fragment,
-    useContext,
-    useState,
-    useSyncExternalStore,
-} from "react";
+import React, { Fragment, useContext, useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import Icon from "../icons/icons";
 import { textPrimary } from "../../constants/colors";
 import { GhostButton } from "../buttons";
+import { useLocationStatus } from "../../hooks/sectionHooks";
+
 const LocationView = ({ location }: { location: string }) => {
     const [showDetails, setShowDetails] = useState(false);
     const serviceContext = useContext(ServiceContext);
@@ -16,11 +13,7 @@ const LocationView = ({ location }: { location: string }) => {
         throw new Error("No location manager provided");
     }
     const tagManager = serviceContext.tagManager;
-    const status = useSyncExternalStore(
-        locationManager.getSubscriberCallback(location),
-        () => locationManager.getLocationStatus(location),
-        () => locationManager.getLocationStatus(location)
-    );
+    const status = useLocationStatus(locationManager, location);
     const connection = serviceContext.connector;
 
     const classes = new Set(["section_check"]);

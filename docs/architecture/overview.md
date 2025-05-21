@@ -184,7 +184,7 @@ Related hook: [useInventoryItems](../../src/hooks/inventoryHook.ts)
 
 Manages the status and tags of locations within a session.
 
-Related hook: none but should have one, must use `useSyncExternalStore` directly for now
+Related hook: [useLocationStatus](../../src/hooks/sectionHooks.ts).
 
 #### [NotificationManager](../../src/services/notifications/notifications.ts):
 
@@ -214,7 +214,7 @@ No hooks.
 
 Maintains the state of the sections and which locations each one has. Build and maintains reports related to tags and location counts.
 
-Related hooks: none but should have one, this is currently subscribed to using `useSyncExternalStore`.
+Related hook: [useSection](../../src/hooks/sectionHooks.ts).
 
 #### [TagManager](../../src/services/tags/tagManager.ts):
 

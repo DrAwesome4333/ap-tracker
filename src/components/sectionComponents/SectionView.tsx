@@ -1,25 +1,12 @@
 // @ts-check
-import React, {
-    useContext,
-    useMemo,
-    useState,
-    useSyncExternalStore,
-} from "react";
+import React, { useContext, useMemo, useState } from "react";
 import LocationView from "./LocationView";
 import ServiceContext from "../../contexts/serviceContext";
 import Icon from "../icons/icons";
 import useOption from "../../hooks/optionHook";
 import { naturalSort } from "../../utility/comparisons";
 import { globalOptionManager } from "../../services/options/optionManager";
-
-/**
- *
- * @param options
- * @param options.name The name of the registered section
- * @param options.context Unused
- * @param options.startOpen Sections will start open instead of closed if true
- * @returns
- */
+import { useSection } from "../../hooks/sectionHooks";
 
 globalOptionManager.setOptionDefault(
     "checkedLocationBehavior",
@@ -31,7 +18,17 @@ globalOptionManager.setOptionDefault(
     "global",
     "nothing"
 );
+
 globalOptionManager.setOptionDefault("checkOrderBehavior", "global", "natural");
+
+/**
+ *
+ * @param options
+ * @param options.name The name of the registered section
+ * @param options.context Unused
+ * @param options.startOpen Sections will start open instead of closed if true
+ * @returns
+ */
 const SectionView = ({
     name,
     context,
@@ -56,11 +53,7 @@ const SectionView = ({
     if (!optionManager) {
         throw new Error("No option manager provided");
     }
-    const section = useSyncExternalStore(
-        sectionManager.getSubscriberCallback(name),
-        () => sectionManager.getSectionStatus(name),
-        () => sectionManager.getSectionStatus(name)
-    );
+    const section = useSection(sectionManager, name);
     const style = {
         borderLeft: `2px dashed ${section?.theme.color ?? "Black"}`,
         paddingLeft: "0.5em",
