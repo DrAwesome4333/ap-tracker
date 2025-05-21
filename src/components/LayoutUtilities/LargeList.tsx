@@ -5,7 +5,6 @@ import React, {
     useContext,
     useEffect,
     useState,
-    useLayoutEffect,
 } from "react";
 import { VariableSizeList } from "react-window";
 
@@ -43,7 +42,7 @@ const Row = <T,>({
         ListContext
     ) as ListContextData<T>;
     // Update row heights with the current height of the row
-    useLayoutEffect(() => {
+    useEffect(() => {
         if (rowRef.current) {
             listContext.setRowHeight(index, rowRef.current.clientHeight);
         }

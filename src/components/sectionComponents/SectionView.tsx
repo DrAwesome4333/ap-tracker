@@ -32,6 +32,8 @@ const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     );
 };
 
+const virtualizationThreshold = 30;
+
 /**
  *
  * @param options
@@ -240,7 +242,7 @@ const SectionView = ({
                     </h3>
                     {isOpen && (
                         <>
-                            {locations.length < 30 ? (
+                            {locations.length < virtualizationThreshold ? (
                                 locations.map((location) => (
                                     <LocationView
                                         location={location}
@@ -252,7 +254,14 @@ const SectionView = ({
                                     items={locations}
                                     defaultRowSize={22}
                                     rowGenerator={rowGenerator}
-                                    style={{ width: "50vw", height: "50vh" }}
+                                    style={{
+                                        width: "95%",
+                                        overflow: "hidden",
+                                        resize: "vertical",
+                                        height: "25vh",
+                                        boxShadow:
+                                            "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                                    }}
                                 />
                             )}
                             {childSections.map((childName) => {

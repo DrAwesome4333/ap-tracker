@@ -11,7 +11,7 @@ const ClientMessage = forwardRef(
     ) => {
         const text = message.parts
             .map((part) => part.text)
-            .reduce((a, b) => a + " " + b, "");
+            .reduce((a, b) => a + b, "");
         return (
             <div
                 ref={ref}

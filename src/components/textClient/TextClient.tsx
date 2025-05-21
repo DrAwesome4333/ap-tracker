@@ -56,8 +56,10 @@ const TextClient = () => {
                     width: "100%",
                     height: "100%",
                     display: "grid",
+                    gap: "0.25em",
                     gridTemplateRows: "3em 1fr auto",
                     overflow: "hidden",
+                    padding: "0.25em",
                 }}
             >
                 <PanelHeader title={"Text Client"}>
