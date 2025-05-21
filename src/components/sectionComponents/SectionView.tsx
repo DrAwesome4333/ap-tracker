@@ -7,12 +7,14 @@ import useOption from "../../hooks/optionHook";
 import { naturalSort } from "../../utility/comparisons";
 import { globalOptionManager } from "../../services/options/optionManager";
 import { useSection } from "../../hooks/sectionHooks";
+import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
 
 globalOptionManager.setOptionDefault(
     "checkedLocationBehavior",
     "global",
     "nothing"
 );
+
 globalOptionManager.setOptionDefault(
     "checkedSectionBehavior",
     "global",
@@ -20,6 +22,15 @@ globalOptionManager.setOptionDefault(
 );
 
 globalOptionManager.setOptionDefault("checkOrderBehavior", "global", "natural");
+
+const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
+    return (
+        <LocationView
+            location={item}
+            ref={ref as React.ForwardedRef<HTMLDivElement>}
+        />
+    );
+};
 
 /**
  *
@@ -53,6 +64,7 @@ const SectionView = ({
     if (!optionManager) {
         throw new Error("No option manager provided");
     }
+
     const section = useSection(sectionManager, name);
     const style = {
         borderLeft: `2px dashed ${section?.theme.color ?? "Black"}`,
@@ -121,7 +133,7 @@ const SectionView = ({
         );
     };
 
-    const locations = useMemo(() => {
+    const locations: string[] = useMemo(() => {
         const locationNames = [...(section?.checks.keys() ?? [])].filter(
             locationFilter
         );
@@ -228,14 +240,21 @@ const SectionView = ({
                     </h3>
                     {isOpen && (
                         <>
-                            <div>
-                                {locations.map((location) => (
+                            {locations.length < 30 ? (
+                                locations.map((location) => (
                                     <LocationView
                                         location={location}
                                         key={location}
                                     />
-                                ))}
-                            </div>
+                                ))
+                            ) : (
+                                <LargeList<string>
+                                    items={locations}
+                                    defaultRowSize={22}
+                                    rowGenerator={rowGenerator}
+                                    style={{ width: "50vw", height: "50vh" }}
+                                />
+                            )}
                             {childSections.map((childName) => {
                                 return (
                                     <SectionView
