@@ -59,7 +59,7 @@ const Modal = ({
             {open &&
                 createPortal(
                     <BackDrop data-theme={readThemeValue(themeValue)}>
-                        <Container>{children}</Container>
+                        <Container className="App">{children}</Container>
                     </BackDrop>,
                     document.body
                 )}

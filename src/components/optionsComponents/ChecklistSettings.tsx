@@ -97,7 +97,7 @@ mockSectionManager.setConfiguration({
     },
     options: {},
     themes: {
-        default: { color: "#000000" },
+        default: { color: "#888888" },
     },
 });
 
