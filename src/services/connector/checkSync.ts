@@ -68,6 +68,7 @@ const setupAPCheckSync = (
     connection: { slotInfo: { connectionId: string } }
 ) => {
     client.room.on("locationsChecked", (locationIds) => {
+        locationManager.pauseUpdateBroadcast();
         locationIds.forEach((id) =>
             locationManager.updateLocationStatus(
                 client.package.lookupLocationName(client.game, id),
@@ -77,6 +78,7 @@ const setupAPCheckSync = (
                 }
             )
         );
+        locationManager.resumeUpdateBroadcast();
     });
 
     client.items
