@@ -46,18 +46,17 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
     }
 
     return (
-        <div
+        <span
             style={{
                 color: textColor,
                 backgroundColor,
                 textDecoration: underline ? "underline" : undefined,
                 fontWeight: bold ? "bold" : "normal",
                 whiteSpace: "pre-wrap",
-                display: "inline-block",
             }}
         >
             {part.text}
-        </div>
+        </span>
     );
 };
 

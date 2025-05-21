@@ -5,7 +5,7 @@ import React, {
     useContext,
     useEffect,
     useState,
-    useCallback,
+    useLayoutEffect,
 } from "react";
 import { VariableSizeList } from "react-window";
 
@@ -43,7 +43,7 @@ const Row = <T,>({
         ListContext
     ) as ListContextData<T>;
     // Update row heights with the current height of the row
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (rowRef.current) {
             listContext.setRowHeight(index, rowRef.current.clientHeight);
         }
@@ -99,7 +99,7 @@ const LargeList_List = forwardRef(
                 height={height}
                 width={width}
                 ref={listRef}
-                overscanCount={30}
+                overscanCount={1}
                 outerRef={ref}
             >
                 {Row}
@@ -150,12 +150,9 @@ const LargeList = <T,>({
         };
     }, [containerRef.current]);
 
-    const setRowHeight = useCallback(
-        (index: number, size: number) => {
-            setRowHeights((r) => ({ ...r, [index]: size }));
-        },
-        [rowHeights]
-    );
+    const setRowHeight = (index: number, size: number) => {
+        setRowHeights((r) => (r[index] === size ? r : { ...r, [index]: size }));
+    };
 
     useEffect(() => {
         if (!listUpdateDebounceTimer.current) {
@@ -164,7 +161,8 @@ const LargeList = <T,>({
                 listUpdateDebounceTimer.current = 0;
             });
         }
-    }, [listRef, rowHeights]);
+    }, [listRef.current, rowHeights]);
+
     return (
         <div ref={containerRef} style={style}>
             <ListContext.Provider
