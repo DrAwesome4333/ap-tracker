@@ -24,7 +24,7 @@ const generateCategories = (groups: { [s: string]: string[] }) => {
         },
         options: {},
         themes: {
-            default: { color: "#000000" },
+            default: { color: "#888888" },
             theme1: { color: "#FF0000" },
             theme2: { color: "#00AA00" },
             theme3: { color: "#0000FF" },

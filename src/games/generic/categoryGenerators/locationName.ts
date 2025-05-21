@@ -256,7 +256,7 @@ const generateCategories = (
         options: {},
         themes: {
             default: {
-                color: "black",
+                color: "#888888",
             },
         },
     };
