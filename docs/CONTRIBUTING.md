@@ -19,6 +19,8 @@ When writing code, please do so in a fork or branch. When the time comes to crea
 
 In the pull request, please mention the issues this PR relates to (by putting `#<issue number>`) as well as giving a summary of the intent and reasoning behind the pull request. Your code will be reviewed and after all concerns have been resolved, the code will be merged and deployed.
 
+Please review the [coding style](./codingStyle.md) and [accessibility](./accessibility.md) guidelines as well to ensure your code meets expectations. You may also find some of the app [structure documentation](./architecture/overview.md) helpful as well to get an idea of what is going on.
+
 ## Have a question about something or need to discuss something?
 
 Feel free to message me on the Archipelago discord server or send me a DM (Discord Tag: dr.awesome4333). Alternatively you can create a post on the [GitHub discussion board](https://github.com/DrAwesome4333/ap-tracker/discussions), though response times may vary.

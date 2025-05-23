@@ -61,13 +61,10 @@ const buildGenericGame = (
         };
     };
 
-    const buildTracker: TrackerBuilder = (
-        _locationManager,
-        _entranceManager,
+    const buildTracker: TrackerBuilder = async ({
         groupManager,
         sectionManager,
-        _slotData
-    ) => {
+    }) => {
         // configure groups and sections
         groupManager.loadGroups(groupConfig);
         sectionManager.setConfiguration(categoryConfig);

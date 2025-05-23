@@ -4,17 +4,20 @@ import { GroupManager } from "../services/sections/groupManager";
 import { SectionManager } from "../services/sections/sectionManager";
 import { GenericGameMethod } from "./generic/categoryGenerators/genericGameEnums";
 import { buildGenericGame } from "./generic/genericGame";
+import { builtInTrackers } from "./builtInTrackers";
 
 const modified = Symbol("modified");
 const TRACKER_CHOICE_KEY = "Archipelago_Checklist_saved_tracker_choices";
 
-type TrackerBuilder = (
-    locationManager: LocationManager,
-    entranceManager: EntranceManager,
-    groupManager: GroupManager,
-    sectionManager: SectionManager,
-    slotData: unknown
-) => void;
+interface TrackerBuilderParams {
+    locationManager: LocationManager;
+    entranceManager: EntranceManager;
+    groupManager: GroupManager;
+    sectionManager: SectionManager;
+    slotData: unknown;
+}
+
+type TrackerBuilder = (params: TrackerBuilderParams) => Promise<void>;
 type TrackerInitParams = {
     gameName: string;
     entranceManager: EntranceManager;
@@ -223,13 +226,13 @@ class TrackerManager {
             );
         }
         this.#sectionManager.deleteAllSections();
-        tracker.buildTracker(
-            this.#locationManager,
-            entranceManager,
-            this.#groupManager,
-            this.#sectionManager,
-            slotData
-        );
+        tracker.buildTracker({
+            locationManager: this.#locationManager,
+            entranceManager: entranceManager,
+            groupManager: this.#groupManager,
+            sectionManager: this.#sectionManager,
+            slotData,
+        });
     };
 
     initializeTracker = (initParams: TrackerInitParams) => {
@@ -265,6 +268,10 @@ class TrackerManager {
         this.#trackerListeners.forEach((listener) => listener());
     };
 }
+
+builtInTrackers.forEach((tracker) =>
+    TrackerManager.directory.addTracker(tracker)
+);
 
 export default TrackerManager;
 export type { Tracker, TrackerBuilder, TrackerInitParams };

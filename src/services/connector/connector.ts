@@ -307,11 +307,11 @@ const createConnector = (
                     return groups;
                 };
                 getGroups().then(
-                    (groups: { [groupName: string]: string[] }) => {
+                    async (groups: { [groupName: string]: string[] }) => {
                         trackerManager.initializeTracker({
                             gameName: savedConnectionInfo.game,
                             entranceManager,
-                            slotData: {},
+                            slotData: await client.players.self.fetchSlotData(),
                             groups,
                         });
                         tagManager.loadTags(connection.slotInfo.connectionId);

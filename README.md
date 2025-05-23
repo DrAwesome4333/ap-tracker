@@ -82,6 +82,10 @@ $ npm run dev
 
 **Note:** To enable hot reloading you need to comment out the `assetPrefix` portion of the `next.config.js` file. Remember to return it back when creating dedicated build or certain resources, such as images and manifest files, may not be accessible.
 
+### Want to contribute to the project?
+
+See [contributing.md](./docs/CONTRIBUTING.md) for details
+
 ## Found a bug?
 
 Checkout the issues page of this GitHub repository and report it there or report it to me directly in the Archipelago Discord (invite link on Archipelago's website) in the Archipelago Checklist thread in the future-game-design thread.

@@ -115,7 +115,7 @@ const themeDefaults = {
 interface SectionDef {
     title: string;
     type?: null;
-    groupKey: string | null;
+    groupKey?: string | null;
     theme: string;
     children: string[] | null;
 }

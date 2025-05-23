@@ -43,13 +43,11 @@ const buildCustomTracker = async (
     }
     const { groupData, sectionData } = customGameData;
 
-    const buildTracker: TrackerBuilder = (
-        locationManager,
-        _entranceManager,
+    const buildTracker: TrackerBuilder = async ({
         groupManager,
         sectionManager,
-        _slotData
-    ) => {
+        locationManager,
+    }) => {
         const errors = verifyTrackerConfig(
             sectionData,
             groupData,
