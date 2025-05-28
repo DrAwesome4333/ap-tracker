@@ -414,7 +414,7 @@ const NameAnalysisModal = ({
                             return;
                         }
                         exportJSONFile(
-                            `tracker-export-${Date.now().toString()}`,
+                            `tracker-export-${customTracker.gameName}-${Date.now().toString()}`,
                             customTracker.exportTracker()
                         );
                     }}

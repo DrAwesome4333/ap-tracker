@@ -95,7 +95,7 @@ const CustomTrackerOptions = ({
                                                     );
                                                 } else {
                                                     exportJSONFile(
-                                                        `tracker-export-${Date.now().toString()}`,
+                                                        `tracker-export-${trackerData.name}`,
                                                         trackerData
                                                     );
                                                 }

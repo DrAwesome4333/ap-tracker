@@ -155,7 +155,7 @@ const CreateCustomTrackerModal = ({
                                             const trackerJSON =
                                                 tracker.exportTracker();
                                             exportJSONFile(
-                                                `tracker-export-${Date.now().toString()}`,
+                                                `tracker-export-${tracker.gameName}-${Date.now().toString()}`,
                                                 trackerJSON,
                                                 true
                                             );
