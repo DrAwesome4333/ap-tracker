@@ -249,7 +249,7 @@ const generateCategories = (
         currentLevelGroups.clear();
         nextLevelGroups.forEach((group) => currentLevelGroups.add(group));
     }
-    // debugger;
+
     const groupConfig: { [groupKey: string]: GroupData } = {};
     const categoryConfig: SectionConfigData = {
         categories: {},

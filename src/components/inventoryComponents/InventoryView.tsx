@@ -75,7 +75,7 @@ const InventoryView = () => {
                         break;
                     }
                     case "count": {
-                        orderValue = a.count - b.count;
+                        orderValue = a.value - b.value;
                         break;
                     }
                     case "index": // fall through
@@ -130,7 +130,7 @@ const InventoryView = () => {
                 >
                     {sortedItems.map((collection) => (
                         <InventoryItemCollectionView
-                            key={collection.id}
+                            key={collection.name}
                             collection={collection}
                         />
                     ))}

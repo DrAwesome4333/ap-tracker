@@ -5,6 +5,7 @@ import { SectionManager } from "../services/sections/sectionManager";
 import { GenericGameMethod } from "./generic/categoryGenerators/genericGameEnums";
 import { buildGenericGame } from "./generic/genericGame";
 import { builtInTrackers } from "./builtInTrackers";
+import { InventoryManager } from "../services/inventory/inventoryManager";
 
 const modified = Symbol("modified");
 const TRACKER_CHOICE_KEY = "Archipelago_Checklist_saved_tracker_choices";
@@ -22,7 +23,10 @@ type TrackerInitParams = {
     gameName: string;
     entranceManager: EntranceManager;
     slotData?: unknown;
-    groups: { [groupName: string]: string[] };
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    };
 };
 
 interface Tracker {
@@ -43,6 +47,7 @@ class TrackerManager {
     #locationManager: LocationManager;
     #sectionManager: SectionManager;
     #groupManager: GroupManager;
+    #inventoryManager: InventoryManager;
     static #managers: Set<TrackerManager> = new Set();
     static #allTrackers: Map<string, Tracker> = new Map();
     static #trackersByGame: Map<string, Set<string>> = new Map();
@@ -135,12 +140,14 @@ class TrackerManager {
     constructor(
         locationManager: LocationManager,
         groupManager: GroupManager,
-        sectionManager: SectionManager
+        sectionManager: SectionManager,
+        inventoryManager: InventoryManager
     ) {
         TrackerManager.#managers.add(this);
         this.#locationManager = locationManager;
         this.#groupManager = groupManager;
         this.#sectionManager = sectionManager;
+        this.#inventoryManager = inventoryManager;
     }
 
     /** Returns a callback that can have a listener passed in that will be called when tracker changes occur and returns a clean up call.*/
@@ -221,6 +228,7 @@ class TrackerManager {
             tracker = buildGenericGame(
                 gameName,
                 this.#locationManager,
+                this.#inventoryManager,
                 groups,
                 GenericGameMethod.locationGroup
             );

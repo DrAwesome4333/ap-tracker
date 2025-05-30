@@ -1,16 +1,19 @@
-import React, { useContext, useState } from "react";
-import { InventoryItemCollection } from "../../services/inventory/inventoryManager";
+import React, { useState } from "react";
+import {
+    InventoryItemCollection,
+    ItemRoundingMode,
+} from "../../services/inventory/inventoryManager";
 import {
     normalItem,
     progressionItem,
     tertiary,
     trapItem,
     usefulItem,
+    textClient,
 } from "../../constants/colors";
-import { GhostButton } from "../buttons";
-import Icon from "../icons/icons";
-import ServiceContext from "../../contexts/serviceContext";
 import styled from "styled-components";
+import InventoryItemView from "./InventoryItemView";
+import { TextButton } from "../buttons";
 
 const CollectionContainer = styled.div<{
     $collection: InventoryItemCollection;
@@ -33,19 +36,45 @@ const InventoryItemCollectionView = ({
 }: {
     collection: InventoryItemCollection;
 }) => {
-    const serviceContext = useContext(ServiceContext);
-    const locationManager = serviceContext.locationManager;
-    const tagManager = serviceContext.tagManager;
-    const connection = serviceContext.connector;
     const [detailsOpen, setDetailsOpen] = useState(false);
+    let value = collection.value;
+    switch (collection.roundingMode) {
+        case ItemRoundingMode.down: {
+            value = Math.floor(value);
+            break;
+        }
+        case ItemRoundingMode.up: {
+            value = Math.ceil(value);
+            break;
+        }
+        case ItemRoundingMode.mid: {
+            value = Math.round(value);
+            break;
+        }
+    }
+
+    let color = normalItem;
+    if (collection.progression) {
+        color = progressionItem;
+    } else if (collection.useful) {
+        color = usefulItem;
+    } else if (collection.trap) {
+        color = trapItem;
+    } else if (collection.fromServer) {
+        color = textClient.yellow;
+    }
     return (
         <div>
             <CollectionContainer
                 $collection={collection}
                 onClick={() => setDetailsOpen((x) => !x)}
             >
-                {collection.count} - {collection.name}{" "}
-                {detailsOpen ? " ▲ " : " ▼ "}
+                <TextButton style={{ outlineColor: color }}>
+                    {value}
+                    {collection.total !== undefined &&
+                        `/${collection.total}`} - {collection.name}{" "}
+                    {detailsOpen ? " ▲ " : " ▼ "}
+                </TextButton>
             </CollectionContainer>
             {detailsOpen && (
                 <div
@@ -57,55 +86,7 @@ const InventoryItemCollectionView = ({
                     }}
                 >
                     {collection.items.map((item) => (
-                        <div key={item.index}>
-                            {item.location} - {item.sender}{" "}
-                            {item.local && locationManager && tagManager && (
-                                <GhostButton
-                                    onClick={(event) => {
-                                        const location = item.location;
-                                        const status =
-                                            locationManager.getLocationStatus(
-                                                location
-                                            );
-                                        event.stopPropagation();
-                                        let found = false;
-                                        status.tags?.forEach((tag) => {
-                                            if (
-                                                tag.tagId === `${location}-star`
-                                            ) {
-                                                found = true;
-                                            }
-                                        });
-                                        if (!found) {
-                                            const tagData =
-                                                tagManager.createTagData();
-                                            tagData.typeId = "star";
-                                            tagData.checkName = location;
-                                            tagData.tagId = `${location}-star`;
-                                            tagManager.addTag(
-                                                tagData,
-                                                connection.connection.slotInfo
-                                                    .connectionId
-                                            );
-                                        } else if (found) {
-                                            const starTag =
-                                                tagManager.createTagData();
-                                            starTag.typeId = "star";
-                                            starTag.checkName = location;
-                                            starTag.tagId = `${location}-star`;
-                                            tagManager.removeTag(
-                                                starTag,
-                                                connection.connection.slotInfo
-                                                    .connectionId
-                                            );
-                                        }
-                                    }}
-                                    $tiny
-                                >
-                                    <Icon fontSize="12pt" type={"star"} />
-                                </GhostButton>
-                            )}
-                        </div>
+                        <InventoryItemView item={item} key={item.uuid} />
                     ))}
                 </div>
             )}

@@ -21,6 +21,7 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import CustomTrackerManager from "../../games/generic/categoryGenerators/customTrackerManager";
 import { exportJSONFile } from "../../utility/jsonExport";
+import { InventoryManager } from "../../services/inventory/inventoryManager";
 
 interface AdditionalParams {
     useAllChecksInDataPackage?: boolean;
@@ -48,6 +49,7 @@ const previewLocationManager = new LocationManager();
 const previewEntranceManager = createEntranceManager();
 const previewGroupManager = createGroupManager(previewEntranceManager);
 const previewTagManager = createTagManager(previewLocationManager);
+const previewInventoryManager = new InventoryManager();
 const previewSectionManager = createSectionManager(
     previewLocationManager,
     previewEntranceManager,
@@ -56,7 +58,8 @@ const previewSectionManager = createSectionManager(
 const previewTrackerManager = new TrackerManager(
     previewLocationManager,
     previewGroupManager,
-    previewSectionManager
+    previewSectionManager,
+    previewInventoryManager
 );
 
 const NameAnalysisModal = ({
@@ -125,11 +128,13 @@ const NameAnalysisModal = ({
             previewTrackerManager.initializeTracker(mainTrackerParams);
             previewLocationManager.pauseUpdateBroadcast();
             previewLocationManager.deleteAllLocations();
-            mainTrackerParams.groups["Everywhere"].forEach((location) => {
-                previewLocationManager.updateLocationStatus(location, {
-                    exists: true,
-                });
-            });
+            mainTrackerParams.groups.location["Everywhere"].forEach(
+                (location) => {
+                    previewLocationManager.updateLocationStatus(location, {
+                        exists: true,
+                    });
+                }
+            );
             previewLocationManager.resumeUpdateBroadcast();
         }
 
@@ -137,6 +142,7 @@ const NameAnalysisModal = ({
             const tracker = buildGenericGame(
                 mainTrackerParams.gameName,
                 services.locationManager,
+                services.inventoryManager,
                 mainTrackerParams.groups,
                 GenericGameMethod.nameAnalysis,
                 {

@@ -281,17 +281,19 @@ const createConnector = (
                 setAPLocations(client, locationManager);
                 // Load groups from save data or request them from AP
                 const getGroups = async (): Promise<{
-                    [groupName: string]: string[];
+                    item: { [name: string]: string[] };
+                    location: { [name: string]: string[] };
                 }> => {
+                    // delete(itemGroups[`_read_item_name_groups_${client.game}`]['Everything']);
                     const cachedGroups =
-                        await SavedConnectionManager.getCachedLocationGroups(
+                        await SavedConnectionManager.getCachedGroups(
                             connection.slotInfo.connectionId
                         );
                     if (cachedGroups) {
                         return cachedGroups;
                     }
                     // @ts-expect-error, typing error in archipelago.js
-                    const groups: { [groupName: string]: string[] } =
+                    const locationGroups: { [groupName: string]: string[] } =
                         await client.storage
                             .fetchLocationNameGroups(client.game)
                             .then(
@@ -300,14 +302,29 @@ const createConnector = (
                                         `_read_location_name_groups_${client.game}`
                                     ]
                             );
-                    SavedConnectionManager.cacheLocationGroups(
+                    // @ts-expect-error, typing error in archipelago.js
+                    const itemGroups: { [groupName: string]: string[] } =
+                        await client.storage
+                            .fetchItemNameGroups(client.game)
+                            .then(
+                                (a) =>
+                                    a[`_read_item_name_groups_${client.game}`]
+                            );
+                    const groups = {
+                        item: itemGroups,
+                        location: locationGroups,
+                    };
+                    SavedConnectionManager.cacheGroups(
                         connection.slotInfo.connectionId,
                         groups
                     );
                     return groups;
                 };
                 getGroups().then(
-                    async (groups: { [groupName: string]: string[] }) => {
+                    async (groups: {
+                        item: { [name: string]: string[] };
+                        location: { [name: string]: string[] };
+                    }) => {
                         trackerManager.initializeTracker({
                             gameName: savedConnectionInfo.game,
                             entranceManager,

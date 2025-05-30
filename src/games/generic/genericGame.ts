@@ -1,3 +1,4 @@
+import { InventoryManager } from "../../services/inventory/inventoryManager";
 import { LocationManager } from "../../services/locations/locationManager";
 import { generateId } from "../../utility/randomIdGen";
 import { Tracker, TrackerBuilder } from "../TrackerManager";
@@ -12,7 +13,11 @@ import locationNameGroupGenerator, {
 const buildGenericGame = (
     gameName: string,
     locationManager: LocationManager,
-    locationGroups: { [locationGroupName: string]: string[] },
+    inventoryManager: InventoryManager,
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    },
     method: GenericGameMethod = GenericGameMethod.locationGroup,
     parameters: {
         useAllChecksInDataPackage?: boolean;
@@ -28,11 +33,11 @@ const buildGenericGame = (
         LocationManager.filters.exist
     );
     if (parameters.useAllChecksInDataPackage ?? true) {
-        locations = new Set(locationGroups["Everywhere"]);
+        locations = new Set(groups.location["Everywhere"]);
     }
     const { groupConfig, categoryConfig } =
         method === GenericGameMethod.locationGroup
-            ? LocationGroupCategoryGenerator.generateCategories(locationGroups)
+            ? LocationGroupCategoryGenerator.generateCategories(groups.location)
             : locationNameGroupGenerator.generateCategories(
                   locations,
                   {
@@ -68,6 +73,7 @@ const buildGenericGame = (
         // configure groups and sections
         groupManager.loadGroups(groupConfig);
         sectionManager.setConfiguration(categoryConfig);
+        inventoryManager.setItemGroups(groups.item);
     };
 
     return {

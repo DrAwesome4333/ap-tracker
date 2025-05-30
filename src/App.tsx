@@ -12,7 +12,7 @@ import ServiceContext from "./contexts/serviceContext";
 import { createGroupManager } from "./services/sections/groupManager";
 import { createSectionManager } from "./services/sections/sectionManager";
 import { createTagManager } from "./services/tags/tagManager";
-import { createInventoryManager } from "./services/inventory/inventoryManager";
+import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
 import { background, textPrimary } from "./constants/colors";
@@ -45,7 +45,7 @@ const AppScreen = styled.div`
 `;
 
 const locationManager = new LocationManager();
-const inventoryManager = createInventoryManager();
+const inventoryManager = new InventoryManager();
 const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 const groupManager = createGroupManager(entranceManager);
@@ -58,7 +58,8 @@ const tagManager = createTagManager(locationManager);
 const trackerManager = new TrackerManager(
     locationManager,
     groupManager,
-    sectionManager
+    sectionManager,
+    inventoryManager
 );
 
 const textClientManager = new TextClientManager();

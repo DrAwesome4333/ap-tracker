@@ -149,6 +149,7 @@ const CreateCustomTrackerModal = ({
                                             const tracker = buildGenericGame(
                                                 connector.slotInfo.game,
                                                 services.locationManager,
+                                                services.inventoryManager,
                                                 trackerData.groups,
                                                 GenericGameMethod.locationGroup
                                             );

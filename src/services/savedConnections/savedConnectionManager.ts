@@ -260,22 +260,31 @@ const deleteDataPackage = (seed: string): Promise<boolean> => {
     return SaveData.deleteItem(DB_STORE_KEYS.dataPackageCache, seed);
 };
 
-const getCachedLocationGroups = async (
+const getCachedGroups = async (
     connectionId: string
-): Promise<{ [name: string]: string[] }> => {
+): Promise<{
+    item: { [name: string]: string[] };
+    location: { [name: string]: string[] };
+}> => {
     const groups = (await SaveData.getItem(
         DB_STORE_KEYS.locationGroupCache,
         connectionId
     )) as {
         connectionId: string;
-        groups: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+        item: { [name: string]: string[] };
     };
-    return groups ? groups.groups : null;
+    return groups && groups.location && groups.item
+        ? { location: groups.location, item: groups.item }
+        : null;
 };
 
-const cacheLocationGroups = (
+const cacheGroups = (
     connectionId: string,
-    groups: { [name: string]: string[] }
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    }
 ): Promise<boolean> => {
     return SaveData.storeItem(DB_STORE_KEYS.locationGroupCache, {
         connectionId,
@@ -332,9 +341,9 @@ const SavedConnectionManager = {
     saveConnectionData,
     getExistingConnections,
     getCachedDataPackage,
-    getCachedLocationGroups,
+    getCachedGroups,
     cacheDataPackage,
-    cacheLocationGroups,
+    cacheGroups,
     getConnectionInfo,
     loadSavedConnectionData,
     deleteConnection,
