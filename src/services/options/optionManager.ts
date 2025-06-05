@@ -1,13 +1,6 @@
+import { JSONValue } from "../dataStores";
 const OPTION_LOCAL_STORAGE_ITEM_NAME: string = "archipelagoTrackerOptionData";
 const DEBUG: boolean = false;
-
-type JSONValue =
-    | string
-    | number
-    | boolean
-    | null
-    | { [property: string]: JSONValue }
-    | JSONValue[];
 
 class OptionManager {
     #optionSubscribers: Map<string, Map<string, Set<() => void>>>;
@@ -220,20 +213,6 @@ class OptionManager {
                 listener();
             });
         });
-    };
-
-    /**
-     * Creates a new options manager with all scope values copied to it.
-     * @returns A new options manager, with scope values cloned
-     */
-    clone = (): OptionManager => {
-        const newManager = new OptionManager();
-        this.#options.forEach((_, scope) => {
-            const exportedValues = this.exportScope(scope);
-            newManager.setScope(scope, exportedValues);
-        });
-
-        return newManager;
     };
 }
 

@@ -267,7 +267,7 @@ const getCachedGroups = async (
     location: { [name: string]: string[] };
 }> => {
     const groups = (await SaveData.getItem(
-        DB_STORE_KEYS.locationGroupCache,
+        DB_STORE_KEYS.groupCache,
         connectionId
     )) as {
         connectionId: string;
@@ -286,14 +286,14 @@ const cacheGroups = (
         location: { [name: string]: string[] };
     }
 ): Promise<boolean> => {
-    return SaveData.storeItem(DB_STORE_KEYS.locationGroupCache, {
+    return SaveData.storeItem(DB_STORE_KEYS.groupCache, {
         connectionId,
         groups,
     });
 };
 
 const deleteLocationGroups = (connectionId: string): Promise<boolean> => {
-    return SaveData.deleteItem(DB_STORE_KEYS.locationGroupCache, connectionId);
+    return SaveData.deleteItem(DB_STORE_KEYS.groupCache, connectionId);
 };
 
 /**
