@@ -86,7 +86,7 @@ const App = (): React.ReactNode => {
         () => connection.slotInfo
     );
     const [optionWindowOpen, setOptionWindowOpen] = useState(false);
-    const themeValue = useOption(optionManager, "theme", "global") as
+    const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
         | "system"

@@ -3,11 +3,10 @@ import useOption from "../../hooks/optionHook";
 import { OptionManager } from "../../services/options/optionManager";
 
 const ThemeOptions = ({ optionManager }: { optionManager: OptionManager }) => {
-    const themeValue = useOption(optionManager, "theme", "global") as
+    const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
-        | "system"
-        | null;
+        | "system";
 
     return (
         <>
@@ -19,8 +18,11 @@ const ThemeOptions = ({ optionManager }: { optionManager: OptionManager }) => {
                 onChange={(event) => {
                     const value = event.target.value;
                     if (value) {
-                        optionManager.setOptionValue("theme", "global", value);
-                        optionManager.saveScope("global");
+                        optionManager.setOptionValue(
+                            "Theme:base",
+                            "global",
+                            value
+                        );
                     }
                 }}
             >

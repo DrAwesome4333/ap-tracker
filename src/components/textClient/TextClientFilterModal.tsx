@@ -22,8 +22,8 @@ const TextClientFilterModal = ({
     const optionManager = services.optionManager;
     const messageFilter = useOption(
         optionManager,
-        "messageFilter",
-        "textClient"
+        "TextClient:message_filter",
+        "global"
     ) as MessageFilter;
     const updateAllowedMessages = (
         checked: boolean,
@@ -39,8 +39,11 @@ const TextClientFilterModal = ({
             allowedTypes.delete(feature);
         }
         newFilter.allowedTypes = [...allowedTypes];
-        optionManager.setOptionValue("messageFilter", "textClient", newFilter);
-        optionManager.saveScope("textClient");
+        optionManager.setOptionValue(
+            "TextClient:message_filter",
+            "global",
+            newFilter
+        );
     };
 
     const updateItemSendFilter = (
@@ -58,8 +61,11 @@ const TextClientFilterModal = ({
             allowedItemSendTypes.delete(feature);
         }
         newFilter.itemSendFilter[who] = [...allowedItemSendTypes];
-        optionManager.setOptionValue("messageFilter", "textClient", newFilter);
-        optionManager.saveScope("textClient");
+        optionManager.setOptionValue(
+            "TextClient:message_filter",
+            "global",
+            newFilter
+        );
     };
     return (
         <Modal open={open}>

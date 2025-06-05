@@ -35,15 +35,6 @@ type MessageFilter = {
     };
 };
 
-globalOptionManager.loadScope("textClient");
-globalOptionManager.setOptionDefault("messageFilter", "textClient", {
-    allowedTypes: ["command", "chat", "status", "login", "misc", "item"],
-    itemSendFilter: {
-        own: ["trap", "progression", "useful", "normal"],
-        others: ["trap", "progression", "useful", "normal"],
-    },
-} as MessageFilter);
-
 const messageTypeCategoryMap = {
     adminCommand: "command",
     userCommand: "command",
@@ -114,8 +105,8 @@ class TextClientManager {
         client: Client
     ): boolean => {
         const messageFilter: MessageFilter = globalOptionManager.getOptionValue(
-            "messageFilter",
-            "textClient"
+            "TextClient:message_filter",
+            "global"
         ) as MessageFilter;
         const simplifiedType: SimpleMessageType = messageTypeCategoryMap[type];
 

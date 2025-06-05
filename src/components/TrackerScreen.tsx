@@ -10,19 +10,20 @@ import Tabs, { Tab } from "./LayoutUtilities/Tabs";
 import { useOrientation } from "../hooks/mediaHook";
 import PanelHeader from "./shared/PanelHeader";
 
+type TrackerLayoutMode = "auto" | "tab" | "flex";
+
 const TrackerScreen = () => {
     const services = useContext(ServiceContext);
-    const showTextClient =
-        (useOption(
-            services.optionManager,
-            "showTextClient",
-            "global"
-        ) as boolean) ?? true;
-    const layoutMode =
-        (useOption(services.optionManager, "trackerLayoutMode", "global") as
-            | "auto"
-            | "tab"
-            | "flex") ?? "auto";
+    const showTextClient = useOption(
+        services.optionManager,
+        "TextClient:show",
+        "global"
+    ) as boolean;
+    const layoutMode = useOption(
+        services.optionManager,
+        "Tracker:layout_mode",
+        "global"
+    ) as TrackerLayoutMode;
     const orientation = useOrientation();
     const useTabLayout =
         layoutMode === "tab" ||

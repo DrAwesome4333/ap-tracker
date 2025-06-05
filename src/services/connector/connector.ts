@@ -111,7 +111,7 @@ const createConnector = (
     let apTags = ["Tracker", "Checklist"];
     let receiveText =
         (globalOptionManager.getOptionValue(
-            "showTextClient",
+            "TextClient:show",
             "global"
         ) as boolean) ?? true;
 
@@ -128,14 +128,14 @@ const createConnector = (
     const toggleText = () => {
         receiveText =
             (globalOptionManager.getOptionValue(
-                "showTextClient",
+                "TextClient:show",
                 "global"
             ) as boolean) ?? true;
         updateTags();
     };
 
     globalOptionManager.getSubscriberCallback(
-        "showTextClient",
+        "TextClient:show",
         "global"
     )(toggleText);
 

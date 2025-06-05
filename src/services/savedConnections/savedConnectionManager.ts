@@ -3,6 +3,7 @@
 import { DataPackage } from "archipelago.js";
 import { TagData } from "../tags/tagManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
+import { JSONValue } from "../dataStores";
 
 /** Data that can be used to create a new Saved Connection */
 interface SavedConnectionInfo {
@@ -50,7 +51,15 @@ interface SavedConnection_V3 {
     lastUsedTime: number;
     createdTime: number;
     version: 3;
-    settings: unknown;
+    settings: {
+        /** Which trackers are in use for this slot */
+        itemTracker?: string;
+        locationTracker?: string;
+        /** Options set by trackers */
+        trackerOptions?: {
+            [trackerId: string]: JSONValue;
+        };
+    };
     saveData?: {
         tagData?: {
             [tagId: string]: TagData;

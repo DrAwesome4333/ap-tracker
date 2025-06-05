@@ -152,6 +152,10 @@ class LocalStorageDataStore implements DataStore {
             };
         };
     };
+
+    get key() {
+        return this.#storageKey;
+    }
 }
 
 class ArchipelagoDataStore implements DataStore {
@@ -203,8 +207,9 @@ class ArchipelagoDataStore implements DataStore {
     cleanup = () => {
         /**
          * Archipelago.js does not provide a way to stop listening for changes
-         * on a data storage key. So no clean up can be done really.
+         * on a data storage key. So we just tell it to not retrigger on reconnect.
          */
+        this.#client.socket.off("connected", this.#setupAPListeners);
     };
 
     read = (itemName?: string) => {
@@ -276,6 +281,10 @@ class ArchipelagoDataStore implements DataStore {
             };
         };
     };
+
+    get key() {
+        return this.#dataStorageKey;
+    }
 }
 
 export { LocalStorageDataStore, ArchipelagoDataStore };

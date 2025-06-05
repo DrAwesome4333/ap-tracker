@@ -190,11 +190,10 @@ const NotificationContainer = () => {
     const toastTimerStopped = useRef(false);
     const serviceContext = useContext(ServiceContext);
     const optionManger = serviceContext.optionManager;
-    const themeValue = useOption(optionManger, "theme", "global") as
+    const themeValue = useOption(optionManger, "Theme:base", "global") as
         | "light"
         | "dark"
-        | "system"
-        | null;
+        | "system";
 
     const openDetailModal = (index: number) => {
         setDetailIndex(index);

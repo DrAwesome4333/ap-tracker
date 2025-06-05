@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../sectionComponents/SectionView";
 import useOption from "../../hooks/optionHook";
@@ -109,37 +109,39 @@ const ChecklistSettings = ({
     const [previewOpen, setPreviewOpen] = useState(false);
     const checkedLocationBehavior = useOption(
         optionManager,
-        "checkedLocationBehavior",
+        "LocationTracker:cleared_location_behavior",
         "global"
     ) as string;
     const clearedSectionBehavior = useOption(
         optionManager,
-        "clearedSectionBehavior",
+        "LocationTracker:cleared_section_behavior",
         "global"
     ) as string;
-    const checkOrderBehavior = useOption(
+    const locationOrderBehavior = useOption(
         optionManager,
-        "checkOrderBehavior",
+        "LocationTracker:location_order",
         "global"
     ) as string;
+    const clearedLocationId = useId();
+    const clearedSectionId = useId();
+    const locationOrderId = useId();
     return (
         <>
-            <label htmlFor={"checked_location_behavior"}>
+            <label htmlFor={clearedLocationId}>
                 Checked Location Behavior:{" "}
             </label>
             <select
                 className="interactive"
-                id={"checked_location_behavior"}
-                value={checkedLocationBehavior ?? "nothing"}
+                id={clearedLocationId}
+                value={checkedLocationBehavior}
                 onChange={(event) => {
                     const value = event.target.value;
                     if (value) {
                         optionManager.setOptionValue(
-                            "checkedLocationBehavior",
+                            "LocationTracker:cleared_location_behavior",
                             "global",
                             value
                         );
-                        optionManager.saveScope("global");
                     }
                 }}
             >
@@ -148,22 +150,19 @@ const ChecklistSettings = ({
                 <option value="hide">Hide</option>
             </select>
             <br />
-            <label htmlFor={"cleared_section_behavior"}>
-                Cleared Section Behavior:{" "}
-            </label>
+            <label htmlFor={clearedSectionId}>Cleared Section Behavior: </label>
             <select
                 className="interactive"
-                id={"cleared_section_behavior"}
-                value={clearedSectionBehavior ?? "nothing"}
+                id={clearedSectionId}
+                value={clearedSectionBehavior}
                 onChange={(event) => {
                     const value = event.target.value;
                     if (value) {
                         optionManager.setOptionValue(
-                            "clearedSectionBehavior",
+                            "LocationTracker:cleared_section_behavior",
                             "global",
                             value
                         );
-                        optionManager.saveScope("global");
                     }
                 }}
             >
@@ -172,20 +171,19 @@ const ChecklistSettings = ({
                 <option value="hide">Hide</option>
             </select>
             <br />
-            <label htmlFor={"check_order_behavior"}>Check Order: </label>
+            <label htmlFor={locationOrderId}>Check Order: </label>
             <select
                 className="interactive"
-                id={"check_order_behavior"}
-                value={checkOrderBehavior ?? "natural"}
+                id={locationOrderId}
+                value={locationOrderBehavior}
                 onChange={(event) => {
                     const value = event.target.value;
                     if (value) {
                         optionManager.setOptionValue(
-                            "checkOrderBehavior",
+                            "LocationTracker:location_order",
                             "global",
                             value
                         );
-                        optionManager.saveScope("global");
                     }
                 }}
             >

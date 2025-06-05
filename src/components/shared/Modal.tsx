@@ -49,7 +49,7 @@ const Modal = ({
 }) => {
     const serviceContext = useContext(ServiceContext);
     const optionManger = serviceContext.optionManager ?? globalOptionManager;
-    const themeValue = useOption(optionManger, "theme", "global") as
+    const themeValue = useOption(optionManger, "Theme:base", "global") as
         | "light"
         | "dark"
         | "system"

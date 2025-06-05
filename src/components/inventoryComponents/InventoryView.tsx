@@ -25,34 +25,34 @@ const InventoryView = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const showProgression = useOption(
         optionManager,
-        "inventory_show_prog_items",
+        "InventoryTracker:show_prog_items",
         "global"
-    ) as boolean | null;
+    ) as boolean;
     const showUseful = useOption(
         optionManager,
-        "inventory_show_useful_items",
+        "InventoryTracker:show_useful_items",
         "global"
-    ) as boolean | null;
+    ) as boolean;
     const showNormal = useOption(
         optionManager,
-        "inventory_show_normal_items",
+        "InventoryTracker:show_normal_items",
         "global"
-    ) as boolean | null;
+    ) as boolean;
     const showTrap = useOption(
         optionManager,
-        "inventory_show_trap_items",
+        "InventoryTracker:show_trap_items",
         "global"
-    ) as boolean | null;
+    ) as boolean;
     const itemOrder = useOption(
         optionManager,
-        "inventory_item_order",
+        "InventoryTracker:item_order",
         "global"
-    ) as InventoryItemOrder | null;
+    ) as InventoryItemOrder;
     const itemOrderDirection_desc = useOption(
         optionManager,
-        "inventory_item_order_desc",
+        "InventoryTracker:item_order_desc",
         "global"
-    ) as boolean | null;
+    ) as boolean;
 
     const items = useInventoryItems(inventoryManager);
     const sortedItems = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useId } from "react";
 import useOption from "../../hooks/optionHook";
 import ServiceContext from "../../contexts/serviceContext";
 import { Checkbox } from "../inputs";
@@ -8,31 +8,30 @@ const LayoutSettings = () => {
     const optionManager = services.optionManager;
     const layoutMode = useOption(
         optionManager,
-        "trackerLayoutMode",
+        "Tracker:layout_mode",
         "global"
     ) as "auto" | "tab" | "flex";
     const showTextClient = useOption(
         services.optionManager,
-        "showTextClient",
+        "TextClient:show",
         "global"
     ) as boolean;
-
+    const layoutModeId = useId();
     return (
         <div>
-            <label htmlFor={"layout_mode"}>Layout: </label>
+            <label htmlFor={layoutModeId}>Layout: </label>
             <select
                 className="interactive"
-                id={"layout_mode"}
+                id={layoutModeId}
                 value={layoutMode ?? "auto"}
                 onChange={(event) => {
                     const value = event.target.value;
                     if (value) {
                         optionManager.setOptionValue(
-                            "trackerLayoutMode",
+                            "Tracker:layout_mode",
                             "global",
                             value
                         );
-                        optionManager.saveScope("global");
                     }
                 }}
             >
@@ -46,11 +45,10 @@ const LayoutSettings = () => {
                 checked={showTextClient ?? true}
                 onChange={(event) => {
                     optionManager.setOptionValue(
-                        "showTextClient",
+                        "TextClient:show",
                         "global",
                         event.target.checked
                     );
-                    optionManager.saveScope("global");
                 }}
             />
         </div>
