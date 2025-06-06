@@ -3,7 +3,7 @@
 import { DataPackage } from "archipelago.js";
 import { TagData } from "../tags/tagManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
-import { JSONValue } from "../dataStores";
+import { JSONValue } from "../dataStores/dataStore";
 
 /** Data that can be used to create a new Saved Connection */
 interface SavedConnectionInfo {
