@@ -8,7 +8,7 @@ import { SectionManager } from "../services/sections/sectionManager";
 import { TagManager } from "../services/tags/tagManager";
 import { OptionManager } from "../services/options/optionManager";
 import TextClientManager from "../services/textClientManager";
-import TrackerManager from "../games/TrackerManager";
+import TrackerManager from "../services/tracker/TrackerManager";
 
 const ServiceContext: React.Context<{
     locationManager?: LocationManager;

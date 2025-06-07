@@ -1,4 +1,4 @@
-import { Tracker } from "../TrackerManager";
+import { Tracker } from "../../services/tracker/TrackerManager";
 
 const tracker: Tracker = {
     name: "Ocarina of Time Demo Tracker",

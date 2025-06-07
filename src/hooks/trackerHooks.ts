@@ -1,7 +1,7 @@
 // @ts-check
 import { useSyncExternalStore } from "react";
-import CustomTrackerManager from "../games/generic/categoryGenerators/customTrackerManager";
-import TrackerManager from "../games/TrackerManager";
+import CustomTrackerManager from "../services/tracker/customTrackerManager";
+import TrackerManager from "../services/tracker/TrackerManager";
 
 const useTrackerDirectory = () => {
     return useSyncExternalStore(

@@ -19,8 +19,8 @@ import { background, textPrimary } from "./constants/colors";
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
-import TrackerManager from "./games/TrackerManager";
-import CustomTrackerManager from "./games/generic/categoryGenerators/customTrackerManager";
+import TrackerManager from "./services/tracker/TrackerManager";
+import CustomTrackerManager from "./services/tracker/customTrackerManager";
 import TextClientManager from "./services/textClientManager";
 
 const AppScreen = styled.div`

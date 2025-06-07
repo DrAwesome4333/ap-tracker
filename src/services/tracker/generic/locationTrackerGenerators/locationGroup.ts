@@ -1,6 +1,6 @@
-import { GroupData } from "../../../services/sections/groupManager";
-import { SectionConfigData } from "../../../services/sections/sectionManager";
-import { naturalSort } from "../../../utility/comparisons";
+import { GroupData } from "../../../sections/groupManager";
+import { SectionConfigData } from "../../../sections/sectionManager";
+import { naturalSort } from "../../../../utility/comparisons";
 
 const GROUP_DEBUG = false;
 const DEBUG_PARENT_GROUP_ORGANIZATION = GROUP_DEBUG;

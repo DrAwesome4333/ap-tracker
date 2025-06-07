@@ -1,11 +1,11 @@
-import { LocationManager } from "../services/locations/locationManager";
-import { EntranceManager } from "../services/entrances/entranceManager";
-import { GroupManager } from "../services/sections/groupManager";
-import { SectionManager } from "../services/sections/sectionManager";
-import { GenericGameMethod } from "./generic/categoryGenerators/genericGameEnums";
+import { LocationManager } from "../locations/locationManager";
+import { EntranceManager } from "../entrances/entranceManager";
+import { GroupManager } from "../sections/groupManager";
+import { SectionManager } from "../sections/sectionManager";
+import { GenericGameMethod } from "./generic/genericGameEnums";
 import { buildGenericGame } from "./generic/genericGame";
-import { builtInTrackers } from "./builtInTrackers";
-import { InventoryManager } from "../services/inventory/inventoryManager";
+import { builtInTrackers } from "../../games/builtInTrackers";
+import { InventoryManager } from "../inventory/inventoryManager";
 
 const modified = Symbol("modified");
 const TRACKER_CHOICE_KEY = "Archipelago_Checklist_saved_tracker_choices";
@@ -36,7 +36,7 @@ interface Tracker {
     gameTitle?: string;
     gameAbbreviation?: string;
     buildTracker: TrackerBuilder;
-    exportTracker?: () => import("./generic/categoryGenerators/customTrackerManager").CustomCategory_V1;
+    exportTracker?: () => import("./customTrackerManager").CustomCategory_V1;
 }
 
 /** Manages list of registered trackers and can be used to initialize them */

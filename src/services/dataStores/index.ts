@@ -1,6 +1,7 @@
 import ArchipelagoDataStore from "./archipelagoStorage";
-import LocalStorageDataStore from "./localstorage";
+import LocalStorageDataStore from "./localStorage";
+import TempDataStore from "./temp";
 import { DataStore, JSONValue } from "./dataStore";
 
-export { ArchipelagoDataStore, LocalStorageDataStore };
+export { ArchipelagoDataStore, LocalStorageDataStore, TempDataStore };
 export type { DataStore, JSONValue };

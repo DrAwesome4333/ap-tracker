@@ -1,13 +1,12 @@
-import { InventoryManager } from "../../services/inventory/inventoryManager";
-import { LocationManager } from "../../services/locations/locationManager";
-import { generateId } from "../../utility/randomIdGen";
+import { InventoryManager } from "../../inventory/inventoryManager";
+import { LocationManager } from "../../locations/locationManager";
 import { Tracker, TrackerBuilder } from "../TrackerManager";
-import { CustomCategory_V1 } from "./categoryGenerators/customTrackerManager";
-import { GenericGameMethod } from "./categoryGenerators/genericGameEnums";
-import LocationGroupCategoryGenerator from "./categoryGenerators/locationGroup";
+import { CustomCategory_V1 } from "../customTrackerManager";
+import { GenericGameMethod } from "./genericGameEnums";
+import LocationGroupCategoryGenerator from "./locationTrackerGenerators/locationGroup";
 import locationNameGroupGenerator, {
     NameTokenizationOptions,
-} from "./categoryGenerators/locationName";
+} from "./locationTrackerGenerators/locationName";
 
 /** Builds a generic tracker for a given game */
 const buildGenericGame = (
@@ -53,8 +52,8 @@ const buildGenericGame = (
                   }
               );
 
-    const discriminator = generateId(8);
-    const id = `Auto-generated-${gameName}-tracker-${discriminator}`;
+    const id = crypto.randomUUID();
+    const discriminator = id.substring(0, 8);
     const exportTracker = (): CustomCategory_V1 => {
         return {
             id,
@@ -77,7 +76,7 @@ const buildGenericGame = (
     };
 
     return {
-        name: `${gameName} - auto grouped by location groups`,
+        name: `${gameName} - auto generated`,
         id,
         gameName: gameName,
         buildTracker,

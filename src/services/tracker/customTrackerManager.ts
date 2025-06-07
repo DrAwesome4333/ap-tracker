@@ -1,13 +1,12 @@
 // Loads custom JSON supplied by users
-import { generateId } from "../../../utility/randomIdGen";
 import NotificationManager, {
     MessageType,
-} from "../../../services/notifications/notifications";
-import { verifyTrackerConfig } from "./trackerVerification";
-import TrackerManager, { Tracker, TrackerBuilder } from "../../TrackerManager";
-import { GroupData } from "../../../services/sections/groupManager";
-import { SectionConfigData } from "../../../services/sections/sectionManager";
-import { DB_STORE_KEYS, SaveData } from "../../../services/saveData";
+} from "../notifications/notifications";
+import { verifyTrackerConfig } from "./generic/trackerVerification";
+import TrackerManager, { Tracker, TrackerBuilder } from "./TrackerManager";
+import { GroupData } from "../sections/groupManager";
+import { SectionConfigData } from "../sections/sectionManager";
+import { DB_STORE_KEYS, SaveData } from "../saveData";
 const CUSTOM_TRACKER_DIRECTORY_STORAGE_KEY =
     "APChecklist_Custom_Tracker_Directory";
 const CUSTOM_TRACKER_STORAGE_KEY_LEGACY = "APChecklist_Custom_Tracker";
@@ -216,7 +215,7 @@ const addCustomTracker = async (data: CustomCategory_V1) => {
         directory.customLists = directory.customLists.slice(0);
         directory.customLists.splice(currentIndex, 1);
     }
-    const id = data.id ?? generateId();
+    const id = data.id ?? crypto.randomUUID();
     directory.customLists.push({
         id,
         game: data.game,

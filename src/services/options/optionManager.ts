@@ -1,4 +1,9 @@
-import { DataStore, JSONValue, LocalStorageDataStore } from "../dataStores";
+import {
+    DataStore,
+    JSONValue,
+    LocalStorageDataStore,
+    TempDataStore,
+} from "../dataStores";
 import { globalDefaults } from "./defaultOptions";
 const OPTION_LOCAL_STORAGE_ITEM_NAME: string = "AP_CHECKLIST_TRACKER_OPTIONS";
 const DEBUG: boolean = false;
@@ -105,13 +110,6 @@ class OptionManager {
             optionScope.store.write(value, optionName);
         }
 
-        // // call listeners
-        // this.#optionSubscribers
-        //     .get(scope)
-        //     ?.get(optionName)
-        //     ?.forEach((listener) => {
-        //         listener();
-        //     });
         if (DEBUG) {
             console.info(`Set option ${scope}.${optionName} to ${value}`);
         }
@@ -145,6 +143,11 @@ class OptionManager {
         }
     };
 
+    /**
+     * Sets up the backend used for the scope
+     * @param scopeName The name of the scope to configure
+     * @param dataStore The data store to use, must implement getUpdateSubscriber
+     */
     configureScope = (scopeName: string, dataStore: DataStore) => {
         const currentScope = this.#scopes.get(scopeName);
         if (currentScope) {
@@ -159,6 +162,8 @@ class OptionManager {
             store: dataStore,
             cleanUp,
         });
+
+        this.#callListeners(scopeName);
     };
 
     /**
@@ -180,5 +185,6 @@ for (const [name, value] of Object.entries(globalDefaults)) {
 }
 
 globalOptionManager.configureScope("global", globalOptionStore);
+globalOptionManager.configureScope("temp", new TempDataStore());
 
 export { globalOptionManager, OptionManager };

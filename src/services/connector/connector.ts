@@ -13,7 +13,7 @@ import { LocationManager } from "../locations/locationManager";
 import { InventoryManager } from "../inventory/inventoryManager";
 import { EntranceManager } from "../entrances/entranceManager";
 import { TagManager } from "../tags/tagManager";
-import TrackerManager from "../../games/TrackerManager";
+import TrackerManager from "../tracker/TrackerManager";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
