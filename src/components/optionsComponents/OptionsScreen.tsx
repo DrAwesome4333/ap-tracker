@@ -5,7 +5,8 @@ import CustomTrackerOptions from "./CustomTrackerOptions";
 import OptionBlock from "./OptionBlock";
 import StickySpacer from "../shared/StickySpacer";
 import ChecklistSettings from "./ChecklistSettings";
-import ThemeOptions from "./ThemeOptions";
+import { baseTrackerOptions } from "../../services/options/trackerOptions";
+import OptionView from "./OptionView";
 import InventorySettings from "./InventorySettings";
 import LayoutSettings from "./LayoutSettings";
 
@@ -31,7 +32,7 @@ const OptionsScreen = () => {
             }}
         >
             <OptionBlock title="Theme Settings">
-                <ThemeOptions optionManager={optionManager} />
+                <OptionView option={baseTrackerOptions["Theme:base"]} />
             </OptionBlock>
             <OptionBlock title="Tracker Layout">
                 <LayoutSettings />
@@ -40,7 +41,7 @@ const OptionsScreen = () => {
                 <ChecklistSettings optionManager={optionManager} />
             </OptionBlock>
             <OptionBlock title="Inventory Settings">
-                <InventorySettings optionManager={optionManager} />
+                <InventorySettings />
             </OptionBlock>
             <OptionBlock title="Tracker Picker">
                 {trackerManager ? (

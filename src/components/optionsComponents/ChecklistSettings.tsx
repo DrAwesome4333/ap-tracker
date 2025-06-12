@@ -1,7 +1,6 @@
-import React, { useId, useState } from "react";
+import React, { useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../sectionComponents/SectionView";
-import useOption from "../../hooks/optionHook";
 import { LocationManager } from "../../services/locations/locationManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
 import { createGroupManager } from "../../services/sections/groupManager";
@@ -9,6 +8,8 @@ import { createSectionManager } from "../../services/sections/sectionManager";
 import { createTagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
 import { SecondaryButton } from "../buttons";
+import OptionView from "./OptionView";
+import { baseTrackerOptions } from "../../services/options/trackerOptions";
 
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
@@ -107,91 +108,25 @@ const ChecklistSettings = ({
     optionManager: OptionManager;
 }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
-    const checkedLocationBehavior = useOption(
-        optionManager,
-        "LocationTracker:cleared_location_behavior",
-        "global"
-    ) as string;
-    const clearedSectionBehavior = useOption(
-        optionManager,
-        "LocationTracker:cleared_section_behavior",
-        "global"
-    ) as string;
-    const locationOrderBehavior = useOption(
-        optionManager,
-        "LocationTracker:location_order",
-        "global"
-    ) as string;
-    const clearedLocationId = useId();
-    const clearedSectionId = useId();
-    const locationOrderId = useId();
     return (
         <>
-            <label htmlFor={clearedLocationId}>
-                Checked Location Behavior:{" "}
-            </label>
-            <select
-                className="interactive"
-                id={clearedLocationId}
-                value={checkedLocationBehavior}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "LocationTracker:cleared_location_behavior",
-                            "global",
-                            value
-                        );
-                    }
-                }}
-            >
-                <option value="nothing">Nothing</option>
-                <option value="separate">Separate</option>
-                <option value="hide">Hide</option>
-            </select>
-            <br />
-            <label htmlFor={clearedSectionId}>Cleared Section Behavior: </label>
-            <select
-                className="interactive"
-                id={clearedSectionId}
-                value={clearedSectionBehavior}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "LocationTracker:cleared_section_behavior",
-                            "global",
-                            value
-                        );
-                    }
-                }}
-            >
-                <option value="nothing">Nothing</option>
-                <option value="separate">Separate</option>
-                <option value="hide">Hide</option>
-            </select>
-            <br />
-            <label htmlFor={locationOrderId}>Check Order: </label>
-            <select
-                className="interactive"
-                id={locationOrderId}
-                value={locationOrderBehavior}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "LocationTracker:location_order",
-                            "global",
-                            value
-                        );
-                    }
-                }}
-            >
-                <option value="natural">Natural</option>
-                <option value="lexical">Lexical</option>
-                <option value="id">Internal id</option>
-            </select>
-            <br />
+            <OptionView
+                option={
+                    baseTrackerOptions[
+                        "LocationTracker:cleared_location_behavior"
+                    ]
+                }
+            />
+            <OptionView
+                option={
+                    baseTrackerOptions[
+                        "LocationTracker:cleared_section_behavior"
+                    ]
+                }
+            />
+            <OptionView
+                option={baseTrackerOptions["LocationTracker:location_order"]}
+            />
             <br />
             <SecondaryButton
                 $small

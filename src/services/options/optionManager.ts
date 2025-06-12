@@ -4,7 +4,8 @@ import {
     LocalStorageDataStore,
     TempDataStore,
 } from "../dataStores";
-import { globalDefaults } from "./defaultOptions";
+import { OptionType, Option } from "./option";
+import { baseTrackerOptions } from "./trackerOptions";
 const OPTION_LOCAL_STORAGE_ITEM_NAME: string = "AP_CHECKLIST_TRACKER_OPTIONS";
 const DEBUG: boolean = false;
 
@@ -180,9 +181,31 @@ const globalOptionStore = new LocalStorageDataStore(
     OPTION_LOCAL_STORAGE_ITEM_NAME
 );
 
-for (const [name, value] of Object.entries(globalDefaults)) {
-    globalOptionManager.setOptionDefault(name, "global", value);
-}
+const parseOption = (option: Option, parent?: JSONValue) => {
+    if (option.type !== OptionType.hierarchical) {
+        if (parent) {
+            parent[option.name] = option.default;
+        } else {
+            globalOptionManager.setOptionDefault(
+                option.name,
+                "global",
+                option.default
+            );
+        }
+    } else {
+        const value = {};
+        option.children.forEach((child) => parseOption(child, value));
+        if (parent) {
+            parent[option.name] = value;
+        } else {
+            globalOptionManager.setOptionDefault(option.name, "global", value);
+        }
+    }
+};
+
+Object.entries(baseTrackerOptions).forEach(([_name, option]) =>
+    parseOption(option)
+);
 
 globalOptionManager.configureScope("global", globalOptionStore);
 globalOptionManager.configureScope("temp", new TempDataStore());

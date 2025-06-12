@@ -26,6 +26,9 @@ const Container = styled.div`
     margin: auto;
     width: fit-content;
     height: fit-content;
+    max-height: 95vh;
+    max-width: 95vw;
+    overflow: auto;
     padding: 2rem;
     background-color: ${background};
     color: ${textPrimary};
