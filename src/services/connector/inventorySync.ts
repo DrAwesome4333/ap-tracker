@@ -9,6 +9,7 @@ const convertAPItem = (
     return {
         name: item.name,
         id: item.id,
+        uuid: crypto.randomUUID(),
         progression: item.progression,
         useful: item.useful,
         trap: item.trap,

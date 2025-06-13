@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../sectionComponents/SectionView";
-import useOption from "../../hooks/optionHook";
 import { LocationManager } from "../../services/locations/locationManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
 import { createGroupManager } from "../../services/sections/groupManager";
@@ -9,6 +8,8 @@ import { createSectionManager } from "../../services/sections/sectionManager";
 import { createTagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
 import { SecondaryButton } from "../buttons";
+import OptionView from "./OptionView";
+import { baseTrackerOptions } from "../../services/options/trackerOptions";
 
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
@@ -107,93 +108,25 @@ const ChecklistSettings = ({
     optionManager: OptionManager;
 }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
-    const checkedLocationBehavior = useOption(
-        optionManager,
-        "checkedLocationBehavior",
-        "global"
-    ) as string;
-    const clearedSectionBehavior = useOption(
-        optionManager,
-        "clearedSectionBehavior",
-        "global"
-    ) as string;
-    const checkOrderBehavior = useOption(
-        optionManager,
-        "checkOrderBehavior",
-        "global"
-    ) as string;
     return (
         <>
-            <label htmlFor={"checked_location_behavior"}>
-                Checked Location Behavior:{" "}
-            </label>
-            <select
-                className="interactive"
-                id={"checked_location_behavior"}
-                value={checkedLocationBehavior ?? "nothing"}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "checkedLocationBehavior",
-                            "global",
-                            value
-                        );
-                        optionManager.saveScope("global");
-                    }
-                }}
-            >
-                <option value="nothing">Nothing</option>
-                <option value="separate">Separate</option>
-                <option value="hide">Hide</option>
-            </select>
-            <br />
-            <label htmlFor={"cleared_section_behavior"}>
-                Cleared Section Behavior:{" "}
-            </label>
-            <select
-                className="interactive"
-                id={"cleared_section_behavior"}
-                value={clearedSectionBehavior ?? "nothing"}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "clearedSectionBehavior",
-                            "global",
-                            value
-                        );
-                        optionManager.saveScope("global");
-                    }
-                }}
-            >
-                <option value="nothing">Nothing</option>
-                <option value="separate">Separate</option>
-                <option value="hide">Hide</option>
-            </select>
-            <br />
-            <label htmlFor={"check_order_behavior"}>Check Order: </label>
-            <select
-                className="interactive"
-                id={"check_order_behavior"}
-                value={checkOrderBehavior ?? "natural"}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value) {
-                        optionManager.setOptionValue(
-                            "checkOrderBehavior",
-                            "global",
-                            value
-                        );
-                        optionManager.saveScope("global");
-                    }
-                }}
-            >
-                <option value="natural">Natural</option>
-                <option value="lexical">Lexical</option>
-                <option value="id">Internal id</option>
-            </select>
-            <br />
+            <OptionView
+                option={
+                    baseTrackerOptions[
+                        "LocationTracker:cleared_location_behavior"
+                    ]
+                }
+            />
+            <OptionView
+                option={
+                    baseTrackerOptions[
+                        "LocationTracker:cleared_section_behavior"
+                    ]
+                }
+            />
+            <OptionView
+                option={baseTrackerOptions["LocationTracker:location_order"]}
+            />
             <br />
             <SecondaryButton
                 $small

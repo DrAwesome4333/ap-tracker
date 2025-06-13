@@ -32,7 +32,7 @@ const ClientMessage = forwardRef(
                 }}
             >
                 {message.parts.map((part, index) => (
-                    // Parts will never change order, we can keep the index
+                    // Parts will never change order, we can keep the index as the key
                     <MessagePart part={part} key={index} />
                 ))}
             </div>

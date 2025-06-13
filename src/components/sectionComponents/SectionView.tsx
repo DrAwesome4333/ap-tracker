@@ -5,23 +5,8 @@ import ServiceContext from "../../contexts/serviceContext";
 import Icon from "../icons/icons";
 import useOption from "../../hooks/optionHook";
 import { naturalSort } from "../../utility/comparisons";
-import { globalOptionManager } from "../../services/options/optionManager";
 import { useSection } from "../../hooks/sectionHooks";
 import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
-
-globalOptionManager.setOptionDefault(
-    "checkedLocationBehavior",
-    "global",
-    "nothing"
-);
-
-globalOptionManager.setOptionDefault(
-    "checkedSectionBehavior",
-    "global",
-    "nothing"
-);
-
-globalOptionManager.setOptionDefault("checkOrderBehavior", "global", "natural");
 
 const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     return (
@@ -81,19 +66,19 @@ const SectionView = ({
     const totalLocationCount = section?.checkReport.existing.size ?? 0;
     const checkedLocationBehavior = useOption(
         optionManager,
-        "checkedLocationBehavior",
+        "LocationTracker:cleared_location_behavior",
         "global"
     ) as "nothing" | "separate" | "hide";
 
     const clearedSectionBehavior = useOption(
         optionManager,
-        "clearedSectionBehavior",
+        "LocationTracker:cleared_section_behavior",
         "global"
     ) as "nothing" | "separate" | "hide";
 
     const locationOrderBehavior = useOption(
         optionManager,
-        "checkOrderBehavior",
+        "LocationTracker:location_order",
         "global"
     ) as "lexical" | "natural" | "id";
 
@@ -141,7 +126,12 @@ const SectionView = ({
         );
         locationNames.sort(locationCompare);
         return locationNames;
-    }, [locationOrderBehavior, section?.checks, locationManager]);
+    }, [
+        locationOrderBehavior,
+        checkedLocationBehavior,
+        section?.checks,
+        locationManager,
+    ]);
 
     /**
      * Compares two sections to determine their relative order

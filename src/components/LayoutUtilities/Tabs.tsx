@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { generateId } from "../../utility/randomIdGen";
 import {
     background,
     filledTextPrimary,
@@ -17,7 +16,7 @@ class Tab {
     constructor(name: string, content: React.ReactNode) {
         this.name = name;
         this.content = content;
-        this.key = generateId();
+        this.key = crypto.randomUUID();
     }
 }
 

@@ -2,7 +2,7 @@ import React from "react";
 import { useTrackerDirectory } from "../../hooks/trackerHooks";
 import TrackerDropdown from "./TrackerDropdown";
 import { tertiary } from "../../constants/colors";
-import TrackerManager from "../../games/TrackerManager";
+import TrackerManager from "../../services/tracker/TrackerManager";
 
 /**
  * A UI for selecting which tracker to use with which game

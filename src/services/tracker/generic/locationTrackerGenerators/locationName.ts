@@ -1,6 +1,6 @@
-import { GroupData } from "../../../services/sections/groupManager";
-import { SectionConfigData } from "../../../services/sections/sectionManager";
-import { naturalSort } from "../../../utility/comparisons";
+import { GroupData } from "../../../sections/groupManager";
+import { SectionConfigData } from "../../../sections/sectionManager";
+import { naturalSort } from "../../../../utility/comparisons";
 
 class TrieNode {
     children: Map<string, TrieNode>;
@@ -249,7 +249,7 @@ const generateCategories = (
         currentLevelGroups.clear();
         nextLevelGroups.forEach((group) => currentLevelGroups.add(group));
     }
-    // debugger;
+
     const groupConfig: { [groupKey: string]: GroupData } = {};
     const categoryConfig: SectionConfigData = {
         categories: {},

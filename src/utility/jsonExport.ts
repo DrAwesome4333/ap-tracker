@@ -11,7 +11,7 @@ const exportJSONFile = (fileName: string, data: unknown, pretty?: boolean) => {
     const blobURL = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = blobURL;
-    link.download = `${fileName}.json`;
+    link.download = `${encodeURIComponent(fileName)}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

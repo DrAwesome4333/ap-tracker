@@ -1,10 +1,11 @@
 const DB_STORE_KEYS = {
     dataPackageCache: "data_packages",
-    locationGroupCache: "location_groups",
+    locationGroupCache_deprecated: "location_groups",
+    groupCache: "cached_groups",
     customTrackers: "custom_trackers",
 };
 
-const database_request = window.indexedDB.open("checklist_db", 4);
+const database_request = window.indexedDB.open("checklist_db", 5);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -32,9 +33,18 @@ database_request.onupgradeneeded = (_event) => {
         );
         dataPackageStore.createIndex("seed", "seed", { unique: true });
     }
-    if (!db.objectStoreNames.contains(DB_STORE_KEYS.locationGroupCache)) {
+
+    if (
+        db.objectStoreNames.contains(
+            DB_STORE_KEYS.locationGroupCache_deprecated
+        )
+    ) {
+        db.deleteObjectStore(DB_STORE_KEYS.locationGroupCache_deprecated);
+    }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.groupCache)) {
         const locationGroupStore = db.createObjectStore(
-            DB_STORE_KEYS.locationGroupCache,
+            DB_STORE_KEYS.groupCache,
             { keyPath: "connectionId" }
         );
         locationGroupStore.createIndex("connectionId", "connectionId", {

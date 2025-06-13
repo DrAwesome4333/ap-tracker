@@ -14,6 +14,10 @@ Going forward, default colors selected for the app should try their best to meet
 
 The app should be completely navigable via keyboard only.
 
+## Mobile Support
+
+The app and all of its features should be completely usable on mobile devices.
+
 ## Alternative text
 
 While the app does not make use of many images yet, all future images and icons should have alt text applied to them to describe what they are in the event the image does not load or is unclear to a new user.

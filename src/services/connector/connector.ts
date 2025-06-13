@@ -13,7 +13,7 @@ import { LocationManager } from "../locations/locationManager";
 import { InventoryManager } from "../inventory/inventoryManager";
 import { EntranceManager } from "../entrances/entranceManager";
 import { TagManager } from "../tags/tagManager";
-import TrackerManager from "../../games/TrackerManager";
+import TrackerManager from "../tracker/TrackerManager";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
@@ -111,7 +111,7 @@ const createConnector = (
     let apTags = ["Tracker", "Checklist"];
     let receiveText =
         (globalOptionManager.getOptionValue(
-            "showTextClient",
+            "TextClient:show",
             "global"
         ) as boolean) ?? true;
 
@@ -128,14 +128,14 @@ const createConnector = (
     const toggleText = () => {
         receiveText =
             (globalOptionManager.getOptionValue(
-                "showTextClient",
+                "TextClient:show",
                 "global"
             ) as boolean) ?? true;
         updateTags();
     };
 
     globalOptionManager.getSubscriberCallback(
-        "showTextClient",
+        "TextClient:show",
         "global"
     )(toggleText);
 
@@ -281,17 +281,19 @@ const createConnector = (
                 setAPLocations(client, locationManager);
                 // Load groups from save data or request them from AP
                 const getGroups = async (): Promise<{
-                    [groupName: string]: string[];
+                    item: { [name: string]: string[] };
+                    location: { [name: string]: string[] };
                 }> => {
+                    // delete(itemGroups[`_read_item_name_groups_${client.game}`]['Everything']);
                     const cachedGroups =
-                        await SavedConnectionManager.getCachedLocationGroups(
+                        await SavedConnectionManager.getCachedGroups(
                             connection.slotInfo.connectionId
                         );
                     if (cachedGroups) {
                         return cachedGroups;
                     }
                     // @ts-expect-error, typing error in archipelago.js
-                    const groups: { [groupName: string]: string[] } =
+                    const locationGroups: { [groupName: string]: string[] } =
                         await client.storage
                             .fetchLocationNameGroups(client.game)
                             .then(
@@ -300,18 +302,33 @@ const createConnector = (
                                         `_read_location_name_groups_${client.game}`
                                     ]
                             );
-                    SavedConnectionManager.cacheLocationGroups(
+                    // @ts-expect-error, typing error in archipelago.js
+                    const itemGroups: { [groupName: string]: string[] } =
+                        await client.storage
+                            .fetchItemNameGroups(client.game)
+                            .then(
+                                (a) =>
+                                    a[`_read_item_name_groups_${client.game}`]
+                            );
+                    const groups = {
+                        item: itemGroups,
+                        location: locationGroups,
+                    };
+                    SavedConnectionManager.cacheGroups(
                         connection.slotInfo.connectionId,
                         groups
                     );
                     return groups;
                 };
                 getGroups().then(
-                    (groups: { [groupName: string]: string[] }) => {
+                    async (groups: {
+                        item: { [name: string]: string[] };
+                        location: { [name: string]: string[] };
+                    }) => {
                         trackerManager.initializeTracker({
                             gameName: savedConnectionInfo.game,
                             entranceManager,
-                            slotData: {},
+                            slotData: await client.players.self.fetchSlotData(),
                             groups,
                         });
                         tagManager.loadTags(connection.slotInfo.connectionId);

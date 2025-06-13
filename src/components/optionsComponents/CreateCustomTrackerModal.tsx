@@ -7,12 +7,12 @@ import CustomTrackerHelpModal from "./CustomTrackerHelpModal";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
-import CustomTrackerManager from "../../games/generic/categoryGenerators/customTrackerManager";
-import TrackerManager from "../../games/TrackerManager";
+import CustomTrackerManager from "../../services/tracker/customTrackerManager";
+import TrackerManager from "../../services/tracker/TrackerManager";
 import { tertiary } from "../../constants/colors";
 import ServiceContext from "../../contexts/serviceContext";
-import { buildGenericGame } from "../../games/generic/genericGame";
-import { GenericGameMethod } from "../../games/generic/categoryGenerators/genericGameEnums";
+import { buildGenericGame } from "../../services/tracker/generic/genericGame";
+import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import { exportJSONFile } from "../../utility/jsonExport";
 import Icon from "../icons/icons";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
@@ -149,13 +149,14 @@ const CreateCustomTrackerModal = ({
                                             const tracker = buildGenericGame(
                                                 connector.slotInfo.game,
                                                 services.locationManager,
+                                                services.inventoryManager,
                                                 trackerData.groups,
                                                 GenericGameMethod.locationGroup
                                             );
                                             const trackerJSON =
                                                 tracker.exportTracker();
                                             exportJSONFile(
-                                                `tracker-export-${Date.now().toString()}`,
+                                                `tracker-export-${tracker.gameName}-${Date.now().toString()}`,
                                                 trackerJSON,
                                                 true
                                             );

@@ -26,6 +26,9 @@ const Container = styled.div`
     margin: auto;
     width: fit-content;
     height: fit-content;
+    max-height: 95vh;
+    max-width: 95vw;
+    overflow: auto;
     padding: 2rem;
     background-color: ${background};
     color: ${textPrimary};
@@ -49,7 +52,7 @@ const Modal = ({
 }) => {
     const serviceContext = useContext(ServiceContext);
     const optionManger = serviceContext.optionManager ?? globalOptionManager;
-    const themeValue = useOption(optionManger, "theme", "global") as
+    const themeValue = useOption(optionManger, "Theme:base", "global") as
         | "light"
         | "dark"
         | "system"

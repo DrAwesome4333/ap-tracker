@@ -1,6 +1,6 @@
-import { LocationManager } from "../../../services/locations/locationManager";
-import { GroupData } from "../../../services/sections/groupManager";
-import { SectionConfigData } from "../../../services/sections/sectionManager";
+import { LocationManager } from "../../locations/locationManager";
+import { GroupData } from "../../sections/groupManager";
+import { SectionConfigData } from "../../sections/sectionManager";
 
 /**
  * Performs validation checks on section and group data provided

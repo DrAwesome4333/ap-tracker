@@ -1,18 +1,22 @@
-import { LocationManager } from "../../services/locations/locationManager";
-import { generateId } from "../../utility/randomIdGen";
+import { InventoryManager } from "../../inventory/inventoryManager";
+import { LocationManager } from "../../locations/locationManager";
 import { Tracker, TrackerBuilder } from "../TrackerManager";
-import { CustomCategory_V1 } from "./categoryGenerators/customTrackerManager";
-import { GenericGameMethod } from "./categoryGenerators/genericGameEnums";
-import LocationGroupCategoryGenerator from "./categoryGenerators/locationGroup";
+import { CustomCategory_V1 } from "../customTrackerManager";
+import { GenericGameMethod } from "./genericGameEnums";
+import LocationGroupCategoryGenerator from "./locationTrackerGenerators/locationGroup";
 import locationNameGroupGenerator, {
     NameTokenizationOptions,
-} from "./categoryGenerators/locationName";
+} from "./locationTrackerGenerators/locationName";
 
 /** Builds a generic tracker for a given game */
 const buildGenericGame = (
     gameName: string,
     locationManager: LocationManager,
-    locationGroups: { [locationGroupName: string]: string[] },
+    inventoryManager: InventoryManager,
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    },
     method: GenericGameMethod = GenericGameMethod.locationGroup,
     parameters: {
         useAllChecksInDataPackage?: boolean;
@@ -28,11 +32,11 @@ const buildGenericGame = (
         LocationManager.filters.exist
     );
     if (parameters.useAllChecksInDataPackage ?? true) {
-        locations = new Set(locationGroups["Everywhere"]);
+        locations = new Set(groups.location["Everywhere"]);
     }
     const { groupConfig, categoryConfig } =
         method === GenericGameMethod.locationGroup
-            ? LocationGroupCategoryGenerator.generateCategories(locationGroups)
+            ? LocationGroupCategoryGenerator.generateCategories(groups.location)
             : locationNameGroupGenerator.generateCategories(
                   locations,
                   {
@@ -48,8 +52,8 @@ const buildGenericGame = (
                   }
               );
 
-    const discriminator = generateId(8);
-    const id = `Auto-generated-${gameName}-tracker-${discriminator}`;
+    const id = crypto.randomUUID();
+    const discriminator = id.substring(0, 8);
     const exportTracker = (): CustomCategory_V1 => {
         return {
             id,
@@ -61,20 +65,18 @@ const buildGenericGame = (
         };
     };
 
-    const buildTracker: TrackerBuilder = (
-        _locationManager,
-        _entranceManager,
+    const buildTracker: TrackerBuilder = async ({
         groupManager,
         sectionManager,
-        _slotData
-    ) => {
+    }) => {
         // configure groups and sections
         groupManager.loadGroups(groupConfig);
         sectionManager.setConfiguration(categoryConfig);
+        inventoryManager.setItemGroups(groups.item);
     };
 
     return {
-        name: `${gameName} - auto grouped by location groups`,
+        name: `${gameName} - auto generated`,
         id,
         gameName: gameName,
         buildTracker,

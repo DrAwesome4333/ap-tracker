@@ -8,19 +8,20 @@ import { LocationManager } from "../../services/locations/locationManager";
 import { createGroupManager } from "../../services/sections/groupManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
 import { createSectionManager } from "../../services/sections/sectionManager";
-import TrackerManager from "../../games/TrackerManager";
+import TrackerManager from "../../services/tracker/TrackerManager";
 import ServiceContext from "../../contexts/serviceContext";
-import { NameTokenizationOptions } from "../../games/generic/categoryGenerators/locationName";
+import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
 import SectionView from "../sectionComponents/SectionView";
 import { createTagManager } from "../../services/tags/tagManager";
-import { buildGenericGame } from "../../games/generic/genericGame";
-import { GenericGameMethod } from "../../games/generic/categoryGenerators/genericGameEnums";
+import { buildGenericGame } from "../../services/tracker/generic/genericGame";
+import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
-import CustomTrackerManager from "../../games/generic/categoryGenerators/customTrackerManager";
+import CustomTrackerManager from "../../services/tracker/customTrackerManager";
 import { exportJSONFile } from "../../utility/jsonExport";
+import { InventoryManager } from "../../services/inventory/inventoryManager";
 
 interface AdditionalParams {
     useAllChecksInDataPackage?: boolean;
@@ -48,6 +49,7 @@ const previewLocationManager = new LocationManager();
 const previewEntranceManager = createEntranceManager();
 const previewGroupManager = createGroupManager(previewEntranceManager);
 const previewTagManager = createTagManager(previewLocationManager);
+const previewInventoryManager = new InventoryManager();
 const previewSectionManager = createSectionManager(
     previewLocationManager,
     previewEntranceManager,
@@ -56,7 +58,8 @@ const previewSectionManager = createSectionManager(
 const previewTrackerManager = new TrackerManager(
     previewLocationManager,
     previewGroupManager,
-    previewSectionManager
+    previewSectionManager,
+    previewInventoryManager
 );
 
 const NameAnalysisModal = ({
@@ -125,11 +128,13 @@ const NameAnalysisModal = ({
             previewTrackerManager.initializeTracker(mainTrackerParams);
             previewLocationManager.pauseUpdateBroadcast();
             previewLocationManager.deleteAllLocations();
-            mainTrackerParams.groups["Everywhere"].forEach((location) => {
-                previewLocationManager.updateLocationStatus(location, {
-                    exists: true,
-                });
-            });
+            mainTrackerParams.groups.location["Everywhere"].forEach(
+                (location) => {
+                    previewLocationManager.updateLocationStatus(location, {
+                        exists: true,
+                    });
+                }
+            );
             previewLocationManager.resumeUpdateBroadcast();
         }
 
@@ -137,6 +142,7 @@ const NameAnalysisModal = ({
             const tracker = buildGenericGame(
                 mainTrackerParams.gameName,
                 services.locationManager,
+                services.inventoryManager,
                 mainTrackerParams.groups,
                 GenericGameMethod.nameAnalysis,
                 {
@@ -414,7 +420,7 @@ const NameAnalysisModal = ({
                             return;
                         }
                         exportJSONFile(
-                            `tracker-export-${Date.now().toString()}`,
+                            `tracker-export-${customTracker.gameName}-${Date.now().toString()}`,
                             customTracker.exportTracker()
                         );
                     }}

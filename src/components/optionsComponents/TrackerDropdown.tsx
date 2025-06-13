@@ -6,7 +6,7 @@ import {
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
-import TrackerManager from "../../games/TrackerManager";
+import TrackerManager from "../../services/tracker/TrackerManager";
 import { naturalSort } from "../../utility/comparisons";
 /**
  * Displays a drop down with a list of options available for trackers for the provided game name

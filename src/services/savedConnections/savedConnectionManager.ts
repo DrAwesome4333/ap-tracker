@@ -3,6 +3,7 @@
 import { DataPackage } from "archipelago.js";
 import { TagData } from "../tags/tagManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
+import { JSONValue } from "../dataStores/dataStore";
 
 /** Data that can be used to create a new Saved Connection */
 interface SavedConnectionInfo {
@@ -50,7 +51,15 @@ interface SavedConnection_V3 {
     lastUsedTime: number;
     createdTime: number;
     version: 3;
-    settings: unknown;
+    settings: {
+        /** Which trackers are in use for this slot */
+        itemTracker?: string;
+        locationTracker?: string;
+        /** Options set by trackers */
+        trackerOptions?: {
+            [trackerId: string]: JSONValue;
+        };
+    };
     saveData?: {
         tagData?: {
             [tagId: string]: TagData;
@@ -260,31 +269,40 @@ const deleteDataPackage = (seed: string): Promise<boolean> => {
     return SaveData.deleteItem(DB_STORE_KEYS.dataPackageCache, seed);
 };
 
-const getCachedLocationGroups = async (
+const getCachedGroups = async (
     connectionId: string
-): Promise<{ [name: string]: string[] }> => {
+): Promise<{
+    item: { [name: string]: string[] };
+    location: { [name: string]: string[] };
+}> => {
     const groups = (await SaveData.getItem(
-        DB_STORE_KEYS.locationGroupCache,
+        DB_STORE_KEYS.groupCache,
         connectionId
     )) as {
         connectionId: string;
-        groups: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+        item: { [name: string]: string[] };
     };
-    return groups ? groups.groups : null;
+    return groups && groups.location && groups.item
+        ? { location: groups.location, item: groups.item }
+        : null;
 };
 
-const cacheLocationGroups = (
+const cacheGroups = (
     connectionId: string,
-    groups: { [name: string]: string[] }
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    }
 ): Promise<boolean> => {
-    return SaveData.storeItem(DB_STORE_KEYS.locationGroupCache, {
+    return SaveData.storeItem(DB_STORE_KEYS.groupCache, {
         connectionId,
         groups,
     });
 };
 
 const deleteLocationGroups = (connectionId: string): Promise<boolean> => {
-    return SaveData.deleteItem(DB_STORE_KEYS.locationGroupCache, connectionId);
+    return SaveData.deleteItem(DB_STORE_KEYS.groupCache, connectionId);
 };
 
 /**
@@ -332,9 +350,9 @@ const SavedConnectionManager = {
     saveConnectionData,
     getExistingConnections,
     getCachedDataPackage,
-    getCachedLocationGroups,
+    getCachedGroups,
     cacheDataPackage,
-    cacheLocationGroups,
+    cacheGroups,
     getConnectionInfo,
     loadSavedConnectionData,
     deleteConnection,

@@ -1,7 +1,7 @@
 import React, { forwardRef, Fragment, useContext, useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import Icon from "../icons/icons";
-import { textPrimary } from "../../constants/colors";
+import { tertiary, textPrimary } from "../../constants/colors";
 import { GhostButton } from "../buttons";
 import { useLocationStatus } from "../../hooks/sectionHooks";
 
@@ -60,7 +60,7 @@ const LocationView = forwardRef(
                         type={iconType}
                         style={{ color: iconColor }}
                     />{" "}
-                    {location}
+                    {status.displayName ?? location}
                     {connection && tagManager && (
                         <>
                             {!status.checked && (
@@ -150,31 +150,41 @@ const LocationView = forwardRef(
                         </>
                     )}
                 </span>
-                {showDetails &&
-                    status.tags.map((tag) => (
-                        <Fragment key={tag.tagId}>
-                            <br />
+                {showDetails && (
+                    <>
+                        {status.displayName && (
                             <div
-                                key={tag.tagId}
-                                style={{
-                                    marginLeft: "1rem",
-                                    color: tag.type.textColor ?? textPrimary,
-                                    textDecoration: "none",
-                                    display: "inline-block",
-                                }}
-                            >
-                                <Icon
-                                    fontSize="14px"
-                                    type={tag.type.icon}
+                                style={{ marginLeft: "1em", color: tertiary }}
+                            >{`Server Name: ${location}`}</div>
+                        )}
+                        {status.tags.map((tag) => (
+                            <Fragment key={tag.tagId}>
+                                <br />
+                                <div
+                                    key={tag.tagId}
                                     style={{
+                                        marginLeft: "1rem",
                                         color:
-                                            tag.type.iconColor ?? textPrimary,
+                                            tag.type.textColor ?? textPrimary,
+                                        textDecoration: "none",
+                                        display: "inline-block",
                                     }}
-                                />{" "}
-                                {tag.text ?? tag.type.displayName}
-                            </div>
-                        </Fragment>
-                    ))}
+                                >
+                                    <Icon
+                                        fontSize="14px"
+                                        type={tag.type.icon}
+                                        style={{
+                                            color:
+                                                tag.type.iconColor ??
+                                                textPrimary,
+                                        }}
+                                    />{" "}
+                                    {tag.text ?? tag.type.displayName}
+                                </div>
+                            </Fragment>
+                        ))}
+                    </>
+                )}
             </div>
         );
     }

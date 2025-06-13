@@ -1,25 +1,32 @@
-import { LocationManager } from "../services/locations/locationManager";
-import { EntranceManager } from "../services/entrances/entranceManager";
-import { GroupManager } from "../services/sections/groupManager";
-import { SectionManager } from "../services/sections/sectionManager";
-import { GenericGameMethod } from "./generic/categoryGenerators/genericGameEnums";
+import { LocationManager } from "../locations/locationManager";
+import { EntranceManager } from "../entrances/entranceManager";
+import { GroupManager } from "../sections/groupManager";
+import { SectionManager } from "../sections/sectionManager";
+import { GenericGameMethod } from "./generic/genericGameEnums";
 import { buildGenericGame } from "./generic/genericGame";
+import { builtInTrackers } from "../../games/builtInTrackers";
+import { InventoryManager } from "../inventory/inventoryManager";
 
 const modified = Symbol("modified");
 const TRACKER_CHOICE_KEY = "Archipelago_Checklist_saved_tracker_choices";
 
-type TrackerBuilder = (
-    locationManager: LocationManager,
-    entranceManager: EntranceManager,
-    groupManager: GroupManager,
-    sectionManager: SectionManager,
-    slotData: unknown
-) => void;
+interface TrackerBuilderParams {
+    locationManager: LocationManager;
+    entranceManager: EntranceManager;
+    groupManager: GroupManager;
+    sectionManager: SectionManager;
+    slotData: unknown;
+}
+
+type TrackerBuilder = (params: TrackerBuilderParams) => Promise<void>;
 type TrackerInitParams = {
     gameName: string;
     entranceManager: EntranceManager;
     slotData?: unknown;
-    groups: { [groupName: string]: string[] };
+    groups: {
+        item: { [name: string]: string[] };
+        location: { [name: string]: string[] };
+    };
 };
 
 interface Tracker {
@@ -29,7 +36,7 @@ interface Tracker {
     gameTitle?: string;
     gameAbbreviation?: string;
     buildTracker: TrackerBuilder;
-    exportTracker?: () => import("./generic/categoryGenerators/customTrackerManager").CustomCategory_V1;
+    exportTracker?: () => import("./customTrackerManager").CustomCategory_V1;
 }
 
 /** Manages list of registered trackers and can be used to initialize them */
@@ -40,6 +47,7 @@ class TrackerManager {
     #locationManager: LocationManager;
     #sectionManager: SectionManager;
     #groupManager: GroupManager;
+    #inventoryManager: InventoryManager;
     static #managers: Set<TrackerManager> = new Set();
     static #allTrackers: Map<string, Tracker> = new Map();
     static #trackersByGame: Map<string, Set<string>> = new Map();
@@ -132,12 +140,14 @@ class TrackerManager {
     constructor(
         locationManager: LocationManager,
         groupManager: GroupManager,
-        sectionManager: SectionManager
+        sectionManager: SectionManager,
+        inventoryManager: InventoryManager
     ) {
         TrackerManager.#managers.add(this);
         this.#locationManager = locationManager;
         this.#groupManager = groupManager;
         this.#sectionManager = sectionManager;
+        this.#inventoryManager = inventoryManager;
     }
 
     /** Returns a callback that can have a listener passed in that will be called when tracker changes occur and returns a clean up call.*/
@@ -218,18 +228,19 @@ class TrackerManager {
             tracker = buildGenericGame(
                 gameName,
                 this.#locationManager,
+                this.#inventoryManager,
                 groups,
                 GenericGameMethod.locationGroup
             );
         }
         this.#sectionManager.deleteAllSections();
-        tracker.buildTracker(
-            this.#locationManager,
-            entranceManager,
-            this.#groupManager,
-            this.#sectionManager,
-            slotData
-        );
+        tracker.buildTracker({
+            locationManager: this.#locationManager,
+            entranceManager: entranceManager,
+            groupManager: this.#groupManager,
+            sectionManager: this.#sectionManager,
+            slotData,
+        });
     };
 
     initializeTracker = (initParams: TrackerInitParams) => {
@@ -265,6 +276,10 @@ class TrackerManager {
         this.#trackerListeners.forEach((listener) => listener());
     };
 }
+
+builtInTrackers.forEach((tracker) =>
+    TrackerManager.directory.addTracker(tracker)
+);
 
 export default TrackerManager;
 export type { Tracker, TrackerBuilder, TrackerInitParams };

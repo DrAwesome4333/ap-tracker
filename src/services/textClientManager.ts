@@ -6,7 +6,6 @@ import {
     ValidJSONColorType,
 } from "archipelago.js";
 import { globalOptionManager } from "./options/optionManager";
-import { generateId } from "../utility/randomIdGen";
 
 interface APMessage {
     parts: (MessageNode | EchoMessageNode)[];
@@ -34,15 +33,6 @@ type MessageFilter = {
         others: ItemType[];
     };
 };
-
-globalOptionManager.loadScope("textClient");
-globalOptionManager.setOptionDefault("messageFilter", "textClient", {
-    allowedTypes: ["command", "chat", "status", "login", "misc", "item"],
-    itemSendFilter: {
-        own: ["trap", "progression", "useful", "normal"],
-        others: ["trap", "progression", "useful", "normal"],
-    },
-} as MessageFilter);
 
 const messageTypeCategoryMap = {
     adminCommand: "command",
@@ -95,7 +85,7 @@ class TextClientManager {
             },
         ];
         const apMessage: APMessage = {
-            key: generateId(),
+            key: crypto.randomUUID(),
             parts,
         };
         this.#messages = [...this.#messages, apMessage];
@@ -114,8 +104,8 @@ class TextClientManager {
         client: Client
     ): boolean => {
         const messageFilter: MessageFilter = globalOptionManager.getOptionValue(
-            "messageFilter",
-            "textClient"
+            "TextClient:message_filter",
+            "global"
         ) as MessageFilter;
         const simplifiedType: SimpleMessageType = messageTypeCategoryMap[type];
 
@@ -184,7 +174,7 @@ class TextClientManager {
     #addMessage = (nodes: MessageNode[]) => {
         const parts = nodes;
         const apMessage: APMessage = {
-            key: generateId(),
+            key: crypto.randomUUID(),
             parts,
         };
         this.#messages = [...this.#messages, apMessage];

@@ -12,15 +12,15 @@ import ServiceContext from "./contexts/serviceContext";
 import { createGroupManager } from "./services/sections/groupManager";
 import { createSectionManager } from "./services/sections/sectionManager";
 import { createTagManager } from "./services/tags/tagManager";
-import { createInventoryManager } from "./services/inventory/inventoryManager";
+import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
 import { background, textPrimary } from "./constants/colors";
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
-import TrackerManager from "./games/TrackerManager";
-import CustomTrackerManager from "./games/generic/categoryGenerators/customTrackerManager";
+import TrackerManager from "./services/tracker/TrackerManager";
+import CustomTrackerManager from "./services/tracker/customTrackerManager";
 import TextClientManager from "./services/textClientManager";
 
 const AppScreen = styled.div`
@@ -45,7 +45,7 @@ const AppScreen = styled.div`
 `;
 
 const locationManager = new LocationManager();
-const inventoryManager = createInventoryManager();
+const inventoryManager = new InventoryManager();
 const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 const groupManager = createGroupManager(entranceManager);
@@ -58,7 +58,8 @@ const tagManager = createTagManager(locationManager);
 const trackerManager = new TrackerManager(
     locationManager,
     groupManager,
-    sectionManager
+    sectionManager,
+    inventoryManager
 );
 
 const textClientManager = new TextClientManager();
@@ -85,7 +86,7 @@ const App = (): React.ReactNode => {
         () => connection.slotInfo
     );
     const [optionWindowOpen, setOptionWindowOpen] = useState(false);
-    const themeValue = useOption(optionManager, "theme", "global") as
+    const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
         | "system"
