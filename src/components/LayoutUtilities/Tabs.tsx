@@ -8,6 +8,7 @@ import {
     textPrimary,
 } from "../../constants/colors";
 import styled from "styled-components";
+import { randomUUID } from "../../utility/uuid";
 
 class Tab {
     name: string;
@@ -16,7 +17,7 @@ class Tab {
     constructor(name: string, content: React.ReactNode) {
         this.name = name;
         this.content = content;
-        this.key = crypto.randomUUID();
+        this.key = randomUUID();
     }
 }
 

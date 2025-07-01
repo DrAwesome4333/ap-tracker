@@ -1,12 +1,11 @@
 import { useSyncExternalStore } from "react";
-import { SectionManager } from "../services/sections/sectionManager";
 import { LocationManager } from "../services/locations/locationManager";
 
-const useSection = (sectionManager: SectionManager, name: string) => {
+const useSection = (tracker: DropdownLocationTracker, name: string) => {
     return useSyncExternalStore(
-        sectionManager.getSubscriberCallback(name),
-        () => sectionManager.getSectionStatus(name),
-        () => sectionManager.getSectionStatus(name)
+        tracker?.getUpdateSubscriber(name),
+        () => tracker?.getSection(name),
+        () => tracker?.getSection(name)
     );
 };
 

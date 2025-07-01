@@ -3,22 +3,56 @@ import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../sectionComponents/SectionView";
 import { LocationManager } from "../../services/locations/locationManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
-import { createGroupManager } from "../../services/sections/groupManager";
-import { createSectionManager } from "../../services/sections/sectionManager";
 import { createTagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
 import { SecondaryButton } from "../buttons";
 import OptionView from "./OptionView";
 import { baseTrackerOptions } from "../../services/options/trackerOptions";
-
+import CustomLocationTracker from "../../services/tracker/locationTrackers/CustomLocationTracker";
+import { ResourceType, LocationTrackerType } from "../../services/tracker/resourceEnums";
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
-const mockGroupManager = createGroupManager(mockEntranceManager);
-const mockSectionManager = createSectionManager(
-    mockLocationManager,
-    mockEntranceManager,
-    mockGroupManager
-);
+const mockLocationTracker = new CustomLocationTracker({
+    manifest:{
+        type: ResourceType.locationTracker,
+        uuid: null,
+        repositoryUuid: null,
+        name: "Mock Location Tracker",
+        game: null,
+        locationTrackerType: LocationTrackerType.dropdown,
+        formatVersion: 2,
+        version: "0.0.0",
+    },
+    themes: {
+        default:{
+            color:"#888888"
+        }
+    },
+    sections: {
+            root: {
+            title: "Numbers",
+            theme: "default",
+            children: ["one", "primes", "composites", "tens"],
+        },
+        one: {
+            title: "One",
+            locations: ["Location 1"],
+        },
+        primes: {
+            title: "Primes",
+            locations: ["Location 2", "Location 3", "Location 5", "Location 7"],
+        },
+        composites: {
+            title: "Composites",
+            locations: ["Location 4", "Location 6", "Location 8", "Location 9"],
+        },
+        tens: {
+            title: "Tens",
+            locations: ["Location 10"]
+        },
+    }
+}, mockLocationManager, null);
+
 const mockTagManager = createTagManager(mockLocationManager);
 
 mockLocationManager.updateLocationStatus("Location 1", {
@@ -43,64 +77,6 @@ mockLocationManager.updateLocationStatus("Location 8", {
 });
 mockLocationManager.updateLocationStatus("Location 9", { exists: true });
 
-mockGroupManager.loadGroups({
-    one: {
-        checks: ["Location 1"],
-    },
-    prime: {
-        checks: ["Location 2", "Location 3", "Location 5", "Location 7"],
-    },
-    composite: {
-        checks: ["Location 4", "Location 6", "Location 8", "Location 9"],
-    },
-    tens: {
-        checks: [],
-    },
-});
-
-mockSectionManager.setConfiguration({
-    categories: {
-        root: {
-            title: "Numbers",
-            type: null,
-            groupKey: null,
-            theme: "default",
-            children: ["one", "primes", "composites", "tens"],
-        },
-        one: {
-            title: "One",
-            type: null,
-            groupKey: "one",
-            theme: "default",
-            children: null,
-        },
-        primes: {
-            title: "Primes",
-            type: null,
-            groupKey: "prime",
-            theme: "default",
-            children: null,
-        },
-        composites: {
-            title: "Composites",
-            type: null,
-            groupKey: "composite",
-            theme: "default",
-            children: null,
-        },
-        tens: {
-            title: "Tens",
-            type: null,
-            groupKey: "tens",
-            theme: "default",
-            children: null,
-        },
-    },
-    options: {},
-    themes: {
-        default: { color: "#888888" },
-    },
-});
 
 const ChecklistSettings = ({
     optionManager,
@@ -141,8 +117,7 @@ const ChecklistSettings = ({
                     value={{
                         locationManager: mockLocationManager,
                         entranceManager: mockEntranceManager,
-                        groupManager: mockGroupManager,
-                        sectionManager: mockSectionManager,
+                        locationTracker: mockLocationTracker,
                         tagManager: mockTagManager,
                         optionManager,
                     }}

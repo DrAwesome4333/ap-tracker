@@ -1,6 +1,5 @@
-import { GroupData } from "../../../sections/groupManager";
-import { SectionConfigData } from "../../../sections/sectionManager";
 import { naturalSort } from "../../../../utility/comparisons";
+import { randomUUID } from "../../../../utility/uuid";
 
 class TrieNode {
     children: Map<string, TrieNode>;
@@ -209,7 +208,7 @@ const sectionName = (name: string) => {
     return `section_${name}`;
 };
 
-const generateCategories = (
+const generateSectionDef = (
     checks: Set<string>,
     nameTokenizationOptions: NameTokenizationOptions,
     requirementParams: {
@@ -250,10 +249,22 @@ const generateCategories = (
         nextLevelGroups.forEach((group) => currentLevelGroups.add(group));
     }
 
-    const groupConfig: { [groupKey: string]: GroupData } = {};
-    const categoryConfig: SectionConfigData = {
-        categories: {},
-        options: {},
+    const trackerGroups: { [groupKey: string]: GroupData_V2 } = {};
+    const sectionDef: CustomLocationTrackerDef_V2  = {
+         manifest: {
+            name: "Place holder name",
+            uuid: randomUUID(),
+            version: "0.0.0",
+            description: "Auto generated tracker based on location names",
+            repositoryUuid: null, // replaced by the caller
+            resourceLocationType: ResourceLocationType.builtIn,
+            type: ResourceType.locationTracker,
+            locationTrackerType: LocationTrackerType.dropdown,
+            game: null,
+            compatibleDataPackages: [],
+            formatVersion: 2,
+        },
+        sections: {},
         themes: {
             default: {
                 color: "#888888",
@@ -266,49 +277,46 @@ const generateCategories = (
         let groupKey: string = null;
         if (node.ownChecks.size > 0) {
             groupKey = `group_${node.name}`;
-            if (groupConfig[groupKey]) {
+            if (trackerGroups[groupKey]) {
                 console.warn(`Duplicate name ${groupKey} detected`);
             }
-            groupConfig[groupKey] = {
-                checks: [...node.ownChecks.values()],
+            trackerGroups[groupKey] = {
+                locations: [...node.ownChecks.values()],
             };
         }
         if (node.name === "root") {
-            categoryConfig.categories[`${node.name}`] = {
+            sectionDef.sections[`${node.name}`] = {
                 theme: "default",
                 title: "Total",
-                groupKey,
+                groups: groupKey,
                 children: [],
             };
         } else {
-            categoryConfig.categories[sectionName(node.name)] = {
+            sectionDef.sections[sectionName(node.name)] = {
                 theme: "default",
                 title: node.name.trim(),
-                groupKey,
+                groups: groupKey,
                 children: [],
             };
         }
 
         node.children.forEach((child) => {
             traverseTreeNode(child);
-            categoryConfig.categories[sectionName(node.name)].children.push(
+            (<string[]>sectionDef.sections[sectionName(node.name)].children).push(
                 sectionName(child.name)
             );
         });
-        categoryConfig.categories[sectionName(node.name)].children.sort(
+        (<string[]>sectionDef.sections[sectionName(node.name)].children).sort(
             naturalSort
         );
     };
     traverseTreeNode(groupTreeRoot);
-    categoryConfig.categories["root"].title = "Total";
-    return {
-        groupConfig,
-        categoryConfig,
-    };
+    sectionDef.sections["root"].title = "Total";
+    return sectionDef;
 };
 
 const LocationNameCategoryGenerator = {
-    generateCategories,
+    generateSectionDef,
 };
 
 export default LocationNameCategoryGenerator;

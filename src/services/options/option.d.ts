@@ -1,11 +1,4 @@
-enum OptionType {
-    boolean = "boolean",
-    select = "select",
-    multiselect = "multiselect",
-    number = "number",
-    hierarchical = "hierarchical",
-}
-
+import { OptionType } from "./optionEnums";
 type BooleanOption = {
     type: OptionType.boolean;
     default: boolean;
@@ -33,7 +26,7 @@ type NumberOption = {
 
 type HierarchicalOption = {
     type: OptionType.hierarchical;
-    children: Option[];
+    children: TrackerOption[];
 } & BaseOption;
 
 interface BaseOption {
@@ -46,19 +39,9 @@ interface BaseOption {
     scope?: string;
 }
 
-type Option =
+type TrackerOption =
     | BooleanOption
     | SelectOption
     | NumberOption
     | MultiselectOption
     | HierarchicalOption;
-
-export { OptionType };
-export type {
-    Option,
-    BooleanOption,
-    SelectOption,
-    NumberOption,
-    MultiselectOption,
-    HierarchicalOption,
-};

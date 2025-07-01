@@ -1,28 +1,39 @@
-import { GroupData } from "../../../sections/groupManager";
-import { SectionConfigData } from "../../../sections/sectionManager";
 import { naturalSort } from "../../../../utility/comparisons";
+import { randomUUID } from "../../../../utility/uuid";
+import { ResourceType, ResourceLocationType, LocationTrackerType } from "../../resourceEnums";
 
 const GROUP_DEBUG = false;
 const DEBUG_PARENT_GROUP_ORGANIZATION = GROUP_DEBUG;
 const DEBUG_GROUP_CLASSIFICATION = GROUP_DEBUG;
 
-const generateCategories = (groups: { [s: string]: string[] }) => {
+const generateSectionDef = (groups: { [s: string]: string[] }) => {
     const unclassifiedLocations = new Set(groups["Everywhere"]);
     if (GROUP_DEBUG) {
         console.log("Location groups provided:", groups);
     }
-    const groupConfig: { [s: string]: GroupData } = {};
+    const trackerGroups: { [s: string]: GroupData_V2 } = {};
 
-    const categoryConfig: SectionConfigData = {
-        categories: {
+    const sectionDef: CustomLocationTrackerDef_V2 = {
+        manifest: {
+            name: "Place holder name",
+            repositoryUuid: null, // replaced by the creating repository
+            uuid: randomUUID(),
+            version: "0.0.0",
+            description: "Auto generated tracker based on location groups",
+            resourceLocationType: ResourceLocationType.builtIn,
+            type: ResourceType.locationTracker,
+            locationTrackerType: LocationTrackerType.dropdown,
+            game: null,
+            compatibleDataPackages: [],
+            formatVersion: 2,
+        },
+        groups: trackerGroups,
+        sections: {
             root: {
                 title: "Total",
-                groupKey: null,
-                theme: "default",
                 children: [],
             },
         },
-        options: {},
         themes: {
             default: { color: "#888888" },
             theme1: { color: "#FF0000" },
@@ -301,8 +312,8 @@ const generateCategories = (groups: { [s: string]: string[] }) => {
 
     // build group tree
     for (const [groupName, checks] of finalGroups.entries()) {
-        groupConfig[`group_${groupName}`] = {
-            checks: [...checks.values()],
+        trackerGroups[`group_${groupName}`] = {
+            locations: [...checks.values()],
         };
     }
 
@@ -320,23 +331,23 @@ const generateCategories = (groups: { [s: string]: string[] }) => {
     // place nodes in tree
     let themeCounter = 0;
     for (const groupName of keyLocationGroups.union(metaLocationGroups)) {
-        categoryConfig.categories[`section_${groupName}`] = {
+        sectionDef.sections[`section_${groupName}`] = {
             title: groupName,
             theme: keyLocationGroups.has(groupName)
                 ? themeNames[themeCounter++ % themeNames.length]
                 : "default",
             children: getChildList(groupName).map((name) => `section_${name}`),
-            groupKey: `group_${groupName}`,
+            groups: `group_${groupName}`,
         };
         if (roots.has(groupName)) {
-            categoryConfig.categories.root.children.push(
+            (<string[]>sectionDef.sections.root.children).push(
                 `section_${groupName}`
             );
         }
     }
 
     // sort the root
-    categoryConfig.categories.root.children.sort((a: string, b: string) => {
+     (<string[]>sectionDef.sections.root.children).sort((a: string, b: string) => {
         const aIsKey = keyLocationGroups.has(a.slice("section_".length));
         const bIsKey = keyLocationGroups.has(b.slice("section_".length));
         if (aIsKey === bIsKey) {
@@ -348,28 +359,17 @@ const generateCategories = (groups: { [s: string]: string[] }) => {
     });
 
     if (unclassifiedLocations.size > 0) {
-        groupConfig["group_unclassified"] = {
-            checks: [...unclassifiedLocations.values()],
+        sectionDef.groups["group_unclassified"] = {
+            locations: [...unclassifiedLocations.values()],
         };
-        categoryConfig.categories["section_unclassified"] = {
-            title: "Unclassified Checks",
-            groupKey: "group_unclassified",
-            theme: "default",
-            children: null,
-        };
-        categoryConfig.categories.root.children.push("section_unclassified");
-    } else {
-        delete categoryConfig.categories["section_unclassified"];
+        sectionDef.sections.root.groups = "group_unclassified";
     }
 
-    return {
-        groupConfig,
-        categoryConfig,
-    };
+    return sectionDef;
 };
 
 const LocationGroupCategoryGenerator = {
-    generateCategories,
+    generateSectionDef,
 };
 
 export default LocationGroupCategoryGenerator;

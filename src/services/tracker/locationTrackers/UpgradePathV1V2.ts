@@ -1,3 +1,5 @@
+import { randomUUID } from "../../../utility/uuid";
+import { ResourceType, LocationTrackerType } from "../resourceEnums";
 const convertLocationTrackerV1toV2 = (
     locationTrackerDef: CustomLocationTrackerDef_V1
 ): CustomLocationTrackerDef_V2 => {
@@ -7,7 +9,7 @@ const convertLocationTrackerV1toV2 = (
             locationTrackerType: LocationTrackerType.dropdown,
             game: locationTrackerDef.game,
             name: locationTrackerDef.name,
-            uuid: locationTrackerDef.id ?? crypto.randomUUID(),
+            uuid: locationTrackerDef.id ?? randomUUID(),
             version: "0.0.0",
             formatVersion: 2,
         },

@@ -1,6 +1,6 @@
-import { Option, OptionType } from "./option";
-
-const baseTrackerOptions: { [optionName: string]: Option } = {
+import { TrackerOption } from "./option";
+import { OptionType } from "./optionEnums";
+const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
     "InventoryTracker:show_prog_items": {
         name: "InventoryTracker:show_prog_items",
         display: "Show Progression",

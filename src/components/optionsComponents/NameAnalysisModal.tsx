@@ -5,21 +5,19 @@ import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton, PrimaryButton, SecondaryButton } from "../buttons";
 import Icon from "../icons/icons";
 import { LocationManager } from "../../services/locations/locationManager";
-import { createGroupManager } from "../../services/sections/groupManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
-import { createSectionManager } from "../../services/sections/sectionManager";
-import TrackerManager from "../../services/tracker/TrackerManager";
+import { TrackerManager } from "../../services/tracker/TrackerManager";
 import ServiceContext from "../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
 import SectionView from "../sectionComponents/SectionView";
 import { createTagManager } from "../../services/tags/tagManager";
-import { buildGenericGame } from "../../services/tracker/generic/genericGame";
+import { genericGameRepository } from "../../services/tracker/generic/genericGame";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
-import CustomTrackerManager from "../../services/tracker/customTrackerManager";
+import { CustomTrackerRepository } from "../../services/tracker/customTrackerManager";
 import { exportJSONFile } from "../../utility/jsonExport";
 import { InventoryManager } from "../../services/inventory/inventoryManager";
 
@@ -46,21 +44,11 @@ const AnalysisGrid = styled.div`
 `;
 
 const previewLocationManager = new LocationManager();
+const previewInventorymanager = new InventoryManager();
 const previewEntranceManager = createEntranceManager();
-const previewGroupManager = createGroupManager(previewEntranceManager);
 const previewTagManager = createTagManager(previewLocationManager);
-const previewInventoryManager = new InventoryManager();
-const previewSectionManager = createSectionManager(
-    previewLocationManager,
-    previewEntranceManager,
-    previewGroupManager
-);
-const previewTrackerManager = new TrackerManager(
-    previewLocationManager,
-    previewGroupManager,
-    previewSectionManager,
-    previewInventoryManager
-);
+
+const previewTrackerManager = new TrackerManager();
 
 const NameAnalysisModal = ({
     open,
@@ -118,49 +106,49 @@ const NameAnalysisModal = ({
     };
 
     useEffect(() => {
-        const mainTrackerParams = mainTrackerManager.getTrackerInitParams();
-        if (
-            mainTrackerParams &&
-            previewTrackerManager.getTrackerInitParams()?.gameName !==
-                mainTrackerParams.gameName &&
-            open
-        ) {
-            previewTrackerManager.initializeTracker(mainTrackerParams);
-            previewLocationManager.pauseUpdateBroadcast();
-            previewLocationManager.deleteAllLocations();
-            mainTrackerParams.groups.location["Everywhere"].forEach(
-                (location) => {
-                    previewLocationManager.updateLocationStatus(location, {
-                        exists: true,
-                    });
-                }
-            );
-            previewLocationManager.resumeUpdateBroadcast();
-        }
+        // const mainTrackerParams = mainTrackerManager.getTrackerInitParams();
+        // if (
+        //     mainTrackerParams &&
+        //     previewTrackerManager.getTrackerInitParams()?.gameName !==
+        //         mainTrackerParams.gameName &&
+        //     open
+        // ) {
+        //     previewTrackerManager.initializeTracker(mainTrackerParams);
+        //     previewLocationManager.pauseUpdateBroadcast();
+        //     previewLocationManager.deleteAllLocations();
+        //     mainTrackerParams.groups.location["Everywhere"].forEach(
+        //         (location) => {
+        //             previewLocationManager.updateLocationStatus(location, {
+        //                 exists: true,
+        //             });
+        //         }
+        //     );
+        //     previewLocationManager.resumeUpdateBroadcast();
+        // }
 
-        if (mainTrackerParams && open) {
-            const tracker = buildGenericGame(
-                mainTrackerParams.gameName,
-                services.locationManager,
-                services.inventoryManager,
-                mainTrackerParams.groups,
-                GenericGameMethod.nameAnalysis,
-                {
-                    useAllChecksInDataPackage:
-                        otherOptions.useAllChecksInDataPackage,
-                    tokenizationOptions: tokenOptions,
-                    groupingOptions: {
-                        minGroupSize: otherOptions.minChecksPerGroup,
-                        maxDepth: otherOptions.maxDepth,
-                        minTokenCount: otherOptions.minTokenCount,
-                    },
-                }
-            );
-            previewTrackerManager.setGameTracker(
-                mainTrackerParams.gameName,
-                tracker
-            );
-        }
+        // if (mainTrackerParams && open) {
+        //     const tracker = buildGenericGame(
+        //         mainTrackerParams.gameName,
+        //         services.locationManager,
+        //         services.inventoryManager,
+        //         mainTrackerParams.groups,
+        //         GenericGameMethod.nameAnalysis,
+        //         {
+        //             useAllChecksInDataPackage:
+        //                 otherOptions.useAllChecksInDataPackage,
+        //             tokenizationOptions: tokenOptions,
+        //             groupingOptions: {
+        //                 minGroupSize: otherOptions.minChecksPerGroup,
+        //                 maxDepth: otherOptions.maxDepth,
+        //                 minTokenCount: otherOptions.minTokenCount,
+        //             },
+        //         }
+        //     );
+        //     previewTrackerManager.setGameTracker(
+        //         mainTrackerParams.gameName,
+        //         tracker
+        //     );
+        // }
     }, [mainTrackerManager, tokenOptions, otherOptions, open]);
 
     return (
@@ -175,7 +163,7 @@ const NameAnalysisModal = ({
                     }}
                 >
                     <h3>Preview</h3>
-                    <ServiceContext.Provider
+                    {/* <ServiceContext.Provider
                         value={{
                             locationManager:
                                 otherOptions.useAllChecksInDataPackage
@@ -189,7 +177,7 @@ const NameAnalysisModal = ({
                         }}
                     >
                         <SectionView name="root" context={{}} />
-                    </ServiceContext.Provider>
+                    </ServiceContext.Provider> */}
                 </div>
                 <div
                     style={{

@@ -3,57 +3,57 @@ import { useCustomTrackerDirectory } from "../../hooks/trackerHooks";
 import { tertiary } from "../../constants/colors";
 import { DangerButton, PrimaryButton } from "../buttons";
 import Icon from "../icons/icons";
-import CustomTrackerManager from "../../services/tracker/customTrackerManager";
-import TrackerManager from "../../services/tracker/TrackerManager";
+// import CustomTrackerManager from "../../services/tracker/customTrackerManager";
+// import TrackerManager_Old from "../../services/tracker/TrackerManager";
 import CreateCustomTrackerModal from "./CreateCustomTrackerModal";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import { exportJSONFile } from "../../utility/jsonExport";
 import { naturalSort } from "../../utility/comparisons";
-
+import { TrackerManager } from "../../services/tracker/TrackerManager";
 const CustomTrackerOptions = ({
     trackerManager,
 }: {
     trackerManager: TrackerManager;
 }) => {
-    const customTrackersDirectory = useCustomTrackerDirectory();
-    const trackersByGame = useMemo(() => {
-        const trackerMap: Map<
-            string,
-            {
-                id: string;
-                game: string;
-                name: string;
-                enabled: boolean;
-            }[]
-        > = new Map();
-        customTrackersDirectory.customLists.forEach((tracker) => {
-            const gameList = trackerMap.get(tracker.game) ?? [];
-            gameList.push(tracker);
-            trackerMap.set(tracker.game, gameList);
-        });
-        const games = [...trackerMap.keys()];
-        games.forEach((game) => {
-            const list = trackerMap.get(game);
-            list.sort((a, b) => naturalSort(a.name, b.name));
-            trackerMap.set(game, list);
-        });
-        return trackerMap;
-    }, [customTrackersDirectory]);
+    // const customTrackersDirectory = useCustomTrackerDirectory();
+    // const trackersByGame = useMemo(() => {
+    //     const trackerMap: Map<
+    //         string,
+    //         {
+    //             id: string;
+    //             game: string;
+    //             name: string;
+    //             enabled: boolean;
+    //         }[]
+    //     > = new Map();
+    //     customTrackersDirectory.customLists.forEach((tracker) => {
+    //         const gameList = trackerMap.get(tracker.game) ?? [];
+    //         gameList.push(tracker);
+    //         trackerMap.set(tracker.game, gameList);
+    //     });
+    //     const games = [...trackerMap.keys()];
+    //     games.forEach((game) => {
+    //         const list = trackerMap.get(game);
+    //         list.sort((a, b) => naturalSort(a.name, b.name));
+    //         trackerMap.set(game, list);
+    //     });
+    //     return trackerMap;
+    // }, [customTrackersDirectory]);
 
-    const sortedGames = useMemo(() => {
-        const games = [...trackersByGame.keys()];
-        games.sort(naturalSort);
-        return games;
-    }, [trackersByGame]);
+    // const sortedGames = useMemo(() => {
+    //     const games = [...trackersByGame.keys()];
+    //     games.sort(naturalSort);
+    //     return games;
+    // }, [trackersByGame]);
 
-    const [modalOpen, setModalOpen] = useState(false);
+    // const [modalOpen, setModalOpen] = useState(false);
     return (
         <div>
             <div>
                 <p>Manage custom trackers here</p>
-                {sortedGames.length > 0 ? (
+                {/* {sortedGames.length > 0 ? (
                     sortedGames.map((game) => (
                         <div
                             key={game}
@@ -134,20 +134,20 @@ const CustomTrackerOptions = ({
                     <i style={{ color: tertiary }}>
                         No custom trackers, try adding one below
                     </i>
-                )}
+                )} */}
             </div>
             <PrimaryButton
                 $tiny
                 onClick={() => {
-                    setModalOpen(true);
+                    // setModalOpen(true);
                 }}
             >
                 <Icon type="add" />
             </PrimaryButton>
             <CreateCustomTrackerModal
                 trackerManager={trackerManager}
-                open={modalOpen}
-                onClose={() => setModalOpen(false)}
+                open={false}
+                onClose={() => {}}
             />
         </div>
     );

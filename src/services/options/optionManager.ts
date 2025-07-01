@@ -4,8 +4,9 @@ import {
     LocalStorageDataStore,
     TempDataStore,
 } from "../dataStores";
-import { OptionType, Option } from "./option";
 import { baseTrackerOptions } from "./trackerOptions";
+import { OptionType } from "./optionEnums";
+import { TrackerOption } from "./option";
 const OPTION_LOCAL_STORAGE_ITEM_NAME: string = "AP_CHECKLIST_TRACKER_OPTIONS";
 const DEBUG: boolean = false;
 
@@ -181,7 +182,7 @@ const globalOptionStore = new LocalStorageDataStore(
     OPTION_LOCAL_STORAGE_ITEM_NAME
 );
 
-const parseOption = (option: Option, parent?: JSONValue) => {
+const parseOption = (option: TrackerOption, parent?: JSONValue) => {
     if (option.type !== OptionType.hierarchical) {
         if (parent) {
             parent[option.name] = option.default;

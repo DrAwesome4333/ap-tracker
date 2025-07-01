@@ -6,8 +6,8 @@ type ThemeDef_V2 = {
 
 type SectionDef_V2 = {
     title?: string;
-    locations?: string;
-    groups?: string[];
+    locations?: string[];
+    groups?: string[] | string;
     children?: string[] | SectionDefs_V2;
     theme?: string;
 };

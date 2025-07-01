@@ -41,18 +41,14 @@ const SectionView = ({
         isClosable ? (startOpen ?? false) : true
     );
     const serviceContext = useContext(ServiceContext);
-    const sectionManager = serviceContext.sectionManager;
+    const locationTracker = serviceContext.locationTracker;
     const locationManager = serviceContext.locationManager;
     const tagManager = serviceContext.tagManager;
     const optionManager = serviceContext.optionManager;
-    if (!sectionManager) {
-        throw new Error("No group context provided");
-    }
     if (!optionManager) {
         throw new Error("No option manager provided");
     }
-
-    const section = useSection(sectionManager, name);
+    const section = useSection(locationTracker, name);
     const style = {
         borderLeft: `2px dashed ${section?.theme.color ?? "Black"}`,
         paddingLeft: "0.5em",
@@ -61,9 +57,9 @@ const SectionView = ({
     };
 
     const clearedLocationCount =
-        (section?.checkReport.checked.size ?? 0) +
-        (section?.checkReport.ignored.size ?? 0);
-    const totalLocationCount = section?.checkReport.existing.size ?? 0;
+        (section?.locationReport.checked.size ?? 0) +
+        (section?.locationReport.ignored.size ?? 0);
+    const totalLocationCount = section?.locationReport.existing.size ?? 0;
     const checkedLocationBehavior = useOption(
         optionManager,
         "LocationTracker:cleared_location_behavior",
@@ -121,7 +117,7 @@ const SectionView = ({
     };
 
     const locations: string[] = useMemo(() => {
-        const locationNames = [...(section?.checks.keys() ?? [])].filter(
+        const locationNames = [...(section?.locations ?? [])].filter(
             locationFilter
         );
         locationNames.sort(locationCompare);
@@ -129,7 +125,7 @@ const SectionView = ({
     }, [
         locationOrderBehavior,
         checkedLocationBehavior,
-        section?.checks,
+        section?.locations,
         locationManager,
     ]);
 
@@ -141,16 +137,16 @@ const SectionView = ({
      * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
      */
     const sectionCompare = (a: string, b: string): number => {
-        const sectionA = sectionManager.getSectionStatus(a);
-        const sectionB = sectionManager.getSectionStatus(b);
+        const sectionA = locationTracker.getSection(a);
+        const sectionB = locationTracker.getSection(b);
         const indexA = section.children.indexOf(a);
         const indexB = section.children.indexOf(b);
         const sectionAClear =
-            sectionA.checkReport.checked.size ===
-            sectionA.checkReport.existing.size;
+            sectionA.locationReport.checked.size ===
+            sectionA.locationReport.existing.size;
         const sectionBClear =
-            sectionB.checkReport.checked.size ===
-            sectionB.checkReport.existing.size;
+            sectionB.locationReport.checked.size ===
+            sectionB.locationReport.existing.size;
 
         if (
             clearedSectionBehavior === "separate" &&
@@ -168,12 +164,12 @@ const SectionView = ({
      * @returns
      */
     const sectionFilter = (sectionName: string) => {
-        const sectionInQuestion = sectionManager.getSectionStatus(sectionName);
+        const sectionInQuestion = locationTracker.getSection(sectionName);
         return (
-            sectionInQuestion?.checkReport.existing.size > 0 &&
+            sectionInQuestion?.locationReport.existing.size > 0 &&
             (clearedSectionBehavior !== "hide" ||
-                sectionInQuestion.checkReport.checked.size <
-                    sectionInQuestion.checkReport.existing.size)
+                sectionInQuestion.locationReport.checked.size <
+                    sectionInQuestion.locationReport.existing.size)
         );
     };
 
@@ -182,15 +178,15 @@ const SectionView = ({
 
     return (
         <>
-            {section?.checkReport.existing.size === 0 ? (
+            {(section?.locationReport.existing.size === 0 && section?.id !== "root") ? (
                 <></> // Hide empty sections
             ) : (
                 <div style={style}>
                     <h3
                         style={{ cursor: isClosable ? "pointer" : "default" }}
                         className={`section_title ${
-                            section?.checkReport.checked.size ===
-                            section?.checkReport.existing.size
+                            section?.locationReport.checked.size ===
+                            section?.locationReport.existing.size
                                 ? "checked"
                                 : ""
                         }`}
@@ -206,7 +202,7 @@ const SectionView = ({
                             {"/"}
                             {totalLocationCount}
                         </i>{" "}
-                        {[...(section?.checkReport.tagCounts ?? [])].map(
+                        {[...(section?.locationReport.tagCounts ?? [])].map(
                             ([id, values]) => {
                                 const counterType = tagManager?.getCounter(id);
                                 return (
@@ -223,7 +219,7 @@ const SectionView = ({
                                         )}
                                         {values.size}
                                         {counterType?.showTotal &&
-                                            `/${section?.checkReport.tagTotals.get(id)?.size ?? 0}`}{" "}
+                                            `/${section?.locationReport.tagTotals.get(id)?.size ?? 0}`}{" "}
                                     </i>
                                 );
                             }

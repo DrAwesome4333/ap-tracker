@@ -15,7 +15,7 @@ interface LocationTrackerUpdatePack {
 
 interface BaseLocationTracker {
     readonly manifest: LocationTrackerManifest;
-    readonly options?: { [optionName: string]: Option };
+    readonly options?: { [optionName: string]: TrackerOption };
     getUpdateSubscriber: () => (listener: () => void) => () => void;
     update?: (updates: LocationTrackerUpdatePack) => void;
     reset?: () => void;
@@ -23,8 +23,23 @@ interface BaseLocationTracker {
 
 type DropdownLocationTracker = {
     readonly type: LocationTrackerType.dropdown;
-    getSection: (name: string) => unknown;
+    getSection: (name: string) => Section;
     exportDropdowns: () => unknown;
+    getUpdateSubscriber: (name?) => (listener: () => void) => () => void;
+
 } & BaseLocationTracker;
+
+type ThemeDef = ThemeDef_V2;
+
+interface Section {
+    id: string;
+    title: string;
+    locationReport: LocationReport;
+    locations: string[];
+    portals?: unknown;
+    theme: ThemeDef;
+    children: string[];
+    parents: string[];
+}
 
 type LocationTracker = DropdownLocationTracker;

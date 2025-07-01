@@ -1,18 +1,16 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useTrackerDirectory } from "../../hooks/trackerHooks";
 import TrackerDropdown from "./TrackerDropdown";
 import { tertiary } from "../../constants/colors";
-import TrackerManager from "../../services/tracker/TrackerManager";
+import ServiceContext from "../../contexts/serviceContext";
 
 /**
  * A UI for selecting which tracker to use with which game
  */
-const TrackerPicker = ({
-    trackerManager,
-}: {
-    trackerManager: TrackerManager;
-}) => {
-    const trackerDirectory = useTrackerDirectory();
+const TrackerPicker = () => {
+    const services = useContext(ServiceContext);
+    const trackerManager = services.trackerManager;
+    const trackerDirectory = useTrackerDirectory(trackerManager);
 
     return (
         <div>

@@ -1,16 +1,17 @@
 import React from "react";
-import { Option, OptionType } from "../../services/options/option";
 import SelectOptionView from "./optionViewComponents/SelectOptionView";
 import CheckboxOptionView from "./optionViewComponents/CheckboxOptionView";
 import HierarchicalOptionView from "./optionViewComponents/HierarchicalOptionView";
 import { JSONValue } from "../../services/dataStores";
 import MultiselectOptionView from "./optionViewComponents/MultiSelectOptionView";
+import { TrackerOption } from "../../services/options/option";
+import { OptionType } from "../../services/options/optionEnums";
 
 const OptionView = ({
     option,
     ...props
 }: {
-    option: Option;
+    option: TrackerOption;
     parent?: { [propName: string]: JSONValue };
     style?: React.CSSProperties;
     className?: string;

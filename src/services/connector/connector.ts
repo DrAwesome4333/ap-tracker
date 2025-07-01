@@ -13,10 +13,12 @@ import { LocationManager } from "../locations/locationManager";
 import { InventoryManager } from "../inventory/inventoryManager";
 import { EntranceManager } from "../entrances/entranceManager";
 import { TagManager } from "../tags/tagManager";
-import TrackerManager from "../tracker/TrackerManager";
+import { TrackerManager } from "../tracker/TrackerManager";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
+import { genericGameRepository } from "../tracker/generic/genericGame";
+import { GenericGameMethod } from "../tracker/generic/genericGameEnums";
 
 const CONNECTION_STATUS = {
     disconnected: "Disconnected",
@@ -55,7 +57,7 @@ interface Connector {
 const createConnector = (
     locationManager: LocationManager,
     inventoryManger: InventoryManager,
-    entranceManager: EntranceManager,
+    _entranceManager: EntranceManager,
     tagManager: TagManager,
     trackerManager: TrackerManager,
     textClientManager: TextClientManager
@@ -325,12 +327,8 @@ const createConnector = (
                         item: { [name: string]: string[] };
                         location: { [name: string]: string[] };
                     }) => {
-                        trackerManager.initializeTracker({
-                            gameName: savedConnectionInfo.game,
-                            entranceManager,
-                            slotData: await client.players.self.fetchSlotData(),
-                            groups,
-                        });
+                        const defaults = genericGameRepository.buildGenericTrackers(savedConnectionInfo.game, locationManager, groups, GenericGameMethod.locationGroup);
+                        trackerManager.loadTrackers(savedConnectionInfo.game, defaults);
                         tagManager.loadTags(connection.slotInfo.connectionId);
                     }
                 );

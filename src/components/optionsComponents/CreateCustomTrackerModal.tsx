@@ -7,16 +7,15 @@ import CustomTrackerHelpModal from "./CustomTrackerHelpModal";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
-import CustomTrackerManager from "../../services/tracker/customTrackerManager";
-import TrackerManager from "../../services/tracker/TrackerManager";
+import { CustomTrackerRepository } from "../../services/tracker/customTrackerManager";
 import { tertiary } from "../../constants/colors";
 import ServiceContext from "../../contexts/serviceContext";
-import { buildGenericGame } from "../../services/tracker/generic/genericGame";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import { exportJSONFile } from "../../utility/jsonExport";
 import Icon from "../icons/icons";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import NameAnalysisModal from "./NameAnalysisModal";
+import { TrackerManager } from "../../services/tracker/TrackerManager";
 
 const ModalGrid = styled.div`
     display: grid;
@@ -44,46 +43,47 @@ const CreateCustomTrackerModal = ({
     const [nameModalOpen, setNameModalOpen] = useState(false);
     const services = useContext(ServiceContext);
     const connector = services.connector.connection;
+
     /**
      * Passes the contents of a file to the CustomTrackerManager
      */
     const loadCustomTracker = (file: File) => {
-        const statusHandle = NotificationManager.createStatus({
-            message: "Loading Custom Tracker",
-            type: MessageType.info,
-            progress: -1,
-        });
-        file.text()
-            .then((text) => JSON.parse(text))
-            .then(async (data) => {
-                await CustomTrackerManager.addCustomTracker(data);
-                return data;
-            })
-            .then((data) => {
-                statusHandle.update({
-                    message: "Successfully added custom tracker",
-                    type: MessageType.success,
-                    progress: 1,
-                    duration: 4,
-                });
+        // const statusHandle = NotificationManager.createStatus({
+        //     message: "Loading Custom Tracker",
+        //     type: MessageType.info,
+        //     progress: -1,
+        // });
+        // file.text()
+        //     .then((text) => JSON.parse(text))
+        //     .then(async (data) => {
+        //         await customTrackerRe;
+        //         return data;
+        //     })
+        //     .then((data) => {
+        //         statusHandle.update({
+        //             message: "Successfully added custom tracker",
+        //             type: MessageType.success,
+        //             progress: 1,
+        //             duration: 4,
+        //         });
 
-                trackerManager.setGameTracker(data.game, data.id);
-            })
-            .catch((e) => {
-                statusHandle.update({
-                    message: "Failed to load tracker",
-                    progress: 0,
-                    duration: 4,
-                    type: MessageType.error,
-                });
-                NotificationManager.createToast({
-                    message: "Failed to create custom tracker",
-                    duration: 10,
-                    type: MessageType.error,
-                    details: `Error: \n\t${e}`,
-                });
-            });
-        onClose();
+        //         trackerManager.setGameTracker(data.game, data.id);
+        //     })
+        //     .catch((e) => {
+        //         statusHandle.update({
+        //             message: "Failed to load tracker",
+        //             progress: 0,
+        //             duration: 4,
+        //             type: MessageType.error,
+        //         });
+        //         NotificationManager.createToast({
+        //             message: "Failed to create custom tracker",
+        //             duration: 10,
+        //             type: MessageType.error,
+        //             details: `Error: \n\t${e}`,
+        //         });
+        //     });
+        // onClose();
     };
     return (
         <>
@@ -134,32 +134,32 @@ const CreateCustomTrackerModal = ({
                                     <PrimaryButton
                                         disabled={!connector.slotInfo.game}
                                         onClick={() => {
-                                            const trackerData =
-                                                trackerManager.getTrackerInitParams();
-                                            if (!trackerData) {
-                                                NotificationManager.createToast(
-                                                    {
-                                                        message:
-                                                            "Failed to export tracker, connect to a slot first",
-                                                        type: MessageType.error,
-                                                    }
-                                                );
-                                                return;
-                                            }
-                                            const tracker = buildGenericGame(
-                                                connector.slotInfo.game,
-                                                services.locationManager,
-                                                services.inventoryManager,
-                                                trackerData.groups,
-                                                GenericGameMethod.locationGroup
-                                            );
-                                            const trackerJSON =
-                                                tracker.exportTracker();
-                                            exportJSONFile(
-                                                `tracker-export-${tracker.gameName}-${Date.now().toString()}`,
-                                                trackerJSON,
-                                                true
-                                            );
+                                            // const trackerData =
+                                            //     trackerManager.getTrackerInitParams();
+                                            // if (!trackerData) {
+                                            //     NotificationManager.createToast(
+                                            //         {
+                                            //             message:
+                                            //                 "Failed to export tracker, connect to a slot first",
+                                            //             type: MessageType.error,
+                                            //         }
+                                            //     );
+                                            //     return;
+                                            // }
+                                            // const tracker = buildGenericGame(
+                                            //     connector.slotInfo.game,
+                                            //     services.locationManager,
+                                            //     services.inventoryManager,
+                                            //     trackerData.groups,
+                                            //     GenericGameMethod.locationGroup
+                                            // );
+                                            // const trackerJSON =
+                                            //     tracker.exportTracker();
+                                            // exportJSONFile(
+                                            //     `tracker-export-${tracker.gameName}-${Date.now().toString()}`,
+                                            //     trackerJSON,
+                                            //     true
+                                            // );
                                         }}
                                     >
                                         Location Group{" "}

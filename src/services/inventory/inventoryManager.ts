@@ -1,3 +1,5 @@
+import { randomUUID } from "../../utility/uuid";
+
 enum ItemRoundingMode {
     /** Use {@link Math.ceil} for rounding*/
     up = "up",
@@ -94,7 +96,7 @@ const createInventoryCollection = (
         items: [],
         itemValueMap: new Map(),
         roundingMode: ItemRoundingMode.none,
-        uuid: crypto.randomUUID(),
+        uuid: randomUUID(),
     };
 
     if (Array.isArray(def)) {

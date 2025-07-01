@@ -5,7 +5,8 @@ import {
     Player,
     ValidJSONColorType,
 } from "archipelago.js";
-import { globalOptionManager } from "./options/optionManager";
+import { globalOptionManager } from "./options/optionManager";import { randomUUID } from "../utility/uuid";
+;
 
 interface APMessage {
     parts: (MessageNode | EchoMessageNode)[];
@@ -85,7 +86,7 @@ class TextClientManager {
             },
         ];
         const apMessage: APMessage = {
-            key: crypto.randomUUID(),
+            key: randomUUID(),
             parts,
         };
         this.#messages = [...this.#messages, apMessage];
@@ -174,7 +175,7 @@ class TextClientManager {
     #addMessage = (nodes: MessageNode[]) => {
         const parts = nodes;
         const apMessage: APMessage = {
-            key: crypto.randomUUID(),
+            key: randomUUID(),
             parts,
         };
         this.#messages = [...this.#messages, apMessage];

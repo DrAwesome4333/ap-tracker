@@ -9,8 +9,6 @@ import OptionsScreen from "./components/optionsComponents/OptionsScreen";
 import { createEntranceManager } from "./services/entrances/entranceManager";
 import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
-import { createGroupManager } from "./services/sections/groupManager";
-import { createSectionManager } from "./services/sections/sectionManager";
 import { createTagManager } from "./services/tags/tagManager";
 import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
@@ -19,9 +17,11 @@ import { background, textPrimary } from "./constants/colors";
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
-import TrackerManager from "./services/tracker/TrackerManager";
-import CustomTrackerManager from "./services/tracker/customTrackerManager";
+import { TrackerManager } from "./services/tracker/TrackerManager";
+import { CustomTrackerRepository } from "./services/tracker/customTrackerManager";
 import TextClientManager from "./services/textClientManager";
+import { genericGameRepository } from "./services/tracker/generic/genericGame";
+import { ResourceType } from "./services/tracker/resourceEnums";
 
 const AppScreen = styled.div`
     position: absolute;
@@ -48,22 +48,16 @@ const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
 const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
-const groupManager = createGroupManager(entranceManager);
-const sectionManager = createSectionManager(
-    locationManager,
-    entranceManager,
-    groupManager
-);
+
 const tagManager = createTagManager(locationManager);
-const trackerManager = new TrackerManager(
-    locationManager,
-    groupManager,
-    sectionManager,
-    inventoryManager
-);
+const trackerManager = new TrackerManager();
+const customTrackerRepository = new CustomTrackerRepository(locationManager, inventoryManager);
+
+trackerManager.addRepository(customTrackerRepository);
+trackerManager.addRepository(genericGameRepository);
 
 const textClientManager = new TextClientManager();
-CustomTrackerManager.readyCallback(trackerManager.loadSavedTrackerChoices);
+
 const connector = createConnector(
     locationManager,
     inventoryManager,
@@ -72,6 +66,7 @@ const connector = createConnector(
     trackerManager,
     textClientManager
 );
+
 const connection = connector.connection;
 
 const App = (): React.ReactNode => {
@@ -91,6 +86,17 @@ const App = (): React.ReactNode => {
         | "dark"
         | "system"
         | null;
+
+    const locationTracker = useSyncExternalStore(
+        trackerManager.getTrackerSubscriberCallback(ResourceType.locationTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
+    ) as LocationTracker;
+    const itemTracker = useSyncExternalStore(
+        trackerManager.getTrackerSubscriberCallback(ResourceType.itemTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
+    ) as ItemTracker;
     return (
         <div className="App" data-theme={readThemeValue(themeValue)}>
             <AppScreen data-theme={readThemeValue(themeValue)}>
@@ -103,10 +109,10 @@ const App = (): React.ReactNode => {
                     <ServiceContext.Provider
                         value={{
                             locationManager,
+                            locationTracker,
+                            inventoryTracker: itemTracker,
                             entranceManager,
                             connector,
-                            groupManager,
-                            sectionManager,
                             tagManager,
                             optionManager,
                             inventoryManager,

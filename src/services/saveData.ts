@@ -2,10 +2,12 @@ const DB_STORE_KEYS = {
     dataPackageCache: "data_packages",
     locationGroupCache_deprecated: "location_groups",
     groupCache: "cached_groups",
-    customTrackers: "custom_trackers",
+    customTrackers_old: "custom_trackers",
+    customTrackers: "custom_trackers_v2",
+    customTrackersDirectory: "custom_tracker_manifests_v2",
 };
 
-const database_request = window.indexedDB.open("checklist_db", 5);
+const database_request = window.indexedDB.open("checklist_db", 6);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -51,12 +53,29 @@ database_request.onupgradeneeded = (_event) => {
             unique: true,
         });
     }
-    if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
-        const locationGroupStore = db.createObjectStore(
-            DB_STORE_KEYS.customTrackers,
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers_old)) {
+        const customTrackerStore = db.createObjectStore(
+            DB_STORE_KEYS.customTrackers_old,
             { keyPath: "id" }
         );
-        locationGroupStore.createIndex("id", "id", { unique: true });
+        customTrackerStore.createIndex("id", "id", { unique: true });
+    }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
+        const customTrackerStore = db.createObjectStore(
+            DB_STORE_KEYS.customTrackers,
+            { keyPath: "uuid" }
+        );
+        customTrackerStore.createIndex("uuid", "uuid", { unique: true });
+    }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackersDirectory)) {
+        const customTrackerStore = db.createObjectStore(
+            DB_STORE_KEYS.customTrackersDirectory,
+            { keyPath: "uuid" }
+        );
+        customTrackerStore.createIndex("uuid", "uuid", { unique: true });
     }
 };
 
@@ -178,10 +197,44 @@ const deleteItem = (storeName: string, key: string): Promise<boolean> => {
     });
 };
 
+const getAllItems = (storeName: string): Promise<unknown> => {
+    return new Promise((resolve, _reject) => {
+        let hasFailed = false;
+        const attemptLoad = () => {
+            try {
+                const db = database_request.result;
+                const transaction = db.transaction([storeName], "readonly");
+                const objectStore = transaction.objectStore(storeName);
+                const request = objectStore.getAll();
+                request.onerror = () => {
+                    resolve(null);
+                };
+                request.onsuccess = () => {
+                    resolve(request.result ?? null);
+                };
+            } catch {
+                if (hasFailed) {
+                    resolve(null);
+                } else {
+                    hasFailed = true;
+                    setTimeout(attemptLoad, 500);
+                }
+            }
+        };
+        
+        if (database_open) {
+            attemptLoad();
+        } else {
+            queuedEvents.push(attemptLoad);
+        }
+    });
+};
+
 const SaveData = {
     getItem,
     storeItem,
     deleteItem,
+    getAllItems,
 };
 
 export { SaveData, DB_STORE_KEYS };

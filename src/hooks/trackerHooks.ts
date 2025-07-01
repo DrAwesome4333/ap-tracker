@@ -1,32 +1,37 @@
-// @ts-check
 import { useSyncExternalStore } from "react";
-import CustomTrackerManager from "../services/tracker/customTrackerManager";
-import TrackerManager from "../services/tracker/TrackerManager";
+import { CustomTrackerRepository } from "../services/tracker/customTrackerManager";
+import { TrackerManager } from "../services/tracker/TrackerManager";
+import { ResourceType } from "../services/tracker/resourceEnums";
 
-const useTrackerDirectory = () => {
+const useTrackerDirectory = (
+    trackerManager: TrackerManager
+) => {
     return useSyncExternalStore(
-        TrackerManager.directory.getSubscriberCallback(),
-        TrackerManager.directory.getDirectory,
-        TrackerManager.directory.getDirectory
+        trackerManager.getDirectorySubscriberCallback(),
+        trackerManager.getDirectory,
+        trackerManager.getDirectory
     );
 };
 
-const useCustomTrackerDirectory = () => {
+const useCustomTrackerDirectory = (
+    customTrackerRepository: CustomTrackerRepository
+) => {
     return useSyncExternalStore(
-        CustomTrackerManager.getDirectorySubscriberCallback(),
-        CustomTrackerManager.getDirectory,
-        CustomTrackerManager.getDirectory
+        customTrackerRepository.getUpdateSubscriber(),
+        () => customTrackerRepository.resources,
+        () => customTrackerRepository.resources
     );
 };
 
 const useCurrentGameTracker = (
     game: string,
-    trackerManager: TrackerManager
+    trackerManager: TrackerManager,
+    type: ResourceType,
 ) => {
     return useSyncExternalStore(
         trackerManager.getTrackerSubscriberCallback(),
-        () => trackerManager.getGameTracker(game),
-        () => trackerManager.getGameTracker(game)
+        () => trackerManager.getCurrentGameTracker(game, type),
+        () => trackerManager.getCurrentGameTracker(game, type)
     );
 };
 
