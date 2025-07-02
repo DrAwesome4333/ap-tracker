@@ -20,7 +20,7 @@ import TrackerScreen from "./components/TrackerScreen";
 import { TrackerManager } from "./services/tracker/TrackerManager";
 import { CustomTrackerRepository } from "./services/tracker/customTrackerManager";
 import TextClientManager from "./services/textClientManager";
-import { genericGameRepository } from "./services/tracker/generic/genericGame";
+import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
 import { ResourceType } from "./services/tracker/resourceEnums";
 import { LocalStorageDataStore } from "./services/dataStores";
 import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTrackers";
@@ -60,9 +60,12 @@ const customTrackerRepository = new CustomTrackerRepository(
     locationManager,
     inventoryManager
 );
-
+const genericTrackerRepository = new GenericTrackerRepository(
+    locationManager,
+    inventoryManager
+);
 trackerManager.addRepository(customTrackerRepository);
-trackerManager.addRepository(genericGameRepository);
+trackerManager.addRepository(genericTrackerRepository);
 // Port from old version
 portTrackers(customTrackerRepository, true);
 
@@ -74,7 +77,8 @@ const connector = createConnector(
     entranceManager,
     tagManager,
     trackerManager,
-    textClientManager
+    textClientManager,
+    genericTrackerRepository
 );
 
 const connection = connector.connection;

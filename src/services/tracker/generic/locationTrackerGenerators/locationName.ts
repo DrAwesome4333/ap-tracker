@@ -1,6 +1,10 @@
 import { naturalSort } from "../../../../utility/comparisons";
 import { randomUUID } from "../../../../utility/uuid";
-
+import {
+    ResourceType,
+    ResourceLocationType,
+    LocationTrackerType,
+} from "../../resourceEnums";
 class TrieNode {
     children: Map<string, TrieNode>;
     count: number;

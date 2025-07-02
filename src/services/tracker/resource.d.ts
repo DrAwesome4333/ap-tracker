@@ -22,7 +22,11 @@ interface ResourceRepository {
         types?: ResourceType[]
     ) => (listener: () => void) => () => void;
     /** Retrieves a resource for a given uuid */
-    loadResource: (uuid: string, version: string) => Promise<Resource>;
+    loadResource: (
+        uuid: string,
+        version: string,
+        type: string
+    ) => Promise<Resource>;
     /** Does any initialization that may be needed such as fetching from a remote server, returns true on success, else false */
     initialize: () => Promise<boolean>;
 }

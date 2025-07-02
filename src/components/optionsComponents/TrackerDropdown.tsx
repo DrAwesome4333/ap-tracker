@@ -9,6 +9,7 @@ import NotificationManager, {
 import ServiceContext from "../../contexts/serviceContext";
 import { naturalSort } from "../../utility/comparisons";
 import { ResourceType } from "../../services/tracker/resourceEnums";
+import { TrackerResourceId } from "../../services/tracker/TrackerManager";
 /**
  * Displays a drop down with a list of options available for trackers for the provided game name
  * @param param0
@@ -30,25 +31,31 @@ const TrackerDropdown = ({ game }: { game: string }) => {
         list.sort((a, b) => naturalSort(a.name, b.name));
         return list;
     }, [directory.trackers[ResourceType.locationTracker]]);
+
+    const getTrackerKey = (tracker: TrackerResourceId) => {
+        return tracker
+            ? `${tracker.uuid}-${tracker.version}-${tracker.type}`
+            : null;
+    };
+
+    const trackerLookupTable = {};
+    trackers.forEach(
+        (tracker) => (trackerLookupTable[getTrackerKey(tracker)] = tracker)
+    );
     return (
         <select
             className="interactive"
-            value={currentSelection?.uuid ?? ""}
+            value={getTrackerKey(currentSelection) ?? ""}
+            disabled={trackers.length < (game ? 1 : 2)} // If game is defined, there is the default
             onChange={(e) => {
                 try {
                     if (e.target.value) {
-                        // const trackerChoices = globalOptionManager.getOptionValue("TrackerChoices", "global") as TrackerChoiceOptions;
-                        // const newChoices: TrackerChoiceOptions = {
-                        //     ...trackerChoices,
-                        //     [game]: {
-                        //         locationTracker: {
-                        //             uuid: e.target.value,
-                        //             version: trackers.filter(manifest => manifest.uuid === e.target.value)[0].version
-                        //         },
-                        //         itemTracker: trackerChoices[game]?.itemTracker,
-                        //     }
-                        // }
-                        // globalOptionManager.setOptionValue("TrackerChoices", "global", newChoices)
+                        const tracker = trackerLookupTable[e.target.value];
+                        trackerManager.setGameTracker(game, tracker);
+                    } else {
+                        trackerManager.setGameTracker(game, {
+                            type: ResourceType.locationTracker,
+                        });
                     }
                 } catch (e) {
                     console.error(e);
@@ -61,10 +68,13 @@ const TrackerDropdown = ({ game }: { game: string }) => {
                 }
             }}
         >
-            <option value="">Default</option>
+            {game && <option value="">Default</option>}
             {trackers.map((tracker) => {
                 return (
-                    <option key={tracker.uuid} value={tracker.uuid}>
+                    <option
+                        key={getTrackerKey(tracker)}
+                        value={getTrackerKey(tracker)}
+                    >
                         {tracker.name}
                     </option>
                 );

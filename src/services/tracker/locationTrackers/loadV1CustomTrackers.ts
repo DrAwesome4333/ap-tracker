@@ -52,8 +52,9 @@ const portTrackers = async (
         return;
     }
     const trackerPromises = directory.customLists.map((metaData) =>
-        getCustomTracker(metaData.id).then((trackerDef) =>
-            customTrackerRepository.addTracker(trackerDef)
+        getCustomTracker(metaData.id).then(
+            (trackerDef) =>
+                trackerDef && customTrackerRepository.addTracker(trackerDef)
         )
     );
     await Promise.all(trackerPromises);

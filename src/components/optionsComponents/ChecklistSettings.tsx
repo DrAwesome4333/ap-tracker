@@ -16,6 +16,8 @@ import {
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
 const mockLocationTracker = new CustomLocationTracker(
+    mockLocationManager,
+    null,
     {
         manifest: {
             type: ResourceType.locationTracker,
@@ -65,9 +67,7 @@ const mockLocationTracker = new CustomLocationTracker(
                 locations: ["Location 10"],
             },
         },
-    },
-    mockLocationManager,
-    null
+    }
 );
 
 const mockTagManager = createTagManager(mockLocationManager);

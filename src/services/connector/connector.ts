@@ -17,8 +17,7 @@ import { TrackerManager } from "../tracker/TrackerManager";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
-import { genericGameRepository } from "../tracker/generic/genericGame";
-import { GenericGameMethod } from "../tracker/generic/genericGameEnums";
+import GenericTrackerRepository from "../tracker/generic/genericTrackerRepository";
 
 const CONNECTION_STATUS = {
     disconnected: "Disconnected",
@@ -60,7 +59,8 @@ const createConnector = (
     _entranceManager: EntranceManager,
     tagManager: TagManager,
     trackerManager: TrackerManager,
-    textClientManager: TextClientManager
+    textClientManager: TextClientManager,
+    genericTrackerRepository: GenericTrackerRepository
 ): Connector => {
     const client = new Client({ debugLogVersions: false });
     const connection = (() => {
@@ -327,17 +327,11 @@ const createConnector = (
                         item: { [name: string]: string[] };
                         location: { [name: string]: string[] };
                     }) => {
-                        const defaults =
-                            genericGameRepository.buildGenericTrackers(
-                                savedConnectionInfo.game,
-                                locationManager,
-                                groups,
-                                GenericGameMethod.locationGroup
-                            );
-                        trackerManager.loadTrackers(
+                        genericTrackerRepository.configureGenericTrackers(
                             savedConnectionInfo.game,
-                            defaults
+                            groups
                         );
+                        trackerManager.loadTrackers(savedConnectionInfo.game);
                         tagManager.loadTags(connection.slotInfo.connectionId);
                     }
                 );

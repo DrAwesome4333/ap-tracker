@@ -12,7 +12,7 @@ import { NameTokenizationOptions } from "../../services/tracker/generic/location
 import { Checkbox, Input } from "../inputs";
 import SectionView from "../sectionComponents/SectionView";
 import { createTagManager } from "../../services/tags/tagManager";
-import { genericGameRepository } from "../../services/tracker/generic/genericGame";
+import { genericGameRepository } from "../../services/tracker/generic/genericTrackerRepository";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,

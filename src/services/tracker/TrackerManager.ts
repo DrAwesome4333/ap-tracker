@@ -1,6 +1,6 @@
 import { DataStore } from "../dataStores";
-import LocationReport from "./locationTrackers/LocationReport";
-import { LocationTrackerType, ResourceType } from "./resourceEnums";
+import GenericLocationTracker from "./generic/genericTracker";
+import { ResourceType } from "./resourceEnums";
 const modified = Symbol("modified");
 
 type TrackerDirectory = {
@@ -22,42 +22,13 @@ type TrackerResourceIds = {
 };
 
 type TrackerChoiceOptions = {
-    [game: string]: {
-        [type: string]: TrackerResourceId;
-    };
+    [game: string]: TrackerResourceIds;
 };
 
-const nullSection = {
-    id: "root",
-    title: "Unloaded Tracker",
-    locationReport: new LocationReport(),
-    locations: [],
-    theme: {
-        color: "red",
-    },
-    children: [],
-    parents: [],
-};
-
-const nullLocationTracker: DropdownLocationTracker = {
-    manifest: {
-        uuid: "00000000-0000-0000-0000-000000000000",
-        name: "Unloaded tracker",
-        formatVersion: 2,
-        version: "0.0.0",
-        type: ResourceType.locationTracker,
-        locationTrackerType: LocationTrackerType.dropdown,
-        repositoryUuid: "00000000-0000-0000-0000-000000000000",
-        game: null,
-    },
-    type: LocationTrackerType.dropdown,
-    getSection: () => nullSection,
-    exportDropdowns: () => {},
-    getUpdateSubscriber: () => {
-        return () => {
-            return () => {};
-        };
-    },
+const getTrackerKey = (tracker: TrackerResourceId) => {
+    return tracker
+        ? `${tracker.uuid}-${tracker.version}-${tracker.type}`
+        : null;
 };
 
 class TrackerManager {
@@ -65,6 +36,7 @@ class TrackerManager {
         string,
         { repo: ResourceRepository; listenerCleanUp: () => void }
     > = new Map();
+    #trackerRepositoryMap: Map<string, string> = new Map();
     #allTrackers: Map<string, LocationTrackerManifest | ItemTrackerManifest> =
         new Map();
     #directoryListeners: Set<() => void> = new Set();
@@ -81,18 +53,18 @@ class TrackerManager {
 
     #trackerChoiceOptions: TrackerChoiceOptions = {};
     #optionsStore: DataStore;
-
-    #locationTracker: LocationTracker = nullLocationTracker;
-    #itemTracker: ItemTracker = null;
+    #trackers: {
+        [type: string]: LocationTracker | ItemTracker;
+    } = {};
     #game: string = null;
     #defaults: TrackerResourceIds = {
         [ResourceType.locationTracker]: {
-            uuid: "00000000-0000-0000-0000-000000000000",
+            uuid: GenericLocationTracker.uuid,
             version: "0.0.0",
             type: ResourceType.locationTracker,
         },
         [ResourceType.itemTracker]: {
-            uuid: "00000000-0000-0000-0000-000000000000",
+            uuid: "",
             version: "0.0.0",
             type: ResourceType.itemTracker,
         },
@@ -102,20 +74,20 @@ class TrackerManager {
         this.#optionsStore = optionStore;
         this.#trackerChoiceOptions =
             (this.#optionsStore.read() as TrackerChoiceOptions) ?? {};
-        const subscriber = this.#optionsStore.getUpdateSubscriber();
-        subscriber(() => {
+        const subscribe = this.#optionsStore.getUpdateSubscriber();
+        subscribe(() => {
             this.#trackerChoiceOptions =
                 this.#optionsStore.read() as TrackerChoiceOptions;
-            const newGameInfo = this.#trackerChoiceOptions[this.#game];
-            if (
-                newGameInfo?.locationTracker.uuid !==
-                    this.#locationTracker.manifest.uuid ||
-                (newGameInfo?.locationTracker.uuid ===
-                    this.#locationTracker.manifest.uuid &&
-                    newGameInfo.locationTracker.version !==
-                        this.#locationTracker.manifest.version)
-            ) {
-                this.loadTrackers(this.#game, this.#defaults);
+            const newGameInfo = this.#trackerChoiceOptions[this.#game] ?? {};
+            const changes = Object.entries(this.#trackers).filter(
+                ([type, tracker]) =>
+                    tracker?.manifest.uuid !== newGameInfo[type]?.uuid ||
+                    tracker?.manifest.version !== newGameInfo[type]?.version
+            );
+            if (changes.length > 0) {
+                this.loadTrackers(this.#game);
+            } else {
+                this.#callTrackerListeners();
             }
             this.#callDirectoryListeners();
         });
@@ -159,14 +131,21 @@ class TrackerManager {
                     manifest.type === ResourceType.itemTracker ||
                     manifest.type === ResourceType.locationTracker
                 ) {
-                    if (this.#allTrackers.has(manifest.uuid)) {
+                    if (this.#allTrackers.has(getTrackerKey(manifest))) {
                         // todo deal with duplicates in a graceful manner
                         console.warn(
                             "Trackers with duplicate ids added, second was ignored with id:",
                             manifest.uuid
                         );
                     } else {
-                        this.#allTrackers.set(manifest.uuid, manifest);
+                        this.#allTrackers.set(
+                            getTrackerKey(manifest),
+                            manifest
+                        );
+                        this.#trackerRepositoryMap.set(
+                            getTrackerKey(manifest),
+                            repo.uuid
+                        );
                         if (
                             manifest.game === this.#game &&
                             Object.entries({
@@ -190,7 +169,7 @@ class TrackerManager {
             );
             this.#callDirectoryListeners();
             if (triggerReload) {
-                this.loadTrackers(this.#game, this.#defaults);
+                this.loadTrackers(this.#game);
             }
         };
         const subCall = repo.getUpdateSubscriber([
@@ -244,40 +223,74 @@ class TrackerManager {
         return this.#cachedDirectory;
     };
 
-    loadTrackers = async (
+    setGameTracker = (
         game: string,
-        defaults: TrackerResourceIds
-    ): Promise<void> => {
-        const trackerOptions = this.#trackerChoiceOptions ?? {};
-        this.#defaults = defaults;
-        let locationTrackerInfo = this.#allTrackers.get(
-            trackerOptions[game]?.locationTracker?.uuid
+        tracker: TrackerResourceId | { type: string }
+    ) => {
+        if (game) {
+            const currentValue =
+                (this.#optionsStore.read(game) as TrackerResourceIds) ?? {};
+            const newValue: TrackerResourceIds = {
+                ...currentValue,
+            };
+            if ("uuid" in tracker) {
+                newValue[tracker.type] = tracker;
+            } else {
+                delete newValue[tracker.type];
+            }
+            this.#optionsStore.write(newValue, game);
+            // tracker should auto reload with change on settings store
+        } else {
+            if ("uuid" in tracker) {
+                this.#defaults[tracker.type] = tracker;
+                // todo reload tracker when default is changed
+            } else {
+                throw new Error(
+                    "Default tracker must be set, cannot be deleted"
+                );
+            }
+        }
+    };
+
+    loadTrackers = async (game: string): Promise<void> => {
+        this.#game = game;
+        const locationTrackerInfo = this.getCurrentGameTracker(
+            game,
+            ResourceType.locationTracker
         );
-        locationTrackerInfo ??= this.#allTrackers.get(
-            defaults[ResourceType.locationTracker]?.uuid
+        const itemTrackerInfo = this.getCurrentGameTracker(
+            game,
+            ResourceType.itemTracker
         );
-        let itemTrackerInfo = this.#allTrackers.get(
-            trackerOptions[game]?.itemTracker?.uuid
+        const locationTrackerRepoUuid = this.#trackerRepositoryMap.get(
+            getTrackerKey(locationTrackerInfo)
         );
-        itemTrackerInfo ??= this.#allTrackers.get(
-            defaults[ResourceType.itemTracker]?.uuid
+        const itemTrackerRepoUuid = this.#trackerRepositoryMap.get(
+            getTrackerKey(itemTrackerInfo)
         );
+
         const locationTrackerPromise = this.#repositories
-            .get(locationTrackerInfo?.repositoryUuid)
+            .get(locationTrackerRepoUuid)
             ?.repo.loadResource(
                 locationTrackerInfo.uuid,
-                locationTrackerInfo.version
+                locationTrackerInfo.version,
+                locationTrackerInfo.type
             )
             .then((tracker) => {
-                this.#locationTracker =
-                    (tracker as LocationTracker) ?? nullLocationTracker;
+                this.#trackers[ResourceType.locationTracker] =
+                    tracker as LocationTracker;
                 this.#callTrackerListeners();
             });
         const itemTrackerPromise = this.#repositories
-            .get(itemTrackerInfo?.repositoryUuid)
-            ?.repo.loadResource(itemTrackerInfo.uuid, itemTrackerInfo.version)
+            .get(itemTrackerRepoUuid)
+            ?.repo.loadResource(
+                itemTrackerInfo.uuid,
+                itemTrackerInfo.version,
+                itemTrackerInfo.type
+            )
             .then((tracker) => {
-                this.#itemTracker = tracker as ItemTracker;
+                this.#trackers[ResourceType.itemTracker] =
+                    tracker as ItemTracker;
                 this.#callTrackerListeners();
             });
         const trackerPromises = [locationTrackerPromise, itemTrackerPromise];
@@ -285,29 +298,20 @@ class TrackerManager {
     };
 
     getCurrentGameTracker = (game: string, type: ResourceType) => {
-        const selectedOption = this.#trackerChoiceOptions[game];
-        if (selectedOption) {
-            if (type === ResourceType.locationTracker) {
-                return selectedOption.locationTracker;
-            }
-            if (type === ResourceType.itemTracker) {
-                return selectedOption.itemTracker;
-            }
-        }
-        return null;
+        const selectedOption =
+            this.#trackerChoiceOptions[game] ?? this.#defaults;
+        return selectedOption[type] ?? this.#defaults[type];
     };
 
     getCurrentTracker = (type: ResourceType) => {
-        switch (type) {
-            case ResourceType.itemTracker: {
-                return this.#itemTracker;
-            }
-            case ResourceType.locationTracker: {
-                return this.#locationTracker;
-            }
-        }
+        return this.#trackers[type];
     };
 }
 
 export { TrackerManager };
-export type { TrackerChoiceOptions, TrackerDirectory };
+export type {
+    TrackerChoiceOptions,
+    TrackerDirectory,
+    TrackerResourceId,
+    TrackerResourceIds,
+};

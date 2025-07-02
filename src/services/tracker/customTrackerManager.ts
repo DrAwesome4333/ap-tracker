@@ -8,10 +8,6 @@ import { ResourceType } from "./resourceEnums";
 const customTrackerRepositoryUUID = "c76c2420-d100-4093-8734-c52ddedd8917";
 type CustomTrackerDirectory = { [uuid: string]: ResourceManifest[] };
 
-const getTrackerKey = (manifest: ResourceManifest) => {
-    return `${manifest.uuid}<${manifest.version}>`;
-};
-
 class CustomTrackerRepository implements ResourceRepository {
     readonly uuid = customTrackerRepositoryUUID;
     resources: ResourceManifest[] = [];
@@ -28,9 +24,16 @@ class CustomTrackerRepository implements ResourceRepository {
         this.#locationManager = locationManager;
         // this.#inventoryManager = inventoryManager;
         SaveData.getAllItems(DB_STORE_KEYS.customTrackersDirectory)
-            .then((directory: CustomTrackerDirectory) => {
-                if (directory) {
-                    this.#updateDirectory(directory);
+            .then((manifests: ResourceManifest[]) => {
+                if (manifests) {
+                    const newDirectory: CustomTrackerDirectory = {};
+                    manifests.forEach((manifest) => {
+                        const items: ResourceManifest[] =
+                            newDirectory[manifest.uuid] ?? [];
+                        items.push(manifest);
+                        newDirectory[manifest.uuid] = items;
+                    });
+                    this.#updateDirectory(newDirectory);
                 }
             })
             .then(() => {
@@ -59,22 +62,25 @@ class CustomTrackerRepository implements ResourceRepository {
         };
     };
 
-    loadResource: (uuid: string, version: string) => Promise<Resource> = async (
-        uuid,
-        version
-    ) => {
+    loadResource: (
+        uuid: string,
+        version: string,
+        type: ResourceType
+    ) => Promise<Resource> = async (uuid, version, type) => {
         if (!this.#directory[uuid]) {
             throw new Error(`Failed to locate resource ${uuid}`);
         }
         // TODO support custom item trackers
-        const resource = (await SaveData.getItem(
-            DB_STORE_KEYS.customTrackers,
-            `${uuid}<${version}>`
-        )) as CustomLocationTrackerDef_V2;
+        const resource = (await SaveData.getItem(DB_STORE_KEYS.customTrackers, [
+            uuid,
+            version,
+            type,
+        ])) as CustomLocationTrackerDef_V2;
+
         return new CustomLocationTracker(
-            resource,
             this.#locationManager,
-            customTrackerRepositoryUUID
+            customTrackerRepositoryUUID,
+            resource
         );
     };
 
@@ -85,6 +91,10 @@ class CustomTrackerRepository implements ResourceRepository {
     addTracker = (
         data: CustomLocationTrackerDef_V2 | CustomLocationTrackerDef_V1
     ) => {
+        if (!data) {
+            console.warn("Could not add empty tracker!");
+            return;
+        }
         if ("customTrackerVersion" in data) {
             data = convertLocationTrackerV1toV2(data);
         }
@@ -108,9 +118,15 @@ class CustomTrackerRepository implements ResourceRepository {
                 trackerVersions[trackerIndex] = data.manifest;
             }
             SaveData.storeItem(
-                DB_STORE_KEYS.customTrackers,
-                getTrackerKey(data.manifest)
+                DB_STORE_KEYS.customTrackersDirectory,
+                data.manifest
             );
+            SaveData.storeItem(DB_STORE_KEYS.customTrackers, {
+                uuid: data.manifest.uuid,
+                version: data.manifest.version,
+                type: data.manifest.type,
+                ...data,
+            });
             this.#updateDirectory(updatedDirectory);
         };
 

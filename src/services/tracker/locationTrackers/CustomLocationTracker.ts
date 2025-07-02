@@ -1,26 +1,26 @@
 import { LocationManager } from "../../locations/locationManager";
 import LocationReport from "./LocationReport";
 import { convertLocationTrackerV1toV2 } from "./upgradePathV1V2";
-import { LocationTrackerType } from "../resourceEnums";
+import { LocationTrackerType, ResourceType } from "../resourceEnums";
 
 class CustomLocationTracker implements DropdownLocationTracker {
     manifest: LocationTrackerManifest;
     type: LocationTrackerType.dropdown;
     locationManager: LocationManager;
-    #listeners: Set<() => void> = new Set();
-    #cleanupCalls: Set<() => void> = new Set();
-    #locations: Set<string> = new Set();
-    #sections: Map<string, Section> = new Map();
-    #errors: string[] = [];
-    #cachedErrors: string[] = [];
+    protected listeners: Set<() => void> = new Set();
+    protected cleanupCalls: Set<() => void> = new Set();
+    protected locations: Set<string> = new Set();
+    protected sections: Map<string, Section> = new Map();
+    protected errors: string[] = [];
+    protected cachedErrors: string[] = [];
 
     constructor(
-        data: CustomLocationTrackerDef_V1 | CustomLocationTrackerDef_V2,
         locationManager: LocationManager,
-        repositoryUUID: string
+        repositoryUUID: string,
+        data?: CustomLocationTrackerDef_V1 | CustomLocationTrackerDef_V2
     ) {
         this.locationManager = locationManager;
-        if ("customTrackerVersion" in data) {
+        if (data && "customTrackerVersion" in data) {
             if (data.customTrackerVersion === 1) {
                 data = convertLocationTrackerV1toV2(data);
             } else {
@@ -29,11 +29,24 @@ class CustomLocationTracker implements DropdownLocationTracker {
                 );
             }
         }
-        this.#read(data);
+        if (data && "manifest" in data) {
+            this.read(data);
+        } else {
+            this.manifest = {
+                repositoryUuid: repositoryUUID,
+                version: "0.0.0",
+                locationTrackerType: LocationTrackerType.dropdown,
+                uuid: null,
+                type: ResourceType.locationTracker,
+                formatVersion: 2,
+                game: null,
+                name: "Null Tracker",
+            };
+        }
         this.manifest.repositoryUuid = repositoryUUID;
     }
 
-    #read = (data: CustomLocationTrackerDef_V2) => {
+    protected read = (data: CustomLocationTrackerDef_V2) => {
         this.manifest = data.manifest;
 
         const groups = data.groups ?? {};
@@ -48,7 +61,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
             const sectionDef = sections[sectionName];
             // Section not found
             if (!sectionDef) {
-                this.#errors.push(
+                this.errors.push(
                     `Section ${sectionName} could not be found.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
                 );
                 return null;
@@ -64,15 +77,15 @@ class CustomLocationTracker implements DropdownLocationTracker {
         ) => {
             // Section is a child of itself
             if (parents && parents.includes(sectionName)) {
-                this.#errors.push(
+                this.errors.push(
                     `Section "${sectionName}" is a descendent of itself.\nPath:\n\t${[...(parents ?? []), sectionName].join("\t => \n")}`
                 );
                 return null;
             }
 
             // Section already processed
-            if (this.#sections.has(sectionName)) {
-                return this.#sections.get(sectionName);
+            if (this.sections.has(sectionName)) {
+                return this.sections.get(sectionName);
             }
 
             const groupNames =
@@ -81,7 +94,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
                     : [...(sectionDef.groups ?? [])];
             for (const groupName of groupNames) {
                 if (!groups[groupName]) {
-                    this.#errors.push(
+                    this.errors.push(
                         `Group ${groupName} could not be found.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
                     );
                 }
@@ -104,7 +117,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
                 theme: { color: "#888888", ...themes[sectionDef.theme] },
             };
 
-            this.#sections.set(sectionName, section);
+            this.sections.set(sectionName, section);
 
             const childParents = [...(parents ?? []), sectionName];
             const children = !sectionDef.children
@@ -127,15 +140,15 @@ class CustomLocationTracker implements DropdownLocationTracker {
                 }
             });
 
-            section.locations.forEach((value) => this.#locations.add(value));
+            section.locations.forEach((value) => this.locations.add(value));
             const subscriber = this.locationManager.getSubscriberCallback(
                 new Set(section.locations)
             );
             const cleanup = subscriber((_updatedLocations) => {
-                this.#updateSection(sectionName);
+                this.updateSection(sectionName);
             });
-            this.#updateSection(sectionName);
-            this.#cleanupCalls.add(cleanup);
+            this.updateSection(sectionName);
+            this.cleanupCalls.add(cleanup);
         };
 
         parseSection_string("root");
@@ -143,8 +156,8 @@ class CustomLocationTracker implements DropdownLocationTracker {
         // extra validation
         const remainingGroups = new Set(Object.keys(groups));
         Object.entries(sections).forEach(([name, section]) => {
-            if (!this.#sections.has(name)) {
-                this.#errors.push(`Section ${name} can not be reached`);
+            if (!this.sections.has(name)) {
+                this.errors.push(`Section ${name} can not be reached`);
             }
             const sectionGroups =
                 typeof section.groups === "string"
@@ -154,9 +167,9 @@ class CustomLocationTracker implements DropdownLocationTracker {
         });
         remainingGroups
             .values()
-            .forEach((name) => this.#errors.push(`Group ${name} is unused.`));
+            .forEach((name) => this.errors.push(`Group ${name} is unused.`));
 
-        this.#sections.values().forEach((section) => {
+        this.sections.values().forEach((section) => {
             Object.freeze(section);
             Object.freeze(section.locations);
             Object.freeze(section.parents);
@@ -164,7 +177,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
         });
     };
 
-    #updateSection = (
+    protected updateSection = (
         sectionName: string,
         processedSections: Set<string> = new Set(),
         callListeners = true
@@ -172,13 +185,13 @@ class CustomLocationTracker implements DropdownLocationTracker {
         if (processedSections.has(sectionName)) {
             return;
         }
-        const section = this.#sections.get(sectionName);
+        const section = this.sections.get(sectionName);
         const locationReport = new LocationReport();
         section.locations.forEach((location) => {
             locationReport.addLocation(this.locationManager, location);
         });
         section.children.forEach((childName) => {
-            const child = this.#sections.get(childName);
+            const child = this.sections.get(childName);
             if (child) {
                 locationReport.addReport(child.locationReport);
             }
@@ -191,49 +204,49 @@ class CustomLocationTracker implements DropdownLocationTracker {
 
         Object.freeze(newSection);
 
-        this.#sections.set(sectionName, newSection);
+        this.sections.set(sectionName, newSection);
 
         section.parents.forEach((parentName) =>
-            this.#updateSection(parentName, processedSections, false)
+            this.updateSection(parentName, processedSections, false)
         );
 
         if (callListeners) {
-            this.#callListeners(sectionName);
+            this.callListeners(sectionName);
         }
     };
 
-    #callListeners = (_sectionName?: string) => {
-        this.#listeners.values().forEach((listener) => listener());
+    protected callListeners = (_sectionName?: string) => {
+        this.listeners.values().forEach((listener) => listener());
     };
 
     getUpdateSubscriber = (_name?: string) => {
         return (listener: () => void) => {
-            this.#listeners.add(listener);
+            this.listeners.add(listener);
             return () => {
-                this.#listeners.delete(listener);
+                this.listeners.delete(listener);
             };
         };
     };
 
     getSection = (name: string) => {
-        return this.#sections.get(name);
+        return this.sections.get(name);
     };
 
     validateLocations = (locations: Set<string>) => {
-        const missingLocations = locations.difference(this.#locations);
+        const missingLocations = locations.difference(this.locations);
         if (missingLocations.size > 0) {
-            this.#errors.push(
+            this.errors.push(
                 `The following locations are missing from the custom location tracker:\n\t${[...missingLocations.values()].join("\n\t")}`
             );
         }
     };
 
     getErrors = () => {
-        if (this.#cachedErrors.length !== this.#errors.length) {
-            this.#cachedErrors = [...this.#errors];
-            Object.freeze(this.#cachedErrors);
+        if (this.cachedErrors.length !== this.errors.length) {
+            this.cachedErrors = [...this.errors];
+            Object.freeze(this.cachedErrors);
         }
-        return this.#cachedErrors;
+        return this.cachedErrors;
     };
 
     exportDropdowns = () => {};

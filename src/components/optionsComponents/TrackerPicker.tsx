@@ -20,11 +20,8 @@ const TrackerPicker = () => {
                     trackerDirectory.games.map((game) => {
                         return (
                             <div key={game}>
-                                {game}:{" "}
-                                <TrackerDropdown
-                                    game={game}
-                                    trackerManager={trackerManager}
-                                />
+                                {game ?? "Default"}:{" "}
+                                <TrackerDropdown game={game} />
                             </div>
                         );
                     })

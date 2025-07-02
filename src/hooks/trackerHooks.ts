@@ -4,10 +4,17 @@ import { TrackerManager } from "../services/tracker/TrackerManager";
 import { ResourceType } from "../services/tracker/resourceEnums";
 
 const useTrackerDirectory = (trackerManager: TrackerManager) => {
+    const callback = trackerManager
+        ? trackerManager.getDirectorySubscriberCallback()
+        : (_: () => void) => {
+              /* There is nothing to listen to*/ return () => {
+                  /* Empty clean up call */
+              };
+          };
     return useSyncExternalStore(
-        trackerManager.getDirectorySubscriberCallback(),
-        trackerManager.getDirectory,
-        trackerManager.getDirectory
+        callback,
+        () => trackerManager?.getDirectory(),
+        () => trackerManager?.getDirectory()
     );
 };
 
@@ -26,10 +33,17 @@ const useCurrentGameTracker = (
     trackerManager: TrackerManager,
     type: ResourceType
 ) => {
+    const callback = trackerManager
+        ? trackerManager.getTrackerSubscriberCallback()
+        : (_: () => void) => {
+              /* There is nothing to listen to*/ return () => {
+                  /* Empty clean up call */
+              };
+          };
     return useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(),
-        () => trackerManager.getCurrentGameTracker(game, type),
-        () => trackerManager.getCurrentGameTracker(game, type)
+        callback,
+        () => trackerManager?.getCurrentGameTracker(game, type),
+        () => trackerManager?.getCurrentGameTracker(game, type)
     );
 };
 

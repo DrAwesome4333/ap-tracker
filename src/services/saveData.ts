@@ -7,7 +7,7 @@ const DB_STORE_KEYS = {
     customTrackersDirectory: "custom_tracker_manifests_v2",
 };
 
-const database_request = window.indexedDB.open("checklist_db", 6);
+const database_request = window.indexedDB.open("checklist_db", 7);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -65,17 +65,17 @@ database_request.onupgradeneeded = (_event) => {
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
         const customTrackerStore = db.createObjectStore(
             DB_STORE_KEYS.customTrackers,
-            { keyPath: "uuid" }
+            { keyPath: ["uuid", "version", "type"] }
         );
-        customTrackerStore.createIndex("uuid", "uuid", { unique: true });
+        customTrackerStore.createIndex("uuid", "uuid", { unique: false });
     }
 
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackersDirectory)) {
         const customTrackerStore = db.createObjectStore(
             DB_STORE_KEYS.customTrackersDirectory,
-            { keyPath: "uuid" }
+            { keyPath: ["uuid", "version", "type"] }
         );
-        customTrackerStore.createIndex("uuid", "uuid", { unique: true });
+        customTrackerStore.createIndex("uuid", "uuid", { unique: false });
     }
 };
 
@@ -85,7 +85,10 @@ database_request.onupgradeneeded = (_event) => {
  * @param key They key of the item to search in the store
  * @returns The requested item if it exists, else null
  */
-const getItem = (storeName: string, key: string): Promise<unknown> => {
+const getItem = (
+    storeName: string,
+    key: string | string[]
+): Promise<unknown> => {
     return new Promise((resolve, _reject) => {
         let hasFailed = false;
         const attemptLoad = () => {
