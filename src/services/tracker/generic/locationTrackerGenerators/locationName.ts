@@ -250,8 +250,8 @@ const generateSectionDef = (
     }
 
     const trackerGroups: { [groupKey: string]: GroupData_V2 } = {};
-    const sectionDef: CustomLocationTrackerDef_V2  = {
-         manifest: {
+    const sectionDef: CustomLocationTrackerDef_V2 = {
+        manifest: {
             name: "Place holder name",
             uuid: randomUUID(),
             version: "0.0.0",
@@ -302,9 +302,9 @@ const generateSectionDef = (
 
         node.children.forEach((child) => {
             traverseTreeNode(child);
-            (<string[]>sectionDef.sections[sectionName(node.name)].children).push(
-                sectionName(child.name)
-            );
+            (<string[]>(
+                sectionDef.sections[sectionName(node.name)].children
+            )).push(sectionName(child.name));
         });
         (<string[]>sectionDef.sections[sectionName(node.name)].children).sort(
             naturalSort

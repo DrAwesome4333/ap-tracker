@@ -3,9 +3,7 @@ import { CustomTrackerRepository } from "../services/tracker/customTrackerManage
 import { TrackerManager } from "../services/tracker/TrackerManager";
 import { ResourceType } from "../services/tracker/resourceEnums";
 
-const useTrackerDirectory = (
-    trackerManager: TrackerManager
-) => {
+const useTrackerDirectory = (trackerManager: TrackerManager) => {
     return useSyncExternalStore(
         trackerManager.getDirectorySubscriberCallback(),
         trackerManager.getDirectory,
@@ -26,7 +24,7 @@ const useCustomTrackerDirectory = (
 const useCurrentGameTracker = (
     game: string,
     trackerManager: TrackerManager,
-    type: ResourceType,
+    type: ResourceType
 ) => {
     return useSyncExternalStore(
         trackerManager.getTrackerSubscriberCallback(),

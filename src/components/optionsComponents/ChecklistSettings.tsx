@@ -9,49 +9,66 @@ import { SecondaryButton } from "../buttons";
 import OptionView from "./OptionView";
 import { baseTrackerOptions } from "../../services/options/trackerOptions";
 import CustomLocationTracker from "../../services/tracker/locationTrackers/CustomLocationTracker";
-import { ResourceType, LocationTrackerType } from "../../services/tracker/resourceEnums";
+import {
+    ResourceType,
+    LocationTrackerType,
+} from "../../services/tracker/resourceEnums";
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
-const mockLocationTracker = new CustomLocationTracker({
-    manifest:{
-        type: ResourceType.locationTracker,
-        uuid: null,
-        repositoryUuid: null,
-        name: "Mock Location Tracker",
-        game: null,
-        locationTrackerType: LocationTrackerType.dropdown,
-        formatVersion: 2,
-        version: "0.0.0",
-    },
-    themes: {
-        default:{
-            color:"#888888"
-        }
-    },
-    sections: {
+const mockLocationTracker = new CustomLocationTracker(
+    {
+        manifest: {
+            type: ResourceType.locationTracker,
+            uuid: null,
+            repositoryUuid: null,
+            name: "Mock Location Tracker",
+            game: null,
+            locationTrackerType: LocationTrackerType.dropdown,
+            formatVersion: 2,
+            version: "0.0.0",
+        },
+        themes: {
+            default: {
+                color: "#888888",
+            },
+        },
+        sections: {
             root: {
-            title: "Numbers",
-            theme: "default",
-            children: ["one", "primes", "composites", "tens"],
+                title: "Numbers",
+                theme: "default",
+                children: ["one", "primes", "composites", "tens"],
+            },
+            one: {
+                title: "One",
+                locations: ["Location 1"],
+            },
+            primes: {
+                title: "Primes",
+                locations: [
+                    "Location 2",
+                    "Location 3",
+                    "Location 5",
+                    "Location 7",
+                ],
+            },
+            composites: {
+                title: "Composites",
+                locations: [
+                    "Location 4",
+                    "Location 6",
+                    "Location 8",
+                    "Location 9",
+                ],
+            },
+            tens: {
+                title: "Tens",
+                locations: ["Location 10"],
+            },
         },
-        one: {
-            title: "One",
-            locations: ["Location 1"],
-        },
-        primes: {
-            title: "Primes",
-            locations: ["Location 2", "Location 3", "Location 5", "Location 7"],
-        },
-        composites: {
-            title: "Composites",
-            locations: ["Location 4", "Location 6", "Location 8", "Location 9"],
-        },
-        tens: {
-            title: "Tens",
-            locations: ["Location 10"]
-        },
-    }
-}, mockLocationManager, null);
+    },
+    mockLocationManager,
+    null
+);
 
 const mockTagManager = createTagManager(mockLocationManager);
 
@@ -76,7 +93,6 @@ mockLocationManager.updateLocationStatus("Location 8", {
     checked: true,
 });
 mockLocationManager.updateLocationStatus("Location 9", { exists: true });
-
 
 const ChecklistSettings = ({
     optionManager,

@@ -221,7 +221,7 @@ const getAllItems = (storeName: string): Promise<unknown> => {
                 }
             }
         };
-        
+
         if (database_open) {
             attemptLoad();
         } else {

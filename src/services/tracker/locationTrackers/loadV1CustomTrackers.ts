@@ -34,22 +34,31 @@ const saveDirectory = (directory: CustomListDirectory) => {
     );
 };
 
-const getCustomTracker = async (id: string): Promise<CustomLocationTrackerDef_V1> => {
+const getCustomTracker = async (
+    id: string
+): Promise<CustomLocationTrackerDef_V1> => {
     return (await SaveData.getItem(
         DB_STORE_KEYS.customTrackers_old,
         id
     )) as CustomLocationTrackerDef_V1;
 };
 
-const portTrackers = async (customTrackerRepository: CustomTrackerRepository, force=false) => {
+const portTrackers = async (
+    customTrackerRepository: CustomTrackerRepository,
+    force = false
+) => {
     const directory = readDirectoryFromStorage();
-    if(directory.ported && !force){
+    if (directory.ported && !force) {
         return;
     }
-    const trackerPromises = directory.customLists.map((metaData) => getCustomTracker(metaData.id).then((trackerDef) => customTrackerRepository.addTracker(trackerDef)));
+    const trackerPromises = directory.customLists.map((metaData) =>
+        getCustomTracker(metaData.id).then((trackerDef) =>
+            customTrackerRepository.addTracker(trackerDef)
+        )
+    );
     await Promise.all(trackerPromises);
     directory.ported = true;
     saveDirectory(directory);
-}
+};
 
-export {portTrackers};
+export { portTrackers };

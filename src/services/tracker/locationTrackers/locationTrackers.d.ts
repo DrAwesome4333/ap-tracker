@@ -26,7 +26,6 @@ type DropdownLocationTracker = {
     getSection: (name: string) => Section;
     exportDropdowns: () => unknown;
     getUpdateSubscriber: (name?) => (listener: () => void) => () => void;
-
 } & BaseLocationTracker;
 
 type ThemeDef = ThemeDef_V2;

@@ -17,4 +17,9 @@ enum ResourceLocationType {
     builtIn = 3,
 }
 
-export {LocationTrackerType, ItemTrackerType, ResourceType, ResourceLocationType}
+export {
+    LocationTrackerType,
+    ItemTrackerType,
+    ResourceType,
+    ResourceLocationType,
+};

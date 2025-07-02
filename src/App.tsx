@@ -22,6 +22,8 @@ import { CustomTrackerRepository } from "./services/tracker/customTrackerManager
 import TextClientManager from "./services/textClientManager";
 import { genericGameRepository } from "./services/tracker/generic/genericGame";
 import { ResourceType } from "./services/tracker/resourceEnums";
+import { LocalStorageDataStore } from "./services/dataStores";
+import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTrackers";
 
 const AppScreen = styled.div`
     position: absolute;
@@ -50,11 +52,19 @@ const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 
 const tagManager = createTagManager(locationManager);
-const trackerManager = new TrackerManager();
-const customTrackerRepository = new CustomTrackerRepository(locationManager, inventoryManager);
+const mainTrackerManagerStore = new LocalStorageDataStore(
+    "AP_ChecklistTracker_TrackerChoices"
+);
+const trackerManager = new TrackerManager(mainTrackerManagerStore);
+const customTrackerRepository = new CustomTrackerRepository(
+    locationManager,
+    inventoryManager
+);
 
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericGameRepository);
+// Port from old version
+portTrackers(customTrackerRepository, true);
 
 const textClientManager = new TextClientManager();
 
@@ -88,14 +98,16 @@ const App = (): React.ReactNode => {
         | null;
 
     const locationTracker = useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(ResourceType.locationTracker),
+        trackerManager.getTrackerSubscriberCallback(
+            ResourceType.locationTracker
+        ),
         () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.locationTracker)
     ) as LocationTracker;
     const itemTracker = useSyncExternalStore(
         trackerManager.getTrackerSubscriberCallback(ResourceType.itemTracker),
         () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
+        () => trackerManager.getCurrentTracker(ResourceType.itemTracker)
     ) as ItemTracker;
     return (
         <div className="App" data-theme={readThemeValue(themeValue)}>

@@ -1,6 +1,10 @@
 import { naturalSort } from "../../../../utility/comparisons";
 import { randomUUID } from "../../../../utility/uuid";
-import { ResourceType, ResourceLocationType, LocationTrackerType } from "../../resourceEnums";
+import {
+    ResourceType,
+    ResourceLocationType,
+    LocationTrackerType,
+} from "../../resourceEnums";
 
 const GROUP_DEBUG = false;
 const DEBUG_PARENT_GROUP_ORGANIZATION = GROUP_DEBUG;
@@ -347,16 +351,18 @@ const generateSectionDef = (groups: { [s: string]: string[] }) => {
     }
 
     // sort the root
-     (<string[]>sectionDef.sections.root.children).sort((a: string, b: string) => {
-        const aIsKey = keyLocationGroups.has(a.slice("section_".length));
-        const bIsKey = keyLocationGroups.has(b.slice("section_".length));
-        if (aIsKey === bIsKey) {
-            return naturalSort(a, b);
-        } else if (aIsKey) {
-            return -1;
+    (<string[]>sectionDef.sections.root.children).sort(
+        (a: string, b: string) => {
+            const aIsKey = keyLocationGroups.has(a.slice("section_".length));
+            const bIsKey = keyLocationGroups.has(b.slice("section_".length));
+            if (aIsKey === bIsKey) {
+                return naturalSort(a, b);
+            } else if (aIsKey) {
+                return -1;
+            }
+            return 1;
         }
-        return 1;
-    });
+    );
 
     if (unclassifiedLocations.size > 0) {
         sectionDef.groups["group_unclassified"] = {

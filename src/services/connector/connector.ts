@@ -327,8 +327,17 @@ const createConnector = (
                         item: { [name: string]: string[] };
                         location: { [name: string]: string[] };
                     }) => {
-                        const defaults = genericGameRepository.buildGenericTrackers(savedConnectionInfo.game, locationManager, groups, GenericGameMethod.locationGroup);
-                        trackerManager.loadTrackers(savedConnectionInfo.game, defaults);
+                        const defaults =
+                            genericGameRepository.buildGenericTrackers(
+                                savedConnectionInfo.game,
+                                locationManager,
+                                groups,
+                                GenericGameMethod.locationGroup
+                            );
+                        trackerManager.loadTrackers(
+                            savedConnectionInfo.game,
+                            defaults
+                        );
                         tagManager.loadTags(connection.slotInfo.connectionId);
                     }
                 );

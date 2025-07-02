@@ -66,7 +66,6 @@ const CreateCustomTrackerModal = ({
         //             progress: 1,
         //             duration: 4,
         //         });
-
         //         trackerManager.setGameTracker(data.game, data.id);
         //     })
         //     .catch((e) => {

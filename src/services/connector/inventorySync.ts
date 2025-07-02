@@ -1,6 +1,6 @@
 import { Client, Item } from "archipelago.js";
 import { InventoryItem, InventoryManager } from "../inventory/inventoryManager";
-import { randomUUID } from "crypto";
+import { randomUUID } from "../../utility/uuid";
 
 const convertAPItem = (
     client: Client,

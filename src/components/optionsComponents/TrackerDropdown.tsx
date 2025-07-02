@@ -9,29 +9,27 @@ import NotificationManager, {
 import ServiceContext from "../../contexts/serviceContext";
 import { naturalSort } from "../../utility/comparisons";
 import { ResourceType } from "../../services/tracker/resourceEnums";
-import { globalOptionManager } from "../../services/options/optionManager";
-import { TrackerChoiceOptions } from "../../services/tracker/TrackerManager";
 /**
  * Displays a drop down with a list of options available for trackers for the provided game name
  * @param param0
  * @returns
  */
-const TrackerDropdown = ({
-    game,
-}: {
-    game: string;
-}) => {
+const TrackerDropdown = ({ game }: { game: string }) => {
     const services = useContext(ServiceContext);
     const trackerManager = services.trackerManager;
     const directory = useTrackerDirectory(trackerManager);
-    const currentSelection = useCurrentGameTracker(game, trackerManager, ResourceType.locationTracker);
+    const currentSelection = useCurrentGameTracker(
+        game,
+        trackerManager,
+        ResourceType.locationTracker
+    );
     const trackers = useMemo(() => {
-        const list = directory.locationTrackers.filter(
+        const list = directory.trackers[ResourceType.locationTracker].filter(
             (tracker) => tracker.game === game
         );
         list.sort((a, b) => naturalSort(a.name, b.name));
         return list;
-    }, [directory.locationTrackers]);
+    }, [directory.trackers[ResourceType.locationTracker]]);
     return (
         <select
             className="interactive"
@@ -39,19 +37,19 @@ const TrackerDropdown = ({
             onChange={(e) => {
                 try {
                     if (e.target.value) {
-                        const trackerChoices = globalOptionManager.getOptionValue("TrackerChoices", "global") as TrackerChoiceOptions;
-                        const newChoices: TrackerChoiceOptions = {
-                            ...trackerChoices,
-                            [game]: {
-                                locationTracker: {
-                                    uuid: e.target.value,
-                                    version: trackers.filter(manifest => manifest.uuid === e.target.value)[0].version
-                                },
-                                itemTracker: trackerChoices[game]?.itemTracker, 
-                            }
-                        }
-                        globalOptionManager.setOptionValue("TrackerChoices", "global", newChoices)
-                    } 
+                        // const trackerChoices = globalOptionManager.getOptionValue("TrackerChoices", "global") as TrackerChoiceOptions;
+                        // const newChoices: TrackerChoiceOptions = {
+                        //     ...trackerChoices,
+                        //     [game]: {
+                        //         locationTracker: {
+                        //             uuid: e.target.value,
+                        //             version: trackers.filter(manifest => manifest.uuid === e.target.value)[0].version
+                        //         },
+                        //         itemTracker: trackerChoices[game]?.itemTracker,
+                        //     }
+                        // }
+                        // globalOptionManager.setOptionValue("TrackerChoices", "global", newChoices)
+                    }
                 } catch (e) {
                     console.error(e);
                     NotificationManager.createToast({

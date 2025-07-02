@@ -178,7 +178,8 @@ const SectionView = ({
 
     return (
         <>
-            {(section?.locationReport.existing.size === 0 && section?.id !== "root") ? (
+            {section?.locationReport.existing.size === 0 &&
+            section?.id !== "root" ? (
                 <></> // Hide empty sections
             ) : (
                 <div style={style}>

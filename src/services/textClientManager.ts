@@ -5,9 +5,8 @@ import {
     Player,
     ValidJSONColorType,
 } from "archipelago.js";
-import { globalOptionManager } from "./options/optionManager";import { randomUUID } from "../utility/uuid";
-;
-
+import { globalOptionManager } from "./options/optionManager";
+import { randomUUID } from "../utility/uuid";
 interface APMessage {
     parts: (MessageNode | EchoMessageNode)[];
     key: string;

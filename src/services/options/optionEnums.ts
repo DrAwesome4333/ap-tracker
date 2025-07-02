@@ -6,4 +6,4 @@ enum OptionType {
     hierarchical = "hierarchical",
 }
 
-export { OptionType } 
+export { OptionType };

@@ -36,7 +36,7 @@ const convertLocationTrackerV1toV2 = (
             groups:
                 typeof section.groupKey === "string"
                     ? [section.groupKey]
-                    : [...section.groupKey],
+                    : [...(section.groupKey ?? [])],
             children: section.children,
             theme: section.theme,
         };
