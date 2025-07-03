@@ -56,7 +56,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
         // Finds a section at the root of the section tree and  parses it.
         const parseSection_string = (
             sectionName: string,
-            parents?: string[]
+            parents: string[] = []
         ) => {
             const sectionDef = sections[sectionName];
             // Section not found
@@ -73,12 +73,12 @@ class CustomLocationTracker implements DropdownLocationTracker {
         const parseSection_v2Def = (
             sectionDef: SectionDef_V2,
             sectionName: string,
-            parents?: string[]
+            parents: string[] = []
         ) => {
             // Section is a child of itself
             if (parents && parents.includes(sectionName)) {
                 this.errors.push(
-                    `Section "${sectionName}" is a descendent of itself.\nPath:\n\t${[...(parents ?? []), sectionName].join("\t => \n")}`
+                    `Section "${sectionName}" is a descendent of itself.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
                 );
                 return null;
             }
@@ -119,7 +119,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
 
             this.sections.set(sectionName, section);
 
-            const childParents = [...(parents ?? []), sectionName];
+            const childParents = [...parents, sectionName];
             const children = !sectionDef.children
                 ? []
                 : Array.isArray(sectionDef.children)
@@ -149,6 +149,8 @@ class CustomLocationTracker implements DropdownLocationTracker {
             });
             this.updateSection(sectionName);
             this.cleanupCalls.add(cleanup);
+
+            return section;
         };
 
         parseSection_string("root");
@@ -205,7 +207,6 @@ class CustomLocationTracker implements DropdownLocationTracker {
         Object.freeze(newSection);
 
         this.sections.set(sectionName, newSection);
-
         section.parents.forEach((parentName) =>
             this.updateSection(parentName, processedSections, false)
         );
