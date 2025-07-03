@@ -74,8 +74,8 @@ class TrackerManager {
         this.#optionsStore = optionStore;
         this.#trackerChoiceOptions =
             (this.#optionsStore.read() as TrackerChoiceOptions) ?? {};
-        const subscribe = this.#optionsStore.getUpdateSubscriber();
-        subscribe(() => {
+        const subscribeToStore = this.#optionsStore.getUpdateSubscriber();
+        subscribeToStore(() => {
             this.#trackerChoiceOptions =
                 this.#optionsStore.read() as TrackerChoiceOptions;
             const newGameInfo = this.#trackerChoiceOptions[this.#game] ?? {};
@@ -128,40 +128,33 @@ class TrackerManager {
             let triggerReload = false;
             repo.resources.forEach((manifest) => {
                 if (
-                    manifest.type === ResourceType.itemTracker ||
-                    manifest.type === ResourceType.locationTracker
+                    [
+                        ResourceType.itemTracker,
+                        ResourceType.locationTracker,
+                    ].includes(manifest.type)
                 ) {
-                    if (this.#allTrackers.has(getTrackerKey(manifest))) {
-                        // todo deal with duplicates in a graceful manner
-                        console.warn(
-                            "Trackers with duplicate ids added, second was ignored with id:",
-                            manifest.uuid
-                        );
-                    } else {
-                        this.#allTrackers.set(
-                            getTrackerKey(manifest),
-                            manifest
-                        );
-                        this.#trackerRepositoryMap.set(
-                            getTrackerKey(manifest),
-                            repo.uuid
-                        );
-                        if (
-                            manifest.game === this.#game &&
-                            Object.entries({
-                                ...this.#defaults,
-                                ...currentTrackers,
-                            }).filter(
-                                ([type, resource]) =>
-                                    resource.uuid === manifest.uuid &&
-                                    manifest.version === resource.version &&
-                                    manifest.type === type
-                            ).length > 1
-                        ) {
-                            triggerReload = true;
-                        }
+                    this.#allTrackers.set(getTrackerKey(manifest), manifest);
+                    this.#trackerRepositoryMap.set(
+                        getTrackerKey(manifest),
+                        repo.uuid
+                    );
+                    // trigger reload if currently loaded tracker was updated
+                    if (
+                        manifest.game === this.#game &&
+                        Object.entries({
+                            ...this.#defaults,
+                            ...currentTrackers,
+                        }).filter(
+                            ([type, resource]) =>
+                                resource.uuid === manifest.uuid &&
+                                manifest.version === resource.version &&
+                                manifest.type === type
+                        ).length > 1
+                    ) {
+                        triggerReload = true;
                     }
-                    trackersToRemove.delete(manifest.uuid);
+
+                    trackersToRemove.delete(getTrackerKey(manifest));
                 }
             });
             trackersToRemove.forEach((trackerId) =>
@@ -223,6 +216,7 @@ class TrackerManager {
         return this.#cachedDirectory;
     };
 
+    /** Sets up a particular tracker to be used for a game */
     setGameTracker = (
         game: string,
         tracker: TrackerResourceId | { type: string }
@@ -238,8 +232,8 @@ class TrackerManager {
             } else {
                 delete newValue[tracker.type];
             }
+            // tracker should auto reload with change on settings store, no need to trigger manually
             this.#optionsStore.write(newValue, game);
-            // tracker should auto reload with change on settings store
         } else {
             if ("uuid" in tracker) {
                 this.#defaults[tracker.type] = tracker;
@@ -252,6 +246,7 @@ class TrackerManager {
         }
     };
 
+    /** Loads the appropriate trackers for a game */
     loadTrackers = async (game: string): Promise<void> => {
         this.#game = game;
         const locationTrackerInfo = this.getCurrentGameTracker(
@@ -297,12 +292,14 @@ class TrackerManager {
         await Promise.all(trackerPromises);
     };
 
+    /** If this game were selected, returns which tracker would be used */
     getCurrentGameTracker = (game: string, type: ResourceType) => {
         const selectedOption =
             this.#trackerChoiceOptions[game] ?? this.#defaults;
         return selectedOption[type] ?? this.#defaults[type];
     };
 
+    /** Gest the currently in use tracker */
     getCurrentTracker = (type: ResourceType) => {
         return this.#trackers[type];
     };

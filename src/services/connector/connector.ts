@@ -206,6 +206,10 @@ const createConnector = (
         }
 
         updateTags();
+
+        locationManager.deleteAllLocations();
+        inventoryManger.clear();
+
         return client
             .login(`${host}:${port}`, slot, undefined, {
                 tags: apTags,
