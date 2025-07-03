@@ -20,7 +20,6 @@ const generateSectionDef = (groups: { [s: string]: string[] }) => {
     const sectionDef: CustomLocationTrackerDef_V2 = {
         manifest: {
             name: "Place holder name",
-            repositoryUuid: null, // replaced by the creating repository
             uuid: randomUUID(),
             version: "0.0.0",
             description: "Auto generated tracker based on location groups",

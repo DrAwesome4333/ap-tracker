@@ -11,49 +11,57 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import { exportJSONFile } from "../../utility/jsonExport";
 import { naturalSort } from "../../utility/comparisons";
-import { TrackerManager } from "../../services/tracker/TrackerManager";
+import { CustomTrackerRepository } from "../../services/tracker/customTrackerManager";
+import { TrackerResourceId } from "../../services/tracker/TrackerManager";
 const CustomTrackerOptions = ({
-    trackerManager,
+    customTrackerRepository,
 }: {
-    trackerManager: TrackerManager;
+    customTrackerRepository: CustomTrackerRepository;
 }) => {
-    // const customTrackersDirectory = useCustomTrackerDirectory();
-    // const trackersByGame = useMemo(() => {
-    //     const trackerMap: Map<
-    //         string,
-    //         {
-    //             id: string;
-    //             game: string;
-    //             name: string;
-    //             enabled: boolean;
-    //         }[]
-    //     > = new Map();
-    //     customTrackersDirectory.customLists.forEach((tracker) => {
-    //         const gameList = trackerMap.get(tracker.game) ?? [];
-    //         gameList.push(tracker);
-    //         trackerMap.set(tracker.game, gameList);
-    //     });
-    //     const games = [...trackerMap.keys()];
-    //     games.forEach((game) => {
-    //         const list = trackerMap.get(game);
-    //         list.sort((a, b) => naturalSort(a.name, b.name));
-    //         trackerMap.set(game, list);
-    //     });
-    //     return trackerMap;
-    // }, [customTrackersDirectory]);
+    const customTrackersDirectory = useCustomTrackerDirectory(
+        customTrackerRepository
+    );
+    const trackersByGame = useMemo(() => {
+        const trackerMap: Map<
+            string,
+            {
+                id: TrackerResourceId;
+                game: string;
+                name: string;
+                enabled: boolean;
+            }[]
+        > = new Map();
+        customTrackersDirectory.forEach((tracker) => {
+            const gameList = trackerMap.get(tracker.game) ?? [];
+            gameList.push({
+                id: { ...tracker },
+                game: tracker.game,
+                name: tracker.name,
+                enabled: true,
+            });
+            trackerMap.set(tracker.game, gameList);
+        });
+        const games = [...trackerMap.keys()];
+        games.forEach((game) => {
+            const list = trackerMap.get(game);
+            list.sort((a, b) => naturalSort(a.name, b.name));
+            trackerMap.set(game, list);
+        });
+        return trackerMap;
+    }, [customTrackersDirectory]);
 
-    // const sortedGames = useMemo(() => {
-    //     const games = [...trackersByGame.keys()];
-    //     games.sort(naturalSort);
-    //     return games;
-    // }, [trackersByGame]);
+    const sortedGames = useMemo(() => {
+        const games = [...trackersByGame.keys()];
+        games.sort(naturalSort);
+        return games;
+    }, [trackersByGame]);
 
-    // const [modalOpen, setModalOpen] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
     return (
         <div>
             <div>
                 <p>Manage custom trackers here</p>
-                {/* {sortedGames.length > 0 ? (
+                {sortedGames.length > 0 ? (
                     sortedGames.map((game) => (
                         <div
                             key={game}
@@ -69,7 +77,11 @@ const CustomTrackerOptions = ({
                             >
                                 {trackersByGame.get(game).map((tracker) => (
                                     <div
-                                        key={tracker.id}
+                                        key={
+                                            tracker.id.uuid +
+                                            tracker.id.version +
+                                            tracker.id.type
+                                        }
                                         style={{
                                             marginBottom: "0.25em",
                                         }}
@@ -80,9 +92,11 @@ const CustomTrackerOptions = ({
                                             $tiny
                                             onClick={async () => {
                                                 const trackerData =
-                                                    await CustomTrackerManager.getCustomTracker(
-                                                        tracker.id
-                                                    );
+                                                    (await customTrackerRepository.loadResource(
+                                                        tracker.id.uuid,
+                                                        tracker.id.version,
+                                                        tracker.id.type
+                                                    )) as DropdownLocationTracker;
                                                 if (!tracker) {
                                                     NotificationManager.createStatus(
                                                         {
@@ -95,8 +109,8 @@ const CustomTrackerOptions = ({
                                                     );
                                                 } else {
                                                     exportJSONFile(
-                                                        `tracker-export-${trackerData.name}`,
-                                                        trackerData
+                                                        `tracker-export-${trackerData.manifest.name}`,
+                                                        trackerData.exportDropdowns()
                                                     );
                                                 }
                                             }}
@@ -114,7 +128,7 @@ const CustomTrackerOptions = ({
                                                         `Are you sure you want to delete ${tracker.name}?`
                                                     )
                                                 ) {
-                                                    CustomTrackerManager.removeCustomTracker(
+                                                    customTrackerRepository.removeTracker(
                                                         tracker.id
                                                     );
                                                 }
@@ -134,20 +148,21 @@ const CustomTrackerOptions = ({
                     <i style={{ color: tertiary }}>
                         No custom trackers, try adding one below
                     </i>
-                )} */}
+                )}
             </div>
             <PrimaryButton
                 $tiny
                 onClick={() => {
-                    // setModalOpen(true);
+                    setModalOpen(true);
                 }}
             >
                 <Icon type="add" />
             </PrimaryButton>
             <CreateCustomTrackerModal
-                trackerManager={trackerManager}
-                open={false}
-                onClose={() => {}}
+                open={modalOpen}
+                onClose={() => {
+                    setModalOpen(false);
+                }}
             />
         </div>
     );

@@ -22,6 +22,10 @@ const OptionsScreen = () => {
     if (!trackerManager) {
         console.warn("No tracker manager provided");
     }
+    const customTrackerRepository = serviceContext.customTrackerRepository;
+    if (!customTrackerRepository) {
+        console.warn("No custom tracker repository added");
+    }
 
     return (
         <div
@@ -45,14 +49,16 @@ const OptionsScreen = () => {
             </OptionBlock>
             <OptionBlock title="Tracker Picker">
                 {trackerManager ? (
-                    <TrackerPicker trackerManager={trackerManager} />
+                    <TrackerPicker />
                 ) : (
                     <i>Failed to initiate tracker picker</i>
                 )}
             </OptionBlock>
             <OptionBlock title="Custom Tracker Manager">
-                {trackerManager ? (
-                    <CustomTrackerOptions trackerManager={trackerManager} />
+                {customTrackerRepository ? (
+                    <CustomTrackerOptions
+                        customTrackerRepository={customTrackerRepository}
+                    />
                 ) : (
                     <i>Failed to initiate tracker manager</i>
                 )}

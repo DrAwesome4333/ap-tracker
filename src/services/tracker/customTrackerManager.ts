@@ -4,6 +4,7 @@ import { DB_STORE_KEYS, SaveData } from "../saveData";
 import CustomLocationTracker from "./locationTrackers/CustomLocationTracker";
 import { convertLocationTrackerV1toV2 } from "./locationTrackers/upgradePathV1V2";
 import { ResourceType } from "./resourceEnums";
+import { TrackerResourceId } from "./TrackerManager";
 
 const customTrackerRepositoryUUID = "c76c2420-d100-4093-8734-c52ddedd8917";
 type CustomTrackerDirectory = { [uuid: string]: ResourceManifest[] };
@@ -77,15 +78,39 @@ class CustomTrackerRepository implements ResourceRepository {
             type,
         ])) as CustomLocationTrackerDef_V2;
 
-        return new CustomLocationTracker(
-            this.#locationManager,
-            customTrackerRepositoryUUID,
-            resource
-        );
+        return new CustomLocationTracker(this.#locationManager, resource);
     };
 
     initialize: () => Promise<boolean> = async () => {
         return true;
+    };
+
+    removeTracker = (id: TrackerResourceId) => {
+        if (this.#directory[id.uuid]) {
+            const versions = this.#directory[id.uuid].filter(
+                (manifest) =>
+                    manifest.version !== id.version && manifest.type !== id.type
+            );
+            const newDirectory = {
+                ...this.#directory,
+            };
+            if (versions.length > 0) {
+                newDirectory[id.uuid] = versions;
+            } else {
+                delete newDirectory[id.uuid];
+            }
+            SaveData.deleteItem(DB_STORE_KEYS.customTrackersDirectory, [
+                id.uuid,
+                id.version,
+                id.type,
+            ]);
+            SaveData.deleteItem(DB_STORE_KEYS.customTrackers, [
+                id.uuid,
+                id.version,
+                id.type,
+            ]);
+            this.#updateDirectory(newDirectory);
+        }
     };
 
     addTracker = (

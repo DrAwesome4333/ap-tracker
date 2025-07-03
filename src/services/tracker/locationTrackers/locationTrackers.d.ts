@@ -24,7 +24,7 @@ interface BaseLocationTracker {
 type DropdownLocationTracker = {
     readonly type: LocationTrackerType.dropdown;
     getSection: (name: string) => Section;
-    exportDropdowns: () => unknown;
+    exportDropdowns: (newUuid?: string) => CustomLocationTrackerDef_V2;
     getUpdateSubscriber: (name?) => (listener: () => void) => () => void;
 } & BaseLocationTracker;
 

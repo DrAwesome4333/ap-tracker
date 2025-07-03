@@ -7,8 +7,8 @@ const genericGameLocationTrackerUuid = "2b1690e1-006f-48d0-9b2d-df8bb3f89338";
 class GenericLocationTracker extends CustomLocationTracker {
     readonly uuid = genericGameLocationTrackerUuid;
     static readonly uuid = genericGameLocationTrackerUuid;
-    constructor(locationManager: LocationManager, repositoryUUID: string) {
-        super(locationManager, repositoryUUID);
+    constructor(locationManager: LocationManager) {
+        super(locationManager);
         this.manifest.uuid = GenericLocationTracker.uuid;
         this.manifest.name = "Generic Dropdown Tracker";
     }

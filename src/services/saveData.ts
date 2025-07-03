@@ -168,7 +168,10 @@ const storeItem = (storeName: string, item: unknown): Promise<boolean> => {
  * @param key The key of the item to delete
  * @returns True if item was deleted (without respect to if the item existed or not)
  */
-const deleteItem = (storeName: string, key: string): Promise<boolean> => {
+const deleteItem = (
+    storeName: string,
+    key: string | string[]
+): Promise<boolean> => {
     return new Promise((resolve, _reject) => {
         let hasFailed = false;
         const attemptDelete = () => {

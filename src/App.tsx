@@ -134,6 +134,7 @@ const App = (): React.ReactNode => {
                             inventoryManager,
                             trackerManager,
                             textClientManager,
+                            customTrackerRepository,
                         }}
                     >
                         <NotificationContainer />

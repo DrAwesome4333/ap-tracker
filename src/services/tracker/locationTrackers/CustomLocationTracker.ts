@@ -13,10 +13,10 @@ class CustomLocationTracker implements DropdownLocationTracker {
     protected sections: Map<string, Section> = new Map();
     protected errors: string[] = [];
     protected cachedErrors: string[] = [];
+    #data: CustomLocationTrackerDef_V2;
 
     constructor(
         locationManager: LocationManager,
-        repositoryUUID: string,
         data?: CustomLocationTrackerDef_V1 | CustomLocationTrackerDef_V2
     ) {
         this.locationManager = locationManager;
@@ -33,7 +33,6 @@ class CustomLocationTracker implements DropdownLocationTracker {
             this.read(data);
         } else {
             this.manifest = {
-                repositoryUuid: repositoryUUID,
                 version: "0.0.0",
                 locationTrackerType: LocationTrackerType.dropdown,
                 uuid: null,
@@ -43,11 +42,11 @@ class CustomLocationTracker implements DropdownLocationTracker {
                 name: "Null Tracker",
             };
         }
-        this.manifest.repositoryUuid = repositoryUUID;
     }
 
     protected read = (data: CustomLocationTrackerDef_V2) => {
         this.manifest = data.manifest;
+        this.#data = data;
 
         const groups = data.groups ?? {};
         const sections = data.sections;
@@ -62,7 +61,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
             // Section not found
             if (!sectionDef) {
                 this.errors.push(
-                    `Section ${sectionName} could not be found.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
+                    `Section ${sectionName} could not be found.\nPath:\n\t${[...parents, sectionName].join(" => \n\t")}`
                 );
                 return null;
             }
@@ -78,7 +77,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
             // Section is a child of itself
             if (parents && parents.includes(sectionName)) {
                 this.errors.push(
-                    `Section "${sectionName}" is a descendent of itself.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
+                    `Section "${sectionName}" is a descendent of itself.\nPath:\n\t${[...parents, sectionName].join(" => \n\t")}`
                 );
                 return null;
             }
@@ -95,7 +94,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
             for (const groupName of groupNames) {
                 if (!groups[groupName]) {
                     this.errors.push(
-                        `Group ${groupName} could not be found.\nPath:\n\t${[...parents, sectionName].join("\t => \n")}`
+                        `Group ${groupName} could not be found.\nPath:\n\t${[...parents, sectionName].join(" => \n\t")}`
                     );
                 }
             }
@@ -233,8 +232,13 @@ class CustomLocationTracker implements DropdownLocationTracker {
         return this.sections.get(name);
     };
 
-    validateLocations = (locations: Set<string>) => {
-        const missingLocations = locations.difference(this.locations);
+    validateLocations = (locations?: Set<string>) => {
+        const missingLocations = (
+            locations ??
+            this.locationManager.getMatchingLocations(
+                LocationManager.filters.exist
+            )
+        ).difference(this.locations);
         if (missingLocations.size > 0) {
             this.errors.push(
                 `The following locations are missing from the custom location tracker:\n\t${[...missingLocations.values()].join("\n\t")}`
@@ -250,7 +254,17 @@ class CustomLocationTracker implements DropdownLocationTracker {
         return this.cachedErrors;
     };
 
-    exportDropdowns = () => {};
+    exportDropdowns = (newUuid?: string) => {
+        return this.#data
+            ? {
+                  ...this.#data,
+                  manifest: {
+                      ...this.#data.manifest,
+                      uuid: newUuid ?? this.#data.manifest.uuid,
+                  },
+              }
+            : null;
+    };
 }
 
 export default CustomLocationTracker;

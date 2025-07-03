@@ -75,7 +75,7 @@ const TrackerDropdown = ({ game }: { game: string }) => {
                         key={getTrackerKey(tracker)}
                         value={getTrackerKey(tracker)}
                     >
-                        {tracker.name}
+                        {tracker.name} {`(${tracker.version})`}
                     </option>
                 );
             })}

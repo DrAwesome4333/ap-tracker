@@ -2,7 +2,6 @@ type BaseResourceManifest = {
     uuid: string;
     name: string;
     version: string;
-    repositoryUuid?: string;
     description?: string;
     resourceLocationType?: ResourceLocationType;
     type: ResourceType;

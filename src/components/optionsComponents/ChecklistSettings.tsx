@@ -15,60 +15,45 @@ import {
 } from "../../services/tracker/resourceEnums";
 const mockLocationManager = new LocationManager();
 const mockEntranceManager = createEntranceManager();
-const mockLocationTracker = new CustomLocationTracker(
-    mockLocationManager,
-    null,
-    {
-        manifest: {
-            type: ResourceType.locationTracker,
-            uuid: null,
-            repositoryUuid: null,
-            name: "Mock Location Tracker",
-            game: null,
-            locationTrackerType: LocationTrackerType.dropdown,
-            formatVersion: 2,
-            version: "0.0.0",
+const mockLocationTracker = new CustomLocationTracker(mockLocationManager, {
+    manifest: {
+        type: ResourceType.locationTracker,
+        uuid: null,
+        name: "Mock Location Tracker",
+        game: null,
+        locationTrackerType: LocationTrackerType.dropdown,
+        formatVersion: 2,
+        version: "0.0.0",
+    },
+    themes: {
+        default: {
+            color: "#888888",
         },
-        themes: {
-            default: {
-                color: "#888888",
-            },
+    },
+    sections: {
+        root: {
+            title: "Numbers",
+            theme: "default",
+            children: ["one", "primes", "composites", "tens"],
         },
-        sections: {
-            root: {
-                title: "Numbers",
-                theme: "default",
-                children: ["one", "primes", "composites", "tens"],
-            },
-            one: {
-                title: "One",
-                locations: ["Location 1"],
-            },
-            primes: {
-                title: "Primes",
-                locations: [
-                    "Location 2",
-                    "Location 3",
-                    "Location 5",
-                    "Location 7",
-                ],
-            },
-            composites: {
-                title: "Composites",
-                locations: [
-                    "Location 4",
-                    "Location 6",
-                    "Location 8",
-                    "Location 9",
-                ],
-            },
-            tens: {
-                title: "Tens",
-                locations: ["Location 10"],
-            },
+        one: {
+            title: "One",
+            locations: ["Location 1"],
         },
-    }
-);
+        primes: {
+            title: "Primes",
+            locations: ["Location 2", "Location 3", "Location 5", "Location 7"],
+        },
+        composites: {
+            title: "Composites",
+            locations: ["Location 4", "Location 6", "Location 8", "Location 9"],
+        },
+        tens: {
+            title: "Tens",
+            locations: ["Location 10"],
+        },
+    },
+});
 
 const mockTagManager = createTagManager(mockLocationManager);
 

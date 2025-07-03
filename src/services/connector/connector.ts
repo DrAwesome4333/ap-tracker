@@ -32,6 +32,10 @@ interface SlotInfo {
     connectionId: string;
     name: string;
     game: string;
+    groups: {
+        location: { [groupName: string]: string[] };
+        item: { [groupName: string]: string[] };
+    };
 }
 
 interface Connector {
@@ -71,6 +75,10 @@ const createConnector = (
             connectionId: "",
             name: "",
             game: "",
+            groups: {
+                location: {},
+                item: {},
+            },
         };
         const listeners: Set<() => void> = new Set();
         const subscribe = (listener: () => void) => {
@@ -331,6 +339,10 @@ const createConnector = (
                         item: { [name: string]: string[] };
                         location: { [name: string]: string[] };
                     }) => {
+                        connection.slotInfo = {
+                            ...connection.slotInfo,
+                            groups,
+                        };
                         genericTrackerRepository.configureGenericTrackers(
                             savedConnectionInfo.game,
                             groups

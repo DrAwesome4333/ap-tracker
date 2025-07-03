@@ -1,5 +1,9 @@
 import { DataStore } from "../dataStores";
+import NotificationManager, {
+    MessageType,
+} from "../notifications/notifications";
 import GenericLocationTracker from "./generic/genericTracker";
+import CustomLocationTracker from "./locationTrackers/CustomLocationTracker";
 import { ResourceType } from "./resourceEnums";
 const modified = Symbol("modified");
 
@@ -95,8 +99,12 @@ class TrackerManager {
 
     #getTrackersInRepository = (repo: ResourceRepository) => {
         return [...this.#allTrackers.entries()]
-            .filter(([_, manifest]) => manifest.repositoryUuid === repo.uuid)
-            .map(([uuid, _]) => uuid);
+            .filter(
+                ([_, manifest]) =>
+                    this.#trackerRepositoryMap.get(getTrackerKey(manifest)) ===
+                    repo.uuid
+            )
+            .map(([_, manifest]) => getTrackerKey(manifest));
     };
 
     #callDirectoryListeners = () => {
@@ -110,8 +118,8 @@ class TrackerManager {
     removeRepository = (repo: ResourceRepository) => {
         this.#repositories.get(repo.uuid)?.listenerCleanUp();
         const trackersToRemove = this.#getTrackersInRepository(repo);
-        trackersToRemove.forEach((trackerId) =>
-            this.#allTrackers.delete(trackerId)
+        trackersToRemove.forEach((trackerKey) =>
+            this.#allTrackers.delete(trackerKey)
         );
     };
 
@@ -157,8 +165,8 @@ class TrackerManager {
                     trackersToRemove.delete(getTrackerKey(manifest));
                 }
             });
-            trackersToRemove.forEach((trackerId) =>
-                this.#allTrackers.delete(trackerId)
+            trackersToRemove.forEach((trackerKey) =>
+                this.#allTrackers.delete(trackerKey)
             );
             this.#callDirectoryListeners();
             if (triggerReload) {
@@ -275,6 +283,18 @@ class TrackerManager {
                 this.#trackers[ResourceType.locationTracker] =
                     tracker as LocationTracker;
                 this.#callTrackerListeners();
+                if (tracker instanceof CustomLocationTracker) {
+                    tracker.validateLocations();
+                    const errors = tracker.getErrors();
+                    if (errors.length > 0) {
+                        NotificationManager.createToast({
+                            message: "Tracker has failed verification",
+                            details: `Tracker has failed verification and may not work as expected.\nErrors: \n${errors.join("\n\n")}`,
+                            type: MessageType.warning,
+                            duration: 10,
+                        });
+                    }
+                }
             });
         const itemTrackerPromise = this.#repositories
             .get(itemTrackerRepoUuid)
@@ -296,7 +316,11 @@ class TrackerManager {
     getCurrentGameTracker = (game: string, type: ResourceType) => {
         const selectedOption =
             this.#trackerChoiceOptions[game] ?? this.#defaults;
-        return selectedOption[type] ?? this.#defaults[type];
+        const trackerId = selectedOption[type] ?? this.#defaults[type];
+        if (!this.#allTrackers.has(getTrackerKey(trackerId))) {
+            return this.#defaults[type];
+        }
+        return trackerId;
     };
 
     /** Gest the currently in use tracker */

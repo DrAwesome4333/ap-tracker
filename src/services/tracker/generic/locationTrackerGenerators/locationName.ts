@@ -260,7 +260,6 @@ const generateSectionDef = (
             uuid: randomUUID(),
             version: "0.0.0",
             description: "Auto generated tracker based on location names",
-            repositoryUuid: null, // replaced by the caller
             resourceLocationType: ResourceLocationType.builtIn,
             type: ResourceType.locationTracker,
             locationTrackerType: LocationTrackerType.dropdown,
