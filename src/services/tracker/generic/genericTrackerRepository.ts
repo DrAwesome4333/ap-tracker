@@ -23,10 +23,7 @@ class GenericTrackerRepository implements ResourceRepository {
     ) {
         // this.#locationManager = locationManager;
         // this.#inventoryManager = inventoryManager;
-        this.#locationTracker = new GenericLocationTracker(
-            locationManager,
-            GenericTrackerRepository.uuid
-        );
+        this.#locationTracker = new GenericLocationTracker(locationManager);
         this.resources = [this.#locationTracker.manifest];
     }
 

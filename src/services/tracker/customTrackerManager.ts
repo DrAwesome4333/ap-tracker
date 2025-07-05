@@ -89,7 +89,7 @@ class CustomTrackerRepository implements ResourceRepository {
         if (this.#directory[id.uuid]) {
             const versions = this.#directory[id.uuid].filter(
                 (manifest) =>
-                    manifest.version !== id.version && manifest.type !== id.type
+                    manifest.version !== id.version || manifest.type !== id.type
             );
             const newDirectory = {
                 ...this.#directory,

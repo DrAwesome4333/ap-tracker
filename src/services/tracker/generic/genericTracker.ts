@@ -15,6 +15,7 @@ class GenericLocationTracker extends CustomLocationTracker {
 
     #reset = () => {
         this.sections.clear();
+        this.cleanupCalls.forEach((callback) => callback());
         this.callListeners();
     };
 

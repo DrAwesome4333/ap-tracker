@@ -3,8 +3,6 @@ import { useCustomTrackerDirectory } from "../../hooks/trackerHooks";
 import { tertiary } from "../../constants/colors";
 import { DangerButton, PrimaryButton } from "../buttons";
 import Icon from "../icons/icons";
-// import CustomTrackerManager from "../../services/tracker/customTrackerManager";
-// import TrackerManager_Old from "../../services/tracker/TrackerManager";
 import CreateCustomTrackerModal from "./CreateCustomTrackerModal";
 import NotificationManager, {
     MessageType,

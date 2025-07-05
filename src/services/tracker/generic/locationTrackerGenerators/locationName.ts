@@ -241,9 +241,7 @@ const generateSectionDef = (
             );
             generatedGroups.forEach((checks, name) => {
                 const child = new GroupNode(name, checks);
-                if (name === "Unorganized" && groupNode.name === "root") {
-                    groupNode.addChild(child);
-                } else if (name !== "Unorganized") {
+                if (name !== "Unorganized") {
                     groupNode.addChild(child);
                     nextLevelGroups.add(child);
                 }
@@ -268,6 +266,7 @@ const generateSectionDef = (
             formatVersion: 2,
         },
         sections: {},
+        groups: trackerGroups,
         themes: {
             default: {
                 color: "#888888",

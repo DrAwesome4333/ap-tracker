@@ -176,6 +176,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
             Object.freeze(section.parents);
             Object.freeze(section.children);
         });
+        this.callListeners();
     };
 
     protected updateSection = (
