@@ -31,6 +31,7 @@ const TextButton = styled.button`
     padding: 0;
     font: inherit;
     cursor: pointer;
+    text-align: left;
     &:hover {
         text-decoration: underline;
     }

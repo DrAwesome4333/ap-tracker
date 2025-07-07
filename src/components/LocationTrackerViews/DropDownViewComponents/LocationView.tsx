@@ -2,7 +2,7 @@ import React, { forwardRef, Fragment, useContext, useState } from "react";
 import ServiceContext from "../../../contexts/serviceContext";
 import Icon from "../../icons/icons";
 import { tertiary, textPrimary } from "../../../constants/colors";
-import { GhostButton } from "../../buttons";
+import { GhostButton, TextButton } from "../../buttons";
 import { useLocationStatus } from "../../../hooks/sectionHooks";
 
 const LocationView = forwardRef(
@@ -55,12 +55,15 @@ const LocationView = forwardRef(
                         setShowDetails(!showDetails);
                     }}
                 >
-                    <Icon
-                        fontSize="14px"
-                        type={iconType}
-                        style={{ color: iconColor }}
-                    />{" "}
-                    {status.displayName ?? location}
+                    <TextButton>
+                        <Icon
+                            fontSize="14px"
+                            type={iconType}
+                            style={{ color: iconColor }}
+                        />{" "}
+                        {status.displayName ?? location}
+                    </TextButton>
+
                     {connection && tagManager && (
                         <>
                             {!status.checked && (

@@ -7,6 +7,7 @@ import useOption from "../../../hooks/optionHook";
 import { naturalSort } from "../../../utility/comparisons";
 import { useSection } from "../../../hooks/sectionHooks";
 import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
+import { TextButton } from "../../buttons";
 
 const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     return (
@@ -47,10 +48,12 @@ const SectionView = ({
         throw new Error("No option manager provided");
     }
     const section = useSection(locationTracker, name);
-    const style = {
-        borderLeft: `2px dashed ${section?.theme.color ?? "Black"}`,
+    const style: React.CSSProperties = {
+        borderLeft: `0.125em solid ${section?.theme.color ?? "Black"}`,
+        borderRadius: "0.25em",
         paddingLeft: "0.5em",
         marginLeft: "0.5em",
+        marginTop: "0.5em",
         minWidth: "10em",
     };
 
@@ -181,50 +184,60 @@ const SectionView = ({
                 <></> // Hide empty sections
             ) : (
                 <div style={style}>
-                    <h3
-                        style={{ cursor: isClosable ? "pointer" : "default" }}
-                        className={`section_title ${
-                            section?.locationReport.checked.size ===
-                            section?.locationReport.existing.size
-                                ? "checked"
-                                : ""
-                        }`}
+                    <TextButton
                         onClick={() => {
                             if (isClosable) {
                                 setIsOpen(!isOpen);
                             }
                         }}
                     >
-                        {section?.title ?? "Unloaded Section"}{" "}
-                        <i>
-                            {clearedLocationCount}
-                            {"/"}
-                            {totalLocationCount}
-                        </i>{" "}
-                        {[...(section?.locationReport.tagCounts ?? [])].map(
-                            ([id, values]) => {
-                                const counterType = tagManager?.getCounter(id);
-                                return (
-                                    <i
-                                        key={id}
-                                        style={{ color: counterType?.color }}
-                                        title={counterType?.displayName}
-                                    >
-                                        {counterType?.icon && (
-                                            <Icon
-                                                fontSize="14px"
-                                                type={counterType.icon}
-                                            />
-                                        )}
-                                        {values.size}
-                                        {counterType?.showTotal &&
-                                            `/${section?.locationReport.tagTotals.get(id)?.size ?? 0}`}{" "}
-                                    </i>
-                                );
-                            }
-                        )}
-                        {isClosable ? (isOpen ? " ▲ " : " ▼ ") : ""}
-                    </h3>
+                        <h3
+                            style={{
+                                cursor: isClosable ? "pointer" : "default",
+                                marginTop: "0.25em",
+                                marginBottom: "0.25em",
+                            }}
+                            className={`section_title ${
+                                section?.locationReport.checked.size ===
+                                section?.locationReport.existing.size
+                                    ? "checked"
+                                    : ""
+                            }`}
+                        >
+                            {section?.title ?? "Unloaded Section"}{" "}
+                            <i>
+                                {clearedLocationCount}
+                                {"/"}
+                                {totalLocationCount}
+                            </i>{" "}
+                            {[...(section?.locationReport.tagCounts ?? [])].map(
+                                ([id, values]) => {
+                                    const counterType =
+                                        tagManager?.getCounter(id);
+                                    return (
+                                        <i
+                                            key={id}
+                                            style={{
+                                                color: counterType?.color,
+                                            }}
+                                            title={counterType?.displayName}
+                                        >
+                                            {counterType?.icon && (
+                                                <Icon
+                                                    fontSize="14px"
+                                                    type={counterType.icon}
+                                                />
+                                            )}
+                                            {values.size}
+                                            {counterType?.showTotal &&
+                                                `/${section?.locationReport.tagTotals.get(id)?.size ?? 0}`}{" "}
+                                        </i>
+                                    );
+                                }
+                            )}
+                            {isClosable ? (isOpen ? " ▲ " : " ▼ ") : ""}
+                        </h3>
+                    </TextButton>
                     {isOpen && (
                         <>
                             {locations.length < virtualizationThreshold ? (
