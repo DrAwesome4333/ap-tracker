@@ -1,9 +1,9 @@
 import React, { forwardRef, Fragment, useContext, useState } from "react";
-import ServiceContext from "../../contexts/serviceContext";
-import Icon from "../icons/icons";
-import { tertiary, textPrimary } from "../../constants/colors";
-import { GhostButton } from "../buttons";
-import { useLocationStatus } from "../../hooks/sectionHooks";
+import ServiceContext from "../../../contexts/serviceContext";
+import Icon from "../../icons/icons";
+import { tertiary, textPrimary } from "../../../constants/colors";
+import { GhostButton } from "../../buttons";
+import { useLocationStatus } from "../../../hooks/sectionHooks";
 
 const LocationView = forwardRef(
     (

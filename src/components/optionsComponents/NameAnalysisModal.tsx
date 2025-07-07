@@ -9,7 +9,7 @@ import { createEntranceManager } from "../../services/entrances/entranceManager"
 import ServiceContext from "../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
-import SectionView from "../sectionComponents/SectionView";
+import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
 import { createTagManager } from "../../services/tags/tagManager";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
@@ -157,7 +157,7 @@ const NameAnalysisModal = ({
                             locationTracker: templateLocationTracker,
                         }}
                     >
-                        <SectionView name="root" context={{}} />
+                        <SectionView name="root" />
                     </ServiceContext.Provider>
                 </div>
                 <div

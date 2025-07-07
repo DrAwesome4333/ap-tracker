@@ -25,9 +25,9 @@ const CustomTrackerHelpModal = ({
                     your liking.
                 </p>
                 <p>
-                    As of right now, the only way to create one is to manually
-                    create JSON files that describe your checklist following a
-                    special format that is documented &nbsp;
+                    Currently the only way to create one is to use JSON files
+                    that describe your checklist following a format that is
+                    documented &nbsp;
                     <a
                         href="https://github.com/DrAwesome4333/ap-tracker/blob/main/docs/customTrackers.md"
                         target="_blank"
@@ -37,21 +37,19 @@ const CustomTrackerHelpModal = ({
                     </a>
                     .
                 </p>
-                <p>
-                    To help make the process easier, I have provided a few ways
-                    to get a working template to get started:
-                </p>
+                <p>Here are some ways to get a working template:</p>
                 <h3>Location Group Templates:</h3>
                 <p>
-                    This is what the tracker uses by default. Location Groups
-                    are defined by the Archipelago world developers and can be
-                    very useful for grouping locations in a logical manner.
-                    However location groups were never meant to be used for
-                    organizing checklists, and as a result the quality of the
-                    grouping done by the App varies from game to game. Some
-                    world developers have not implemented location groups into
-                    their world, making this option no better than just listing
-                    all the checks.
+                    These templates use location groups defined by Archipelago
+                    world developers to populate dropdowns. While helpful for
+                    organizing locations, these groups were not intended for
+                    checklists, so the quality varies by game. In some cases,
+                    developers have not added location groups at all, making
+                    this option no better than a simple list.
+                </p>
+                <p>
+                    This is the same template the tracker uses by default on any
+                    new games it encounters.
                 </p>
                 <h3>Name Analysis Templates:</h3>
                 <p>
@@ -60,33 +58,12 @@ const CustomTrackerHelpModal = ({
                     grouping for those.
                 </p>
                 <p>
-                    There are many different ways that Archipelago world
-                    developers name their locations, as such the app provides
-                    some parameters that can be set to change how the names are
-                    analyzed. To understand these parameters, it is best to know
-                    a bit about how the analysis takes place.
+                    The algorithm first splits each location name into tokens,
+                    based on the token settings below. It then groups locations
+                    that share starting tokens, following the listed grouping
+                    requirements.
                 </p>
-                <h4>How the location names are analyzed</h4>
-                <p>
-                    When determining the best groupings for a given set of
-                    location names, the App builds a{" "}
-                    <a
-                        href="https://en.wikipedia.org/wiki/Trie"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        Trie tree
-                    </a>{" "}
-                    to identify common prefixes within the names. If this was
-                    applied on a character by character basis, you end up with
-                    groupings like &quot;W&quot; if a lot of the names start
-                    with the letter W. To get around this, the App tries to use
-                    the different &quot;words&quot; or tokens in a name instead
-                    of looking at each character individually. How words are
-                    separated in a location name varies from game to game, so
-                    the following parameters can be selected to help the App
-                    find tokens in the names:
-                </p>
+                <h4>Token Settings: </h4>
                 <ul>
                     <li>
                         <b>Split Characters:</b> Any time the app sees a
@@ -104,7 +81,7 @@ const CustomTrackerHelpModal = ({
                         name its own token.
                     </li>
                 </ul>
-                <h4>Additional parameters</h4>
+                <h4>Grouping parameters</h4>
                 <ul>
                     <li>
                         <b>Minium location count:</b> The minimum number
@@ -117,14 +94,8 @@ const CustomTrackerHelpModal = ({
                     </li>
                     <li>
                         <b>Minimum token count:</b> Determines how many tokens
-                        are required prior to splitting. Note that split
-                        characters count as tokens.
-                    </li>
-                    <li>
-                        <b>Use all checks in Data Package:</b> When enabled, all
-                        locations defined by the world developer will be used in
-                        the analysis instead of just the locations present in
-                        the current slot.
+                        are must match in a name before it is split. Note that
+                        split characters count as tokens.
                     </li>
                 </ul>
             </div>

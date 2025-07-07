@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
-import SectionView from "../sectionComponents/SectionView";
+import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
 import { LocationManager } from "../../services/locations/locationManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
 import { createTagManager } from "../../services/tags/tagManager";
@@ -123,7 +123,7 @@ const ChecklistSettings = ({
                         optionManager,
                     }}
                 >
-                    <SectionView name="root" context={{}} startOpen />
+                    <SectionView name="root" startOpen />
                 </ServiceContext.Provider>
             )}
         </>

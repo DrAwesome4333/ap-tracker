@@ -1,12 +1,12 @@
 // @ts-check
 import React, { useContext, useMemo, useState } from "react";
 import LocationView from "./LocationView";
-import ServiceContext from "../../contexts/serviceContext";
-import Icon from "../icons/icons";
-import useOption from "../../hooks/optionHook";
-import { naturalSort } from "../../utility/comparisons";
-import { useSection } from "../../hooks/sectionHooks";
-import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
+import ServiceContext from "../../../contexts/serviceContext";
+import Icon from "../../icons/icons";
+import useOption from "../../../hooks/optionHook";
+import { naturalSort } from "../../../utility/comparisons";
+import { useSection } from "../../../hooks/sectionHooks";
+import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
 
 const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     return (
@@ -29,11 +29,9 @@ const virtualizationThreshold = 30;
  */
 const SectionView = ({
     name,
-    context,
     startOpen,
 }: {
     name: string;
-    context: unknown;
     startOpen?: boolean;
 }) => {
     const isClosable = name !== "root";
@@ -255,7 +253,6 @@ const SectionView = ({
                                 return (
                                     <SectionView
                                         name={childName}
-                                        context={context}
                                         key={childName}
                                         startOpen={startOpen}
                                     />

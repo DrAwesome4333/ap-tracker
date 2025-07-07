@@ -49,7 +49,7 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         choices: [
             { name: "nothing", display: "Nothing" },
             { name: "separate", display: "Separate" },
-            { name: "hide", display: "separate" },
+            { name: "hide", display: "HIde" },
         ],
         default: "nothing",
     },
@@ -60,7 +60,7 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         choices: [
             { name: "nothing", display: "Nothing" },
             { name: "separate", display: "Separate" },
-            { name: "hide", display: "separate" },
+            { name: "hide", display: "Hide" },
         ],
         default: "nothing",
     },

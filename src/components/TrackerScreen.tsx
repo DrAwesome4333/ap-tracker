@@ -1,14 +1,12 @@
 import React, { useContext, useMemo } from "react";
-import SectionView from "./sectionComponents/SectionView";
 import InventoryView from "./inventoryComponents/InventoryView";
-import StickySpacer from "./shared/StickySpacer";
 import ServiceContext from "../contexts/serviceContext";
 import useOption from "../hooks/optionHook";
 import TextClient from "./textClient/TextClient";
 import Flex from "./LayoutUtilities/Flex";
 import Tabs, { Tab } from "./LayoutUtilities/Tabs";
 import { useOrientation } from "../hooks/mediaHook";
-import PanelHeader from "./shared/PanelHeader";
+import LocationTrackerDropdownView from "./LocationTrackerViews/DropdownView";
 
 type TrackerLayoutMode = "auto" | "tab" | "flex";
 
@@ -36,9 +34,7 @@ const TrackerScreen = () => {
     const checklist = (
         <>
             <div style={{ display: "grid", gridTemplateRows: "3em 1fr" }}>
-                <PanelHeader title="Locations"></PanelHeader>
-                <SectionView name="root" context={{}} />
-                <StickySpacer />
+                <LocationTrackerDropdownView />
             </div>
         </>
     );
