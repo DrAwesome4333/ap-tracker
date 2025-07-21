@@ -24,6 +24,8 @@ import GenericTrackerRepository from "./services/tracker/generic/genericTrackerR
 import { ResourceType } from "./services/tracker/resourceEnums";
 import { LocalStorageDataStore } from "./services/dataStores";
 import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTrackers";
+import { LocationTracker } from "./services/tracker/locationTrackers/locationTrackers";
+import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
 
 const AppScreen = styled.div`
     position: absolute;

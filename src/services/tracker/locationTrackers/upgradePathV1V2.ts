@@ -1,5 +1,6 @@
 import { randomUUID } from "../../../utility/uuid";
 import { ResourceType, LocationTrackerType } from "../resourceEnums";
+import { CustomLocationTrackerDef_V2 } from "./formatDefinitions/CustomLocationTrackerFormat_V2";
 const convertLocationTrackerV1toV2 = (
     locationTrackerDef: CustomLocationTrackerDef_V1
 ): CustomLocationTrackerDef_V2 => {

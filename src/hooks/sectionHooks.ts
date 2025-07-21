@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { LocationManager } from "../services/locations/locationManager";
 import { LocationTrackerType } from "../services/tracker/resourceEnums";
+import { DropdownLocationTracker } from "../services/tracker/locationTrackers/locationTrackers";
 
 const useSection = (tracker: DropdownLocationTracker, name: string) => {
     const callback =

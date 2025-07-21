@@ -2,6 +2,7 @@ import { InventoryManager } from "../inventory/inventoryManager";
 import { LocationManager } from "../locations/locationManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import CustomLocationTracker from "./locationTrackers/CustomLocationTracker";
+import { CustomLocationTrackerDef_V2 } from "./locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
 import { convertLocationTrackerV1toV2 } from "./locationTrackers/upgradePathV1V2";
 import { ResourceType } from "./resourceEnums";
 import { TrackerResourceId } from "./TrackerManager";
@@ -114,15 +115,16 @@ class CustomTrackerRepository implements ResourceRepository {
     };
 
     addTracker = (
-        data: CustomLocationTrackerDef_V2 | CustomLocationTrackerDef_V1
+        trackerDef: CustomLocationTrackerDef_V2 | CustomLocationTrackerDef_V1
     ) => {
-        if (!data) {
+        if (!trackerDef) {
             console.warn("Could not add empty tracker!");
             return;
         }
-        if ("customTrackerVersion" in data) {
-            data = convertLocationTrackerV1toV2(data);
+        if ("customTrackerVersion" in trackerDef) {
+            trackerDef = convertLocationTrackerV1toV2(trackerDef);
         }
+        const data = trackerDef as CustomLocationTrackerDef_V2;
 
         const addTracker = () => {
             const trackerVersions = this.#directory[data.manifest.uuid] ?? [];

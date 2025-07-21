@@ -1,6 +1,10 @@
 import { naturalSort } from "../../../../utility/comparisons";
 import { randomUUID } from "../../../../utility/uuid";
 import {
+    CustomLocationTrackerDef_V2,
+    GroupData_V2,
+} from "../../locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
+import {
     ResourceType,
     ResourceLocationType,
     LocationTrackerType,
