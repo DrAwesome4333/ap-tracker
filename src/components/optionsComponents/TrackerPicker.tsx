@@ -3,6 +3,7 @@ import { useTrackerDirectory } from "../../hooks/trackerHooks";
 import TrackerDropdown from "./TrackerDropdown";
 import { tertiary } from "../../constants/colors";
 import ServiceContext from "../../contexts/serviceContext";
+import { ResourceType } from "../../services/tracker/resourceEnums";
 
 /**
  * A UI for selecting which tracker to use with which game
@@ -21,7 +22,10 @@ const TrackerPicker = () => {
                         return (
                             <div key={game}>
                                 {game ?? "Default"}:{" "}
-                                <TrackerDropdown game={game} />
+                                <TrackerDropdown
+                                    type={ResourceType.locationTracker}
+                                    game={game}
+                                />
                             </div>
                         );
                     })

@@ -1,3 +1,5 @@
+import { ResourceType, LocationTrackerType } from "../resourceEnums";
+
 type LocationTrackerManifest = {
     type: ResourceType.locationTracker;
     locationTrackerType: LocationTrackerType;

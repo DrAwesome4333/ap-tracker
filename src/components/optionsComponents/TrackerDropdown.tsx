@@ -15,22 +15,24 @@ import { TrackerResourceId } from "../../services/tracker/TrackerManager";
  * @param param0
  * @returns
  */
-const TrackerDropdown = ({ game }: { game: string }) => {
+const TrackerDropdown = ({
+    game,
+    type,
+}: {
+    game: string;
+    type: ResourceType;
+}) => {
     const services = useContext(ServiceContext);
     const trackerManager = services.trackerManager;
     const directory = useTrackerDirectory(trackerManager);
-    const currentSelection = useCurrentGameTracker(
-        game,
-        trackerManager,
-        ResourceType.locationTracker
-    );
+    const currentSelection = useCurrentGameTracker(game, trackerManager, type);
     const trackers = useMemo(() => {
-        const list = directory.trackers[ResourceType.locationTracker].filter(
+        const list = directory.trackers[type].filter(
             (tracker) => tracker.game === game
         );
         list.sort((a, b) => naturalSort(a.name, b.name));
         return list;
-    }, [directory.trackers[ResourceType.locationTracker]]);
+    }, [directory.trackers[type]]);
 
     const getTrackerKey = (tracker: TrackerResourceId) => {
         return tracker
@@ -46,7 +48,7 @@ const TrackerDropdown = ({ game }: { game: string }) => {
         <select
             className="interactive"
             value={getTrackerKey(currentSelection) ?? ""}
-            disabled={trackers.length < (game ? 1 : 2)} // If game is defined, there is the default
+            disabled={trackers.length < (game ? 1 : 2)} // If game is defined, there is the default option to consider
             onChange={(e) => {
                 try {
                     if (e.target.value) {
@@ -54,7 +56,7 @@ const TrackerDropdown = ({ game }: { game: string }) => {
                         trackerManager.setGameTracker(game, tracker);
                     } else {
                         trackerManager.setGameTracker(game, {
-                            type: ResourceType.locationTracker,
+                            type,
                         });
                     }
                 } catch (e) {

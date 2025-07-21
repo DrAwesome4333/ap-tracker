@@ -1,3 +1,4 @@
+import { LocationTrackerManifest } from "../locationTrackers";
 type SectionDefs_V2 = { [sectionName: string]: SectionDef_V2 };
 
 type ThemeDef_V2 = {

@@ -2,8 +2,14 @@ import { DataStore } from "../dataStores";
 import NotificationManager, {
     MessageType,
 } from "../notifications/notifications";
-import GenericLocationTracker from "./generic/genericTracker";
+import GenericLocationTracker from "./generic/GenericLocationTracker";
+import GenericItemTracker from "./generic/GenericItemTracker";
+import { ItemTracker, ItemTrackerManifest } from "./itemTrackers/itemTrackers";
 import CustomLocationTracker from "./locationTrackers/CustomLocationTracker";
+import {
+    LocationTracker,
+    LocationTrackerManifest,
+} from "./locationTrackers/locationTrackers";
 import { ResourceType } from "./resourceEnums";
 const modified = Symbol("modified");
 
@@ -68,7 +74,7 @@ class TrackerManager {
             type: ResourceType.locationTracker,
         },
         [ResourceType.itemTracker]: {
-            uuid: "",
+            uuid: GenericItemTracker.uuid,
             version: "0.0.0",
             type: ResourceType.itemTracker,
         },
@@ -304,8 +310,7 @@ class TrackerManager {
                 itemTrackerInfo.type
             )
             .then((tracker) => {
-                this.#trackers[ResourceType.itemTracker] =
-                    tracker as ItemTracker;
+                this.#trackers[ResourceType.itemTracker] = tracker;
                 this.#callTrackerListeners();
             });
         const trackerPromises = [locationTrackerPromise, itemTrackerPromise];

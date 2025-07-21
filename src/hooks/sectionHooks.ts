@@ -1,14 +1,17 @@
 import { useSyncExternalStore } from "react";
 import { LocationManager } from "../services/locations/locationManager";
+import { LocationTrackerType } from "../services/tracker/resourceEnums";
 
 const useSection = (tracker: DropdownLocationTracker, name: string) => {
-    const callback = tracker
-        ? tracker.getUpdateSubscriber(name)
-        : (_: () => void) => {
-              /* There is nothing to listen to*/ return () => {
-                  /* Empty clean up call */
+    const callback =
+        tracker &&
+        tracker.manifest.locationTrackerType === LocationTrackerType.dropdown
+            ? tracker.getUpdateSubscriber(name)
+            : (_: () => void) => {
+                  /* There is nothing to listen to*/ return () => {
+                      /* Empty clean up call */
+                  };
               };
-          };
     return useSyncExternalStore(
         callback,
         () => tracker?.getSection(name),

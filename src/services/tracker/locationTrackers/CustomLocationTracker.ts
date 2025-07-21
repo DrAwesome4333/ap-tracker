@@ -2,6 +2,15 @@ import { LocationManager } from "../../locations/locationManager";
 import LocationReport from "./LocationReport";
 import { convertLocationTrackerV1toV2 } from "./upgradePathV1V2";
 import { LocationTrackerType, ResourceType } from "../resourceEnums";
+import {
+    DropdownLocationTracker,
+    LocationTrackerManifest,
+    Section,
+} from "./locationTrackers";
+import {
+    CustomLocationTrackerDef_V2,
+    SectionDef_V2,
+} from "./formatDefinitions/CustomLocationTrackerFormat_V2";
 
 class CustomLocationTracker implements DropdownLocationTracker {
     manifest: LocationTrackerManifest;

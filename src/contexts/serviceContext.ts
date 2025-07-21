@@ -8,6 +8,8 @@ import { OptionManager } from "../services/options/optionManager";
 import TextClientManager from "../services/textClientManager";
 import { TrackerManager } from "../services/tracker/TrackerManager";
 import { CustomTrackerRepository } from "../services/tracker/customTrackerManager";
+import { LocationTracker } from "../services/tracker/locationTrackers/locationTrackers";
+import { ItemTracker } from "../services/tracker/itemTrackers/itemTrackers";
 
 const ServiceContext: React.Context<{
     locationManager?: LocationManager;

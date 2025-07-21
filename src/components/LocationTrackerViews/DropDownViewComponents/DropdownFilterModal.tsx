@@ -5,6 +5,7 @@ import ServiceContext from "../../../contexts/serviceContext";
 import ButtonRow from "../../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../../buttons";
 import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
+import { ResourceType } from "../../../services/tracker/resourceEnums";
 
 const DropdownFilterModal = ({
     open,
@@ -21,6 +22,7 @@ const DropdownFilterModal = ({
             Tracker: &nbsp;
             <TrackerDropdown
                 game={services.connector?.connection.slotInfo.game}
+                type={ResourceType.locationTracker}
             />
             <br />
             <br />

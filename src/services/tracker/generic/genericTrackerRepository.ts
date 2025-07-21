@@ -1,7 +1,8 @@
 import { LocationManager } from "../../locations/locationManager";
 import { ResourceType } from "../resourceEnums";
 import { InventoryManager } from "../../inventory/inventoryManager";
-import GenericLocationTracker from "./genericTracker";
+import GenericLocationTracker from "./GenericLocationTracker";
+import GenericItemTracker from "./GenericItemTracker";
 
 const genericGameRepositoryUuid = "22b6c601-6f35-4264-b90e-1c83389c4a86";
 // const genericGameItemTrackerUuid = '46995402-c311-4992-9c35-8bf9a9c8427e';
@@ -13,7 +14,7 @@ class GenericTrackerRepository implements ResourceRepository {
     #listeners: Set<{ listener: () => void; types: ResourceType[] }> =
         new Set();
     #locationTracker: GenericLocationTracker;
-    #itemTracker: ItemTracker;
+    #itemTracker: GenericItemTracker;
     // #locationManager: LocationManager;
     // #inventoryManager: InventoryManager;
 
@@ -24,7 +25,11 @@ class GenericTrackerRepository implements ResourceRepository {
         // this.#locationManager = locationManager;
         // this.#inventoryManager = inventoryManager;
         this.#locationTracker = new GenericLocationTracker(locationManager);
-        this.resources = [this.#locationTracker.manifest];
+        this.#itemTracker = new GenericItemTracker();
+        this.resources = [
+            this.#locationTracker.manifest,
+            this.#itemTracker.manifest,
+        ];
     }
 
     getUpdateSubscriber = (types?: ResourceType[]) => {
@@ -54,14 +59,21 @@ class GenericTrackerRepository implements ResourceRepository {
         _gameName: string,
         groups: {
             location: { [name: string]: string[] };
+            item: { [name: string]: string[] };
         }
     ) => {
         this.#locationTracker.configure(groups);
+        this.#itemTracker.configure(groups);
         this.#callListeners([ResourceType.locationTracker]);
         return {
             [ResourceType.locationTracker]: {
                 uuid: this.#locationTracker.manifest.uuid,
                 version: this.#locationTracker.manifest.version,
+                type: ResourceType.locationTracker,
+            },
+            [ResourceType.itemTracker]: {
+                uuid: this.#itemTracker.manifest.uuid,
+                version: this.#itemTracker.manifest.version,
                 type: ResourceType.locationTracker,
             },
         };

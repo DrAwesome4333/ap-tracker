@@ -32,14 +32,12 @@ const InventoryItemView = ({ item }: { item: InventoryItem }) => {
                 color,
             }}
         >
-            {item.name} <br />
             <div
                 style={{
                     marginLeft: "1em",
                 }}
             >
-                From {item.sender}
-                <br />@ {item.location}
+                {item.location} ({item.sender})
                 {item.local && locationManager && tagManager && (
                     <GhostButton
                         onClick={(event) => {

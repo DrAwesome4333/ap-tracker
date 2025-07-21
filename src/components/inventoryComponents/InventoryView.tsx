@@ -1,7 +1,12 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, {
+    useContext,
+    useMemo,
+    useState,
+    useSyncExternalStore,
+} from "react";
 import { useInventoryItems } from "../../hooks/inventoryHook";
 import ServiceContext from "../../contexts/serviceContext";
-import InventoryItemCollectionView from "./InventoryItemCollectionView";
+import InventoryItemListView from "./InventoryItemListView";
 import StickySpacer from "../shared/StickySpacer";
 import { globalOptionManager } from "../../services/options/optionManager";
 import useOption from "../../hooks/optionHook";
@@ -11,11 +16,30 @@ import PanelHeader from "../shared/PanelHeader";
 import { PrimaryButton } from "../buttons";
 import Icon from "../icons/icons";
 import InventoryFilterOptionsModal from "./InventoryFilterOptionsModal";
-
+import { ItemTrackerType } from "../../services/tracker/resourceEnums";
+import { InventoryItem } from "../../services/inventory/inventoryManager";
+import { ItemCollectionDef } from "../../services/tracker/itemTrackers/itemTrackers";
+import InventoryItemGroupView from "./InventoryItemGroupView";
+const emptyList = [];
 const InventoryView = () => {
     const services = useContext(ServiceContext);
     const inventoryManager = services.inventoryManager;
     const optionManager = services.optionManager ?? globalOptionManager;
+    const itemTracker = services.inventoryTracker;
+    const groups: ItemCollectionDef[] = useSyncExternalStore(
+        itemTracker?.type === ItemTrackerType.group
+            ? itemTracker.getUpdateSubscriber()
+            : () => {
+                  return () => {};
+              },
+        itemTracker?.type === ItemTrackerType.group
+            ? () => itemTracker.getGroups()
+            : () => emptyList,
+        itemTracker?.type === ItemTrackerType.group
+            ? () => itemTracker.getGroups()
+            : () => emptyList
+    );
+
     if (!inventoryManager) {
         throw new Error(
             "Inventory manager not provided to inventory view service list"
@@ -55,9 +79,10 @@ const InventoryView = () => {
     ) as boolean;
 
     const items = useInventoryItems(inventoryManager);
+
     const sortedItems = useMemo(() => {
         return items
-            .filter(
+            ?.filter(
                 (collection) =>
                     (collection.progression && (showProgression ?? true)) ||
                     (collection.useful && (showUseful ?? true)) ||
@@ -74,10 +99,10 @@ const InventoryView = () => {
                         orderValue = naturalSort(a.name, b.name);
                         break;
                     }
-                    case "count": {
-                        orderValue = a.value - b.value;
-                        break;
-                    }
+                    // case "count": {
+                    //     orderValue = a.value - b.value;
+                    //     break;
+                    // }
                     case "index": // fall through
                     default: {
                         orderValue = a.index - b.index;
@@ -98,6 +123,62 @@ const InventoryView = () => {
         itemOrder,
         items,
     ]);
+
+    const itemsGroupedByName: InventoryItem[][] = [];
+    const itemsGroupedByNameIndex: { [itemName: string]: number } = {};
+    sortedItems.forEach((item) => {
+        if (itemsGroupedByNameIndex[item.name] === undefined) {
+            itemsGroupedByNameIndex[item.name] = itemsGroupedByName.length;
+            itemsGroupedByName.push([]);
+        }
+        const index = itemsGroupedByNameIndex[item.name];
+        itemsGroupedByName[index].push(item);
+    });
+
+    const itemCollections: {
+        type: "group" | "item";
+        name: string;
+        index: number;
+        count: number;
+        items: InventoryItem[][];
+    }[] = [];
+    const pulledItems: Set<string> = new Set();
+    groups.forEach((group) => {
+        let index = -1;
+        const groupItems = itemsGroupedByName.filter((items) => {
+            const pullItem =
+                group.allowedItems.has(items[0].id) ||
+                group.allowedItems.has(items[0].name);
+            if (pullItem) {
+                pulledItems.add(items[0].name);
+                if (index === -1) {
+                    index = items[0].index;
+                }
+            }
+            return pullItem;
+        });
+        if (index !== -1)
+            itemCollections.push({
+                type: "group",
+                name: group.name,
+                index,
+                items: groupItems,
+                count: groupItems.reduce((a, b) => a + b.length, 0),
+            });
+    });
+
+    itemsGroupedByName.forEach((items) => {
+        if (!pulledItems.has(items[0].name)) {
+            itemCollections.push({
+                type: "item",
+                name: items[0].name + "_",
+                index: items[0].index,
+                count: items.length,
+                items: [items],
+            });
+        }
+    });
+
     return (
         <>
             <div
@@ -128,12 +209,27 @@ const InventoryView = () => {
                         boxSizing: "border-box",
                     }}
                 >
-                    {sortedItems.map((collection) => (
-                        <InventoryItemCollectionView
-                            key={collection.name}
-                            collection={collection}
-                        />
-                    ))}
+                    {itemTracker?.type !== ItemTrackerType.group ? (
+                        <>Unsupported Tracker type {itemTracker?.type}</>
+                    ) : (
+                        <>
+                            {itemCollections.map((collection) =>
+                                collection.type === "group" ? (
+                                    <InventoryItemGroupView
+                                        key={collection.name}
+                                        name={collection.name}
+                                        items={collection.items}
+                                    />
+                                ) : (
+                                    <InventoryItemListView
+                                        key={collection.name}
+                                        items={collection.items[0]}
+                                    />
+                                )
+                            )}
+                        </>
+                    )}
+
                     <StickySpacer />
                 </div>
             </div>

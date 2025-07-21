@@ -8,6 +8,7 @@ import { naturalSort } from "../../../utility/comparisons";
 import { useSection } from "../../../hooks/sectionHooks";
 import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
 import { TextButton } from "../../buttons";
+import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
 
 const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     return (
@@ -204,7 +205,10 @@ const SectionView = ({
                                     : ""
                             }`}
                         >
-                            {section?.title ?? "Unloaded Section"}{" "}
+                            {locationTracker?.manifest.locationTrackerType ===
+                            LocationTrackerType.dropdown
+                                ? (section?.title ?? "Unloaded Section")
+                                : `Unsupported tracker type ${locationTracker?.manifest.locationTrackerType}`}{" "}
                             <i>
                                 {clearedLocationCount}
                                 {"/"}
