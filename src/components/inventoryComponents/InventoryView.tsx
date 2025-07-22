@@ -179,6 +179,29 @@ const InventoryView = () => {
         }
     });
 
+    itemCollections.sort((a, b) => {
+        let orderValue = 1;
+        switch (itemOrder) {
+            case "name": {
+                orderValue = naturalSort(a.name, b.name);
+                break;
+            }
+            case "count": {
+                orderValue = a.count - b.count;
+                break;
+            }
+            case "index": // fall through
+            default: {
+                orderValue = a.index - b.index;
+                break;
+            }
+        }
+        if (itemOrderDirection_desc ?? true) {
+            orderValue *= -1;
+        }
+        return orderValue;
+    });
+
     return (
         <>
             <div
