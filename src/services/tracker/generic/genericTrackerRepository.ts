@@ -3,6 +3,7 @@ import { ResourceType } from "../resourceEnums";
 import { InventoryManager } from "../../inventory/inventoryManager";
 import GenericLocationTracker from "./GenericLocationTracker";
 import GenericItemTracker from "./GenericItemTracker";
+import { OptionManager } from "../../options/optionManager";
 
 const genericGameRepositoryUuid = "22b6c601-6f35-4264-b90e-1c83389c4a86";
 // const genericGameItemTrackerUuid = '46995402-c311-4992-9c35-8bf9a9c8427e';
@@ -19,13 +20,14 @@ class GenericTrackerRepository implements ResourceRepository {
     // #inventoryManager: InventoryManager;
 
     constructor(
+        optionManager: OptionManager,
         locationManager: LocationManager,
         _inventoryManager: InventoryManager
     ) {
         // this.#locationManager = locationManager;
         // this.#inventoryManager = inventoryManager;
         this.#locationTracker = new GenericLocationTracker(locationManager);
-        this.#itemTracker = new GenericItemTracker();
+        this.#itemTracker = new GenericItemTracker(optionManager);
         this.resources = [
             this.#locationTracker.manifest,
             this.#itemTracker.manifest,

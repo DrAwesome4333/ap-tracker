@@ -1,9 +1,11 @@
+import { JSONValue } from "../../dataStores";
 import {
     HierarchicalOption,
     MultiselectOption,
     TrackerOption,
 } from "../../options/option";
 import { OptionType } from "../../options/optionEnums";
+import { OptionManager, setOptionDefaults } from "../../options/optionManager";
 import { ItemTrackerType, ResourceType } from "../resourceEnums";
 import {
     CustomItemTrackerDef_V1,
@@ -25,10 +27,12 @@ class CustomItemTracker implements GroupItemTracker {
     protected groups: ItemCollectionDef[] = [];
     protected allGroups: ItemCollectionDef[] = [];
     protected cacheDirty: boolean = true;
+    protected optionManager: OptionManager;
     options: { [optionName: string]: TrackerOption } = {};
     #cachedGroups: ItemCollectionDef[] = [];
 
-    constructor(data?: CustomItemTrackerDef_V1) {
+    constructor(optionManager: OptionManager, data?: CustomItemTrackerDef_V1) {
+        this.optionManager = optionManager;
         this.read(data);
     }
     protected callListeners = () => {
@@ -84,6 +88,7 @@ class CustomItemTracker implements GroupItemTracker {
         Object.entries(data.groups).forEach(([name, def]) =>
             parseGroup(name, def)
         );
+        this.generateOptions();
         this.callListeners();
     };
 
@@ -100,7 +105,7 @@ class CustomItemTracker implements GroupItemTracker {
             type: OptionType.hierarchical,
             name: optionKey,
             display: "Options",
-            children: [],
+            children: [groupOption],
         };
         this.options = {
             [optionKey]: options,
@@ -110,10 +115,28 @@ class CustomItemTracker implements GroupItemTracker {
             groupOption.choices.push(group.name);
             groupOption.default.push(group.name);
         });
-
+        setOptionDefaults(this.optionManager, this.options);
+        const subscriber = this.optionManager.getSubscriberCallback(
+            optionKey,
+            "global"
+        );
+        const cleanupCall = subscriber(() => {
+            this.update({
+                options: this.optionManager.getOptionValue(
+                    optionKey,
+                    "global"
+                ) as { [optionName: string]: JSONValue },
+            });
+        });
+        this.cleanupCalls.add(cleanupCall);
         Object.freeze(options);
         Object.freeze(this.options);
         this.callOptionListeners();
+        this.update({
+            options: this.optionManager.getOptionValue(optionKey, "global") as {
+                [optionName: string]: JSONValue;
+            },
+        });
     };
 
     reset = () => {};
@@ -121,12 +144,9 @@ class CustomItemTracker implements GroupItemTracker {
     update = (updates: ItemTrackerUpdatePack) => {
         if (updates.options) {
             const options = updates.options;
-            const optionKey = `CustomTrackerOption:${this.manifest.uuid}-${this.manifest.type}-${this.manifest.version}`;
-            if (options[optionKey] && options[optionKey]["enabledGroups"]) {
+            if (options["enabledGroups"]) {
                 this.groups = this.allGroups.filter((x) =>
-                    (<string[]>options[optionKey]["enabledGroups"]).includes(
-                        x.name
-                    )
+                    (<string[]>options["enabledGroups"]).includes(x.name)
                 );
                 Object.freeze(this.groups);
                 this.callListeners();

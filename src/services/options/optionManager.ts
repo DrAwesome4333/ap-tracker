@@ -182,12 +182,16 @@ const globalOptionStore = new LocalStorageDataStore(
     OPTION_LOCAL_STORAGE_ITEM_NAME
 );
 
-const parseOption = (option: TrackerOption, parent?: JSONValue) => {
+const parseOption = (
+    optionManager: OptionManager,
+    option: TrackerOption,
+    parent?: JSONValue
+) => {
     if (option.type !== OptionType.hierarchical) {
         if (parent) {
             parent[option.name] = option.default;
         } else {
-            globalOptionManager.setOptionDefault(
+            optionManager.setOptionDefault(
                 option.name,
                 "global",
                 option.default
@@ -195,20 +199,29 @@ const parseOption = (option: TrackerOption, parent?: JSONValue) => {
         }
     } else {
         const value = {};
-        option.children.forEach((child) => parseOption(child, value));
+        option.children.forEach((child) =>
+            parseOption(optionManager, child, value)
+        );
         if (parent) {
             parent[option.name] = value;
         } else {
-            globalOptionManager.setOptionDefault(option.name, "global", value);
+            optionManager.setOptionDefault(option.name, "global", value);
         }
     }
 };
 
-Object.entries(baseTrackerOptions).forEach(([_name, option]) =>
-    parseOption(option)
-);
+const setOptionDefaults = (
+    optionManager: OptionManager,
+    options: { [name: string]: TrackerOption }
+) => {
+    Object.entries(options).forEach(([_name, option]) =>
+        parseOption(optionManager, option)
+    );
+};
+
+setOptionDefaults(globalOptionManager, baseTrackerOptions);
 
 globalOptionManager.configureScope("global", globalOptionStore);
 globalOptionManager.configureScope("temp", new TempDataStore());
 
-export { globalOptionManager, OptionManager };
+export { globalOptionManager, OptionManager, setOptionDefaults };

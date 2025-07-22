@@ -63,6 +63,7 @@ const customTrackerRepository = new CustomTrackerRepository(
     inventoryManager
 );
 const genericTrackerRepository = new GenericTrackerRepository(
+    optionManager,
     locationManager,
     inventoryManager
 );
