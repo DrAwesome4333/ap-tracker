@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { CustomTrackerRepository } from "../services/tracker/customTrackerManager";
+import { CustomTrackerRepository } from "../services/tracker/customTrackerRepository";
 import { TrackerManager } from "../services/tracker/TrackerManager";
 import { ResourceType } from "../services/tracker/resourceEnums";
 

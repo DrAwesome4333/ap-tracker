@@ -1,10 +1,17 @@
+import { JSONValue } from "../../dataStores";
+import { TrackerOption } from "../../options/option";
+import { BaseResourceManifest } from "../resource";
 import { ResourceType, LocationTrackerType } from "../resourceEnums";
+import {
+    CustomLocationTrackerDef_V2,
+    ThemeDef_V2,
+} from "./formatDefinitions/CustomLocationTrackerFormat_V2";
+import LocationReport from "./LocationReport";
 
 type LocationTrackerManifest = {
     type: ResourceType.locationTracker;
     locationTrackerType: LocationTrackerType;
     game: string;
-    compatibleDataPackages?: string[];
     formatVersion: number;
 } & BaseResourceManifest;
 
@@ -44,3 +51,13 @@ interface Section {
 }
 
 type LocationTracker = DropdownLocationTracker;
+
+export type {
+    LocationTracker,
+    Section,
+    ThemeDef,
+    DropdownLocationTracker,
+    LocationTrackerManifest,
+    LocationTrackerUpdatePack,
+    BaseLocationTracker,
+};

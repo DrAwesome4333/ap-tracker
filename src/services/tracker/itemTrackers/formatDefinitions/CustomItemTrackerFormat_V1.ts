@@ -13,8 +13,6 @@ type ItemGroupsDef = { [name: string]: ItemGroupDef };
 type CustomItemTrackerDef_V1 = {
     manifest: ItemTrackerManifest;
     groups: ItemGroupsDef;
-    /** The version of the definition */
-    version: 1;
 };
 
 export type {

@@ -4,6 +4,7 @@ import { InventoryManager } from "../../inventory/inventoryManager";
 import GenericLocationTracker from "./GenericLocationTracker";
 import GenericItemTracker from "./GenericItemTracker";
 import { OptionManager } from "../../options/optionManager";
+import { ResourceManifest, ResourceRepository } from "../resource";
 
 const genericGameRepositoryUuid = "22b6c601-6f35-4264-b90e-1c83389c4a86";
 // const genericGameItemTrackerUuid = '46995402-c311-4992-9c35-8bf9a9c8427e';

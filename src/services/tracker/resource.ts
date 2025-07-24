@@ -1,3 +1,10 @@
+import { ItemTracker, ItemTrackerManifest } from "./itemTrackers/itemTrackers";
+import {
+    LocationTracker,
+    LocationTrackerManifest,
+} from "./locationTrackers/locationTrackers";
+import { ResourceLocationType, ResourceType } from "./resourceEnums";
+
 type BaseResourceManifest = {
     uuid: string;
     name: string;
@@ -29,3 +36,10 @@ interface ResourceRepository {
     /** Does any initialization that may be needed such as fetching from a remote server, returns true on success, else false */
     initialize: () => Promise<boolean>;
 }
+
+export type {
+    Resource,
+    ResourceManifest,
+    ResourceRepository,
+    BaseResourceManifest,
+};

@@ -11,6 +11,7 @@ import {
     LocationTrackerManifest,
 } from "./locationTrackers/locationTrackers";
 import { ResourceType } from "./resourceEnums";
+import { ResourceManifest, ResourceRepository } from "./resource";
 const modified = Symbol("modified");
 
 type TrackerDirectory = {
@@ -171,9 +172,20 @@ class TrackerManager {
                     trackersToRemove.delete(getTrackerKey(manifest));
                 }
             });
-            trackersToRemove.forEach((trackerKey) =>
-                this.#allTrackers.delete(trackerKey)
-            );
+            trackersToRemove.forEach((trackerKey) => {
+                const tracker = this.#allTrackers.get(trackerKey);
+                const inUseTracker = this.getCurrentGameTracker(
+                    tracker.game,
+                    tracker.type
+                );
+                if (
+                    inUseTracker.uuid === tracker.uuid &&
+                    inUseTracker.version === tracker.version
+                ) {
+                    this.setGameTracker(tracker.game, { type: tracker.type });
+                }
+                this.#allTrackers.delete(trackerKey);
+            });
             this.#callDirectoryListeners();
             if (triggerReload) {
                 this.loadTrackers(this.#game);
@@ -235,6 +247,7 @@ class TrackerManager {
         game: string,
         tracker: TrackerResourceId | { type: string }
     ) => {
+        console.log(`Updating ${game} to:`, tracker);
         if (game) {
             const currentValue =
                 (this.#optionsStore.read(game) as TrackerResourceIds) ?? {};
@@ -302,6 +315,7 @@ class TrackerManager {
                     }
                 }
             });
+
         const itemTrackerPromise = this.#repositories
             .get(itemTrackerRepoUuid)
             ?.repo.loadResource(

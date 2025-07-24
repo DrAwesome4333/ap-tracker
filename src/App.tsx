@@ -18,7 +18,7 @@ import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
 import { TrackerManager } from "./services/tracker/TrackerManager";
-import { CustomTrackerRepository } from "./services/tracker/customTrackerManager";
+import { CustomTrackerRepository } from "./services/tracker/customTrackerRepository";
 import TextClientManager from "./services/textClientManager";
 import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
 import { ResourceType } from "./services/tracker/resourceEnums";
@@ -59,6 +59,7 @@ const mainTrackerManagerStore = new LocalStorageDataStore(
 );
 const trackerManager = new TrackerManager(mainTrackerManagerStore);
 const customTrackerRepository = new CustomTrackerRepository(
+    optionManager,
     locationManager,
     inventoryManager
 );
@@ -138,6 +139,7 @@ const App = (): React.ReactNode => {
                             trackerManager,
                             textClientManager,
                             customTrackerRepository,
+                            genericTrackerRepository,
                         }}
                     >
                         <NotificationContainer />

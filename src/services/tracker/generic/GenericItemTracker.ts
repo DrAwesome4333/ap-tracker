@@ -10,7 +10,7 @@ class GenericItemTracker extends CustomItemTracker {
     constructor(optionManager: OptionManager) {
         super(optionManager);
         this.manifest.uuid = GenericItemTracker.uuid;
-        this.manifest.name = "Generic Dropdown Tracker";
+        this.manifest.name = "Generic Item Tracker";
     }
 
     #reset = () => {
@@ -25,7 +25,6 @@ class GenericItemTracker extends CustomItemTracker {
         const itemGroupDef: CustomItemTrackerDef_V1 = {
             manifest: { ...this.manifest },
             groups: groupsUpdated,
-            version: 1,
         };
         this.read(itemGroupDef);
     };

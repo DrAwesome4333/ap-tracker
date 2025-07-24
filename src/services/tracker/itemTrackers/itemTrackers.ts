@@ -1,11 +1,14 @@
+import { JSONValue } from "../../dataStores";
 import { InventoryItem } from "../../inventory/inventoryManager";
 import { TrackerOption } from "../../options/option";
+import { BaseResourceManifest } from "../resource";
 import { ResourceType, ItemTrackerType } from "../resourceEnums";
 import { CustomItemTrackerDef_V1 } from "./formatDefinitions/CustomItemTrackerFormat_V1";
 type ItemTrackerManifest = {
     type: ResourceType.itemTracker;
     game: string;
-    compatibleDataPackages?: string[];
+    itemTrackerType: ItemTrackerType;
+    formatVersion: number;
 } & BaseResourceManifest;
 
 /** Values that have changed since the last update*/
@@ -33,9 +36,17 @@ type ItemCollectionDef = {
 };
 
 type GroupItemTracker = {
-    readonly type: ItemTrackerType.group;
     getGroups: () => ItemCollectionDef[];
     exportGroups: () => CustomItemTrackerDef_V1;
 } & BaseItemTracker;
 
 type ItemTracker = GroupItemTracker;
+
+export type {
+    ItemTrackerManifest,
+    ItemTrackerUpdatePack,
+    BaseItemTracker,
+    ItemCollectionDef,
+    GroupItemTracker,
+    ItemTracker,
+};

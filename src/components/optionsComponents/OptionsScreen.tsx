@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import ServiceContext from "../../contexts/serviceContext";
-import TrackerPicker from "./TrackerPicker";
 import CustomTrackerOptions from "./CustomTrackerOptions";
 import OptionBlock from "./OptionBlock";
 import StickySpacer from "../shared/StickySpacer";
@@ -46,13 +45,6 @@ const OptionsScreen = () => {
             </OptionBlock>
             <OptionBlock title="Inventory Settings">
                 <InventorySettings />
-            </OptionBlock>
-            <OptionBlock title="Tracker Picker">
-                {trackerManager ? (
-                    <TrackerPicker />
-                ) : (
-                    <i>Failed to initiate tracker picker</i>
-                )}
             </OptionBlock>
             <OptionBlock title="Custom Tracker Manager">
                 {customTrackerRepository ? (

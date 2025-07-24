@@ -4,11 +4,7 @@ import {
     CustomLocationTrackerDef_V2,
     GroupData_V2,
 } from "../../locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
-import {
-    ResourceType,
-    ResourceLocationType,
-    LocationTrackerType,
-} from "../../resourceEnums";
+import { ResourceType, LocationTrackerType } from "../../resourceEnums";
 
 const GROUP_DEBUG = false;
 const DEBUG_PARENT_GROUP_ORGANIZATION = GROUP_DEBUG;
@@ -27,11 +23,9 @@ const generateSectionDef = (groups: { [s: string]: string[] }) => {
             uuid: randomUUID(),
             version: "0.0.0",
             description: "Auto generated tracker based on location groups",
-            resourceLocationType: ResourceLocationType.builtIn,
             type: ResourceType.locationTracker,
             locationTrackerType: LocationTrackerType.dropdown,
             game: null,
-            compatibleDataPackages: [],
             formatVersion: 2,
         },
         groups: trackerGroups,

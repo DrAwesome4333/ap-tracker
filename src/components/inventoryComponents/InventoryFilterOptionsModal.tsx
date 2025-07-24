@@ -6,6 +6,8 @@ import { GhostButton } from "../buttons";
 import ServiceContext from "../../contexts/serviceContext";
 import OptionView from "../optionsComponents/OptionView";
 import { JSONValue } from "../../services/dataStores";
+import TrackerDropdown from "../optionsComponents/TrackerDropdown";
+import { ResourceType } from "../../services/tracker/resourceEnums";
 const InventoryFilterOptionsModal = ({
     open,
     onClose,
@@ -32,7 +34,15 @@ const InventoryFilterOptionsModal = ({
 
     return (
         <Modal open={open}>
-            <h2>Inventory Filters</h2>
+            <h2>Inventory Settings</h2>
+            Tracker: &nbsp;
+            <TrackerDropdown
+                game={services.connector?.connection.slotInfo.game}
+                type={ResourceType.itemTracker}
+            />
+            <br />
+            <br />
+            <h3>Inventory Filters</h3>
             <div>
                 <InventorySettings />
                 {options &&

@@ -27,22 +27,22 @@ const InventoryView = () => {
     const optionManager = services.optionManager ?? globalOptionManager;
     const itemTracker = services.inventoryTracker;
     const groups: ItemCollectionDef[] = useSyncExternalStore(
-        itemTracker?.type === ItemTrackerType.group
+        itemTracker?.manifest.itemTrackerType === ItemTrackerType.group
             ? itemTracker.getUpdateSubscriber()
             : () => {
                   return () => {};
               },
-        itemTracker?.type === ItemTrackerType.group
+        itemTracker?.manifest.itemTrackerType === ItemTrackerType.group
             ? () => itemTracker.getGroups()
             : () => emptyList,
-        itemTracker?.type === ItemTrackerType.group
+        itemTracker?.manifest.itemTrackerType === ItemTrackerType.group
             ? () => itemTracker.getGroups()
             : () => emptyList
     );
 
     if (!inventoryManager) {
         throw new Error(
-            "Inventory manager not provided to inventory view service list"
+            "Inventory manager was not provided for Inventory View"
         );
     }
 
@@ -99,10 +99,6 @@ const InventoryView = () => {
                         orderValue = naturalSort(a.name, b.name);
                         break;
                     }
-                    // case "count": {
-                    //     orderValue = a.value - b.value;
-                    //     break;
-                    // }
                     case "index": // fall through
                     default: {
                         orderValue = a.index - b.index;
@@ -232,8 +228,12 @@ const InventoryView = () => {
                         boxSizing: "border-box",
                     }}
                 >
-                    {itemTracker?.type !== ItemTrackerType.group ? (
-                        <>Unsupported Tracker type {itemTracker?.type}</>
+                    {itemTracker?.manifest.itemTrackerType !==
+                    ItemTrackerType.group ? (
+                        <>
+                            Unsupported Tracker type{" "}
+                            {itemTracker?.manifest.itemTrackerType}
+                        </>
                     ) : (
                         <>
                             {itemCollections.map((collection) =>

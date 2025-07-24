@@ -20,7 +20,6 @@ import {
 
 class CustomItemTracker implements GroupItemTracker {
     manifest: ItemTrackerManifest;
-    type = ItemTrackerType.group;
     protected groupListeners: Set<() => void> = new Set();
     protected optionListeners: Set<() => void> = new Set();
     protected cleanupCalls: Set<() => void> = new Set();
@@ -53,19 +52,23 @@ class CustomItemTracker implements GroupItemTracker {
         if (!data) {
             this.manifest = {
                 type: ResourceType.itemTracker,
+                itemTrackerType: ItemTrackerType.group,
                 uuid: null,
                 game: null,
                 version: "0.0.0",
                 name: "Unknown Tracker",
+                formatVersion: 1,
             };
 
             return;
         }
-        if (data.version !== 1) {
+        if (data.manifest.formatVersion !== 1) {
             throw new Error(
-                `Unsupported Custom Item Tracker version ${data.version}`
+                `Unsupported Custom Item Tracker version ${data.manifest.formatVersion}`
             );
         }
+
+        this.manifest = { ...data.manifest };
 
         const parseGroup = (name: string, groupDef: ItemGroupDef) => {
             const collection: ItemCollectionDef = {
@@ -162,9 +165,22 @@ class CustomItemTracker implements GroupItemTracker {
         return this.#cachedGroups;
     };
 
-    exportGroups = () => {
-        // todo
-        return null;
+    exportGroups = (newUuid?: string): CustomItemTrackerDef_V1 => {
+        const manifest = {
+            ...this.manifest,
+            uuid: newUuid ?? this.manifest.uuid,
+        };
+        const def: CustomItemTrackerDef_V1 = {
+            manifest,
+            groups: {},
+        };
+        this.allGroups.forEach((group) => {
+            def.groups[group.name] = {
+                name: group.name,
+                items: [...group.allowedItems.values()],
+            };
+        });
+        return def;
     };
 
     subscribeToGroups = (listener: () => void) => {
@@ -187,6 +203,11 @@ class CustomItemTracker implements GroupItemTracker {
 
     getOptionSubscriber = () => {
         return (listener: () => void) => this.subscribeToOptions(listener);
+    };
+
+    getErrors = () => {
+        /** For future use */
+        return [];
     };
 }
 

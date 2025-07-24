@@ -352,8 +352,8 @@ const NameAnalysisModal = ({
                             connection.slotInfo.game,
                             {
                                 type: ResourceType.locationTracker,
-                                uuid: customTracker.manifest.uuid,
-                                version: customTracker.manifest.version,
+                                uuid: customTrackerExport.manifest.uuid,
+                                version: customTrackerExport.manifest.version,
                             }
                         );
                         NotificationManager.createStatus({
@@ -382,7 +382,7 @@ const NameAnalysisModal = ({
                             return;
                         }
                         exportJSONFile(
-                            `tracker-export-${customTrackerExport.manifest.game}-${Date.now().toString()}`,
+                            `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
                             customTrackerExport
                         );
                     }}

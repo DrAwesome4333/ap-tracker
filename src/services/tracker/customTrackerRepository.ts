@@ -1,9 +1,13 @@
 import { InventoryManager } from "../inventory/inventoryManager";
 import { LocationManager } from "../locations/locationManager";
+import { OptionManager } from "../options/optionManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
+import CustomItemTracker from "./itemTrackers/CustomItemTracker";
+import { CustomItemTrackerDef_V1 } from "./itemTrackers/formatDefinitions/CustomItemTrackerFormat_V1";
 import CustomLocationTracker from "./locationTrackers/CustomLocationTracker";
 import { CustomLocationTrackerDef_V2 } from "./locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
 import { convertLocationTrackerV1toV2 } from "./locationTrackers/upgradePathV1V2";
+import { Resource, ResourceManifest, ResourceRepository } from "./resource";
 import { ResourceType } from "./resourceEnums";
 import { TrackerResourceId } from "./TrackerManager";
 
@@ -17,13 +21,16 @@ class CustomTrackerRepository implements ResourceRepository {
     #resourceListeners: Set<() => void> = new Set();
     #locationManager: LocationManager;
     #directoryQueueCallbacks: (() => void)[] = [];
+    #optionManager: OptionManager;
     // #inventoryManager: InventoryManager;
 
     constructor(
+        optionManager: OptionManager,
         locationManager: LocationManager,
         _inventoryManager: InventoryManager
     ) {
         this.#locationManager = locationManager;
+        this.#optionManager = optionManager;
         // this.#inventoryManager = inventoryManager;
         SaveData.getAllItems(DB_STORE_KEYS.customTrackersDirectory)
             .then((manifests: ResourceManifest[]) => {
@@ -72,14 +79,24 @@ class CustomTrackerRepository implements ResourceRepository {
         if (!this.#directory[uuid]) {
             throw new Error(`Failed to locate resource ${uuid}`);
         }
-        // TODO support custom item trackers
-        const resource = (await SaveData.getItem(DB_STORE_KEYS.customTrackers, [
-            uuid,
-            version,
-            type,
-        ])) as CustomLocationTrackerDef_V2;
-
-        return new CustomLocationTracker(this.#locationManager, resource);
+        const resource = (
+            await SaveData.getItem(DB_STORE_KEYS.customTrackers, [
+                uuid,
+                version,
+                type,
+            ])
+        )?.["data"] as CustomLocationTrackerDef_V2 | CustomItemTrackerDef_V1;
+        if (resource?.manifest?.type === ResourceType.locationTracker) {
+            return new CustomLocationTracker(
+                this.#locationManager,
+                resource as CustomLocationTrackerDef_V2
+            );
+        } else if (resource?.manifest?.type === ResourceType.itemTracker) {
+            return new CustomItemTracker(
+                this.#optionManager,
+                resource as CustomItemTrackerDef_V1
+            );
+        }
     };
 
     initialize: () => Promise<boolean> = async () => {
@@ -115,7 +132,10 @@ class CustomTrackerRepository implements ResourceRepository {
     };
 
     addTracker = (
-        trackerDef: CustomLocationTrackerDef_V2 | CustomLocationTrackerDef_V1
+        trackerDef:
+            | CustomLocationTrackerDef_V2
+            | CustomLocationTrackerDef_V1
+            | CustomItemTrackerDef_V1
     ) => {
         if (!trackerDef) {
             console.warn("Could not add empty tracker!");
@@ -124,7 +144,9 @@ class CustomTrackerRepository implements ResourceRepository {
         if ("customTrackerVersion" in trackerDef) {
             trackerDef = convertLocationTrackerV1toV2(trackerDef);
         }
-        const data = trackerDef as CustomLocationTrackerDef_V2;
+        const data = trackerDef as
+            | CustomLocationTrackerDef_V2
+            | CustomItemTrackerDef_V1;
 
         const addTracker = () => {
             const trackerVersions = this.#directory[data.manifest.uuid] ?? [];
@@ -152,7 +174,7 @@ class CustomTrackerRepository implements ResourceRepository {
                 uuid: data.manifest.uuid,
                 version: data.manifest.version,
                 type: data.manifest.type,
-                ...data,
+                data,
             });
             this.#updateDirectory(updatedDirectory);
         };

@@ -1,6 +1,6 @@
 // Loads 0.2.x trackers into the new 0.3.x format.
 import { DB_STORE_KEYS, SaveData } from "../../saveData";
-import { CustomTrackerRepository } from "../customTrackerManager";
+import { CustomTrackerRepository } from "../customTrackerRepository";
 const CUSTOM_TRACKER_DIRECTORY_STORAGE_KEY =
     "APChecklist_Custom_Tracker_Directory";
 

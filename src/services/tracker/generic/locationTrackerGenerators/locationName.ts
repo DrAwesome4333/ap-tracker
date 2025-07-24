@@ -4,11 +4,7 @@ import {
     CustomLocationTrackerDef_V2,
     GroupData_V2,
 } from "../../locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
-import {
-    ResourceType,
-    ResourceLocationType,
-    LocationTrackerType,
-} from "../../resourceEnums";
+import { ResourceType, LocationTrackerType } from "../../resourceEnums";
 class TrieNode {
     children: Map<string, TrieNode>;
     count: number;
@@ -262,11 +258,9 @@ const generateSectionDef = (
             uuid: randomUUID(),
             version: "0.0.0",
             description: "Auto generated tracker based on location names",
-            resourceLocationType: ResourceLocationType.builtIn,
             type: ResourceType.locationTracker,
             locationTrackerType: LocationTrackerType.dropdown,
             game: null,
-            compatibleDataPackages: [],
             formatVersion: 2,
         },
         sections: {},

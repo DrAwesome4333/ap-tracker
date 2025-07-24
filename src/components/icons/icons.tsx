@@ -49,6 +49,9 @@ const supportedIcons = [
     "delete",
     "download",
     "upload_file",
+    "eject",
+    "radio_button_checked",
+    "radio_button_unchecked",
 ];
 
 const link = document.createElement("link");
