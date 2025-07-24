@@ -18,8 +18,12 @@ class GenericItemTracker extends CustomItemTracker {
         this.callListeners();
     };
 
-    configure = (groups: { item: { [name: string]: string[] } }) => {
+    configure = (
+        groups: { item: { [name: string]: string[] } },
+        gameName: string
+    ) => {
         this.#reset();
+        this.discriminator = `-${gameName}`;
         const groupsUpdated = { ...groups.item };
         delete groupsUpdated["Everything"];
         const itemGroupDef: CustomItemTrackerDef_V1 = {

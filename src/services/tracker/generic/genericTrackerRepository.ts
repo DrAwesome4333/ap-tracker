@@ -59,14 +59,14 @@ class GenericTrackerRepository implements ResourceRepository {
     };
 
     configureGenericTrackers = (
-        _gameName: string,
+        gameName: string,
         groups: {
             location: { [name: string]: string[] };
             item: { [name: string]: string[] };
         }
     ) => {
         this.#locationTracker.configure(groups);
-        this.#itemTracker.configure(groups);
+        this.#itemTracker.configure(groups, gameName);
         this.#callListeners([ResourceType.locationTracker]);
         return {
             [ResourceType.locationTracker]: {

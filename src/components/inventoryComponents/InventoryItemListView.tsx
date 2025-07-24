@@ -11,6 +11,19 @@ import CollectionContainer from "./CollectionContainer";
 import InventoryItemView from "./InventoryItemView";
 import { TextButton } from "../buttons";
 import { InventoryItem } from "../../services/inventory/inventoryManager";
+import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
+
+const virtualizationThreshold = 50;
+
+const rowGenerator: RowGenerator<InventoryItem> = ({ ref, item }) => {
+    return (
+        <InventoryItemView
+            item={item}
+            key={item.uuid}
+            ref={ref as React.ForwardedRef<HTMLDivElement>}
+        />
+    );
+};
 
 /** Renders a list of locations for a given item. Will throw warnings if all items do not have the same name */
 const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
@@ -64,9 +77,24 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                         color: tertiary,
                     }}
                 >
-                    {items.map((item) => (
-                        <InventoryItemView item={item} key={item.uuid} />
-                    ))}
+                    {items.length < virtualizationThreshold ? (
+                        items.map((item) => (
+                            <InventoryItemView item={item} key={item.uuid} />
+                        ))
+                    ) : (
+                        <LargeList<InventoryItem>
+                            items={items}
+                            defaultRowSize={22}
+                            rowGenerator={rowGenerator}
+                            style={{
+                                width: "95%",
+                                overflow: "hidden",
+                                resize: "vertical",
+                                height: "50vh",
+                                boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </div>

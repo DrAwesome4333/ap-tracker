@@ -27,6 +27,7 @@ class CustomItemTracker implements GroupItemTracker {
     protected allGroups: ItemCollectionDef[] = [];
     protected cacheDirty: boolean = true;
     protected optionManager: OptionManager;
+    protected discriminator: string;
     options: { [optionName: string]: TrackerOption } = {};
     #cachedGroups: ItemCollectionDef[] = [];
 
@@ -96,7 +97,7 @@ class CustomItemTracker implements GroupItemTracker {
     };
 
     protected generateOptions = () => {
-        const optionKey = `CustomTrackerOption:${this.manifest.uuid}-${this.manifest.type}-${this.manifest.version}`;
+        const optionKey = `CustomTrackerOption:${this.manifest.uuid}-${this.manifest.type}-${this.manifest.version}${this.discriminator ?? ""}`;
         const groupOption: MultiselectOption = {
             type: OptionType.multiselect,
             name: "enabledGroups",
@@ -116,7 +117,9 @@ class CustomItemTracker implements GroupItemTracker {
 
         this.groups.forEach((group) => {
             groupOption.choices.push(group.name);
-            groupOption.default.push(group.name);
+            if (group.allowedItems.size > 1) {
+                groupOption.default.push(group.name);
+            }
         });
         setOptionDefaults(this.optionManager, this.options);
         const subscriber = this.optionManager.getSubscriberCallback(
