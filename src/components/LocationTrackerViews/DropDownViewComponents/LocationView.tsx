@@ -55,7 +55,14 @@ const LocationView = forwardRef(
                         setShowDetails(!showDetails);
                     }}
                 >
-                    <TextButton>
+                    <TextButton
+                        style={{
+                            textDecoration:
+                                classes.has("checked") || classes.has("ignored")
+                                    ? "line-through"
+                                    : "",
+                        }}
+                    >
                         <Icon
                             fontSize="14px"
                             type={iconType}
