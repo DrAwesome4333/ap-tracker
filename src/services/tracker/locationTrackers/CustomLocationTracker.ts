@@ -54,6 +54,11 @@ class CustomLocationTracker implements DropdownLocationTracker {
     }
 
     protected read = (data: CustomLocationTrackerDef_V2) => {
+        if (data.manifest.formatVersion !== 2) {
+            throw new Error(
+                `Unsupported custom tracker format version ${data.manifest.formatVersion}`
+            );
+        }
         this.manifest = data.manifest;
         this.#data = data;
 

@@ -1,0 +1,178 @@
+{
+    "manifest": {
+        "type": "item_tracker",
+        "itemTrackerType": "group",
+        "uuid": "d17d6362-7897-44a1-b9c6-22b85679d79e",
+        "game": "The Wind Waker",
+        "version": "0.0.0",
+        "name": "The Wind Waker Item Tracker",
+        "formatVersion": 1
+    },
+    "groups": {
+        "Big Keys": {
+            "name": "Big Keys",
+            "items": [
+                "DRC Big Key",
+                "ET Big Key",
+                "FW Big Key",
+                "TotG Big Key",
+                "WT Big Key"
+            ]
+        },
+        "Dungeon Items": {
+            "name": "Dungeon Items",
+            "items": [
+                "DRC Compass",
+                "DRC Dungeon Map",
+                "ET Compass",
+                "ET Dungeon Map",
+                "FF Compass",
+                "FF Dungeon Map",
+                "FW Compass",
+                "FW Dungeon Map",
+                "TotG Compass",
+                "TotG Dungeon Map",
+                "WT Compass",
+                "WT Dungeon Map"
+            ]
+        },
+        "Mail": {
+            "name": "Mail",
+            "items": ["Maggie's Letter", "Moblin's Letter", "Note to Mom"]
+        },
+        "Pearls": {
+            "name": "Pearls",
+            "items": ["Din's Pearl", "Farore's Pearl", "Nayru's Pearl"]
+        },
+        "Rupees": {
+            "name": "Rupees",
+            "items": [
+                "Blue Rupee",
+                "Green Rupee",
+                "Orange Rupee",
+                "Purple Rupee",
+                "Rainbow Rupee",
+                "Red Rupee",
+                "Silver Rupee",
+                "Yellow Rupee"
+            ]
+        },
+        "Shards": {
+            "name": "Shards",
+            "items": [
+                "Triforce Shard 1",
+                "Triforce Shard 2",
+                "Triforce Shard 3",
+                "Triforce Shard 4",
+                "Triforce Shard 5",
+                "Triforce Shard 6",
+                "Triforce Shard 7",
+                "Triforce Shard 8"
+            ]
+        },
+        "Small Keys": {
+            "name": "Small Keys",
+            "items": [
+                "DRC Small Key",
+                "ET Small Key",
+                "FW Small Key",
+                "TotG Small Key",
+                "WT Small Key"
+            ]
+        },
+        "Songs": {
+            "name": "Songs",
+            "items": [
+                "Ballad of Gales",
+                "Command Melody",
+                "Earth God's Lyric",
+                "Song of Passing",
+                "Wind God's Aria",
+                "Wind's Requiem"
+            ]
+        },
+        "Special Charts": {
+            "name": "Special Charts",
+            "items": [
+                "Beedle's Chart",
+                "Ghost Ship Chart",
+                "Great Fairy Chart",
+                "Light Ring Chart",
+                "Octo Chart",
+                "Platform Chart",
+                "Secret Cave Chart",
+                "Submarine Chart",
+                "Tingle's Chart"
+            ]
+        },
+        "Tingle Statues": {
+            "name": "Tingle Statues",
+            "items": [
+                "Dragon Tingle Statue",
+                "Earth Tingle Statue",
+                "Forbidden Tingle Statue",
+                "Goddess Tingle Statue",
+                "Wind Tingle Statue"
+            ]
+        },
+        "Treasure Charts": {
+            "name": "Treasure Charts",
+            "items": [
+                "Treasure Chart 1",
+                "Treasure Chart 10",
+                "Treasure Chart 11",
+                "Treasure Chart 12",
+                "Treasure Chart 13",
+                "Treasure Chart 14",
+                "Treasure Chart 15",
+                "Treasure Chart 16",
+                "Treasure Chart 17",
+                "Treasure Chart 18",
+                "Treasure Chart 19",
+                "Treasure Chart 2",
+                "Treasure Chart 20",
+                "Treasure Chart 21",
+                "Treasure Chart 22",
+                "Treasure Chart 23",
+                "Treasure Chart 24",
+                "Treasure Chart 25",
+                "Treasure Chart 26",
+                "Treasure Chart 27",
+                "Treasure Chart 28",
+                "Treasure Chart 29",
+                "Treasure Chart 3",
+                "Treasure Chart 30",
+                "Treasure Chart 31",
+                "Treasure Chart 32",
+                "Treasure Chart 33",
+                "Treasure Chart 34",
+                "Treasure Chart 35",
+                "Treasure Chart 36",
+                "Treasure Chart 37",
+                "Treasure Chart 38",
+                "Treasure Chart 39",
+                "Treasure Chart 4",
+                "Treasure Chart 40",
+                "Treasure Chart 41",
+                "Treasure Chart 5",
+                "Treasure Chart 6",
+                "Treasure Chart 7",
+                "Treasure Chart 8",
+                "Treasure Chart 9"
+            ]
+        },
+        "Triforce Charts": {
+            "name": "Triforce Charts",
+            "items": [
+                "Triforce Chart 1",
+                "Triforce Chart 2",
+                "Triforce Chart 3",
+                "Triforce Chart 4",
+                "Triforce Chart 5",
+                "Triforce Chart 6",
+                "Triforce Chart 7",
+                "Triforce Chart 8"
+            ]
+        }
+    }
+}

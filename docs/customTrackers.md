@@ -4,6 +4,8 @@ In this guide, we will explain how to create and use a custom tracker. I highly 
 
 > Looking for the old guide for the previous format? It is now located here: [previous format spec](./customTrackers_V0.md). Trackers that were made using the previous format will work fine on the current version.
 
+> There are some examples in [the example folder](./examples/) of the repository.
+
 ## Using a custom tracker
 
 If you are trying to use a custom tracker and already have the file for it, you can use it by following these steps:
@@ -139,7 +141,7 @@ Sections are placed in the document as so:
                 "Mine chest 2",
                 "Item beneath crystal"
             ],
-            "groups": "Crystal Bugs",
+            "groups": "Crystal Bugs", // This wold refer to a group called "Crystal Bugs"
             "children": ["crystal mines"], // this would refer to another section called "crystal mines"
             "theme": "crystal"
         },
@@ -147,7 +149,7 @@ Sections are placed in the document as so:
             "title": "Fire Caverns",
             "groups": ["fire cavern chests", "fire cavern drops"],
             "children": {
-                // notice how this is a dictionary instead of an array
+                // notice how this can be a section definition instead of an array of names
                 "fire cavern boss": {
                     "title": "Boss",
                     "locations": ["Fire Cavern Boss drop"]
@@ -196,7 +198,7 @@ Groups are now an optional feature that can be used to easily have the same list
         "version": "0.0.0", // A version for your tracker
         "description": "An optional field, not currently used in the app",
         "type": "item_tracker",
-        "formatVersion": 1, // Must be 1 for now
+        "formatVersion": 2, // Must be 2 for now
         "game": "Game name according to ap", // Must match exactly what you put in the game field for archipelago yaml files
         "itemTrackerType": "group" // The only supported type at this time
     },

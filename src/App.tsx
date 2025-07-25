@@ -71,7 +71,7 @@ const genericTrackerRepository = new GenericTrackerRepository(
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
 // Port from old version
-portTrackers(customTrackerRepository, true);
+portTrackers(customTrackerRepository);
 
 const textClientManager = new TextClientManager();
 

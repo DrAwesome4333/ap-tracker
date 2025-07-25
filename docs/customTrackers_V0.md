@@ -1,6 +1,6 @@
 # Custom Tracker Files
 
-The tracker supports loading of external files to define how the checks are organized. There are a few ways to get some starting templates from the app, but any fine tuning will have to be done by editing `.json` files by hand (see Getting a template section). This document hopes to explain the expected format and will refer to this example [Ori_BF_custom_example.json](./examples/Ori_BF_custom_example.json).
+The tracker supports loading of external files to define how the checks are organized. There are a few ways to get some starting templates from the app, but any fine tuning will have to be done by editing `.json` files by hand (see Getting a template section). This document hopes to explain the expected format and will refer to this example [Ori_BF_custom_example.json](./examples/Ori_BF_custom_example-old.json).
 
 > Note there is a [new custom tracker format](./customTrackers.md) that is recommended. If you need to update a tracker using this format, you can upload the tracker and then redownload it and it will be automatically updated for you. The formats are very similar in concept.
 
@@ -99,7 +99,7 @@ Example:
     }
 ```
 
-See [Ori_BF_custom_example.json](./examples/Ori_BF_custom_example.json) for how these are placed in the `groupData` object.
+See [Ori_BF_custom_example.json](./examples/Ori_BF_custom_example-old.json) for how these are placed in the `groupData` object.
 
 Each check name must match exactly the name that Archipelago assigns it or it will not show up.
 

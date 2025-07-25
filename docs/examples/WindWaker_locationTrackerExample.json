@@ -1,0 +1,1201 @@
+{
+    "manifest": {
+        "name": "The Wind Waker Tracker",
+        "uuid": "a7dc11c3-a7f3-4df1-89cb-b776ea035bbe",
+        "version": "0.0.1",
+        "description": "An example template for the Wind Waker",
+        "type": "location_tracker",
+        "locationTrackerType": "dropdown",
+        "game": "The Wind Waker",
+        "formatVersion": 2
+    },
+    "sections": {
+        "root": {
+            "theme": "default",
+            "title": "Total",
+            "groups": "group_root",
+            "children": [
+                "section_Angular Isles",
+                "section_Bird's Peak Rock",
+                "section_Boating Course",
+                "section_Bomb Island",
+                "section_Cliff Plateau Isles",
+                "section_Crescent Moon Island",
+                "section_Cyclops Reef",
+                "section_Diamond Steppe Island",
+                "section_Dragon Roost Cavern",
+                "section_Dragon Roost Island",
+                "section_Earth Temple",
+                "section_Eastern Fairy Island",
+                "section_Fire Mountain",
+                "section_Five-Eye Reef",
+                "section_Five-Star Isles",
+                "section_Flight Control Platform",
+                "section_Forbidden Woods",
+                "section_Forest Haven",
+                "section_Forsaken Fortress",
+                "section_Four-Eye Reef",
+                "section_Greatfish Isle",
+                "section_Headstone Island",
+                "section_Horseshoe Island",
+                "section_Ice Ring Isle",
+                "section_Islet of Steel",
+                "section_Mailbox - Letter ",
+                "section_Mother and Child Isles",
+                "section_Needle Rock Isle",
+                "section_Northern Fairy Island",
+                "section_Outset Island",
+                "section_Overlook Island",
+                "section_Pawprint Isle",
+                "section_Private Oasis",
+                "section_Rock Spire Isle",
+                "section_Seven-Star Isles",
+                "section_Shark Island",
+                "section_Six-Eye Reef",
+                "section_Southern Fairy Island",
+                "section_Spectacle Island",
+                "section_Star Belt Archipelago",
+                "section_Star Island",
+                "section_Stone Watcher Island",
+                "section_The Great Sea",
+                "section_Thorned Fairy Island",
+                "section_Three-Eye Reef",
+                "section_Tingle Island",
+                "section_Tower of the Gods ",
+                "section_Two-Eye Reef",
+                "section_Western Fairy Island",
+                "section_Wind Temple",
+                "section_Windfall Island"
+            ]
+        },
+        "section_Windfall Island": {
+            "theme": "default",
+            "title": "Windfall Island",
+            "groups": "group_Windfall Island",
+            "children": [
+                "section_Windfall Island - Battlesquid",
+                "section_Windfall Island - Chu Jelly Juice Shop - Give 15 ",
+                "section_Windfall Island - Jail",
+                "section_Windfall Island - Lenzo's House",
+                "section_Windfall Island - Maggie",
+                "section_Windfall Island - Mrs. Marie"
+            ]
+        },
+        "section_Windfall Island - Lenzo's House": {
+            "theme": "default",
+            "title": "Windfall Island - Lenzo's House",
+            "groups": "group_Windfall Island - Lenzo's House"
+        },
+        "section_Windfall Island - Mrs. Marie": {
+            "theme": "default",
+            "title": "Windfall Island - Mrs. Marie",
+            "groups": "group_Windfall Island - Mrs. Marie"
+        },
+        "section_Windfall Island - Battlesquid": {
+            "theme": "default",
+            "title": "Windfall Island - Battlesquid",
+            "groups": "group_Windfall Island - Battlesquid"
+        },
+        "section_Windfall Island - Jail": {
+            "theme": "default",
+            "title": "Windfall Island - Jail",
+            "groups": "group_Windfall Island - Jail"
+        },
+        "section_Windfall Island - Chu Jelly Juice Shop - Give 15 ": {
+            "theme": "default",
+            "title": "Windfall Island - Chu Jelly Juice Shop - Give 15",
+            "groups": "group_Windfall Island - Chu Jelly Juice Shop - Give 15 "
+        },
+        "section_Windfall Island - Maggie": {
+            "theme": "default",
+            "title": "Windfall Island - Maggie",
+            "groups": "group_Windfall Island - Maggie"
+        },
+        "section_Dragon Roost Cavern": {
+            "theme": "default",
+            "title": "Dragon Roost Cavern",
+            "groups": "group_Dragon Roost Cavern",
+            "children": [
+                "section_Dragon Roost Cavern - Boss Stairs ",
+                "section_Dragon Roost Cavern - Pot ",
+                "section_Dragon Roost Cavern - Rat Room",
+                "section_Dragon Roost Cavern - Tingle "
+            ]
+        },
+        "section_Dragon Roost Cavern - Boss Stairs ": {
+            "theme": "default",
+            "title": "Dragon Roost Cavern - Boss Stairs",
+            "groups": "group_Dragon Roost Cavern - Boss Stairs "
+        },
+        "section_Dragon Roost Cavern - Rat Room": {
+            "theme": "default",
+            "title": "Dragon Roost Cavern - Rat Room",
+            "groups": "group_Dragon Roost Cavern - Rat Room"
+        },
+        "section_Dragon Roost Cavern - Tingle ": {
+            "theme": "default",
+            "title": "Dragon Roost Cavern - Tingle",
+            "groups": "group_Dragon Roost Cavern - Tingle "
+        },
+        "section_Dragon Roost Cavern - Pot ": {
+            "theme": "default",
+            "title": "Dragon Roost Cavern - Pot",
+            "groups": "group_Dragon Roost Cavern - Pot "
+        },
+        "section_Forbidden Woods": {
+            "theme": "default",
+            "title": "Forbidden Woods",
+            "groups": "group_Forbidden Woods",
+            "children": [
+                "section_Forbidden Woods - Chest ",
+                "section_Forbidden Woods - Vine Maze "
+            ]
+        },
+        "section_Forbidden Woods - Vine Maze ": {
+            "theme": "default",
+            "title": "Forbidden Woods - Vine Maze",
+            "groups": "group_Forbidden Woods - Vine Maze "
+        },
+        "section_Forbidden Woods - Chest ": {
+            "theme": "default",
+            "title": "Forbidden Woods - Chest",
+            "groups": "group_Forbidden Woods - Chest "
+        },
+        "section_Earth Temple": {
+            "theme": "default",
+            "title": "Earth Temple",
+            "groups": "group_Earth Temple",
+            "children": [
+                "section_Earth Temple - Behind Curtain ",
+                "section_Earth Temple - Chest ",
+                "section_Earth Temple - Many Mirrors Room ",
+                "section_Earth Temple - Stalfos ",
+                "section_Earth Temple - Transparent Chest "
+            ]
+        },
+        "section_Earth Temple - Chest ": {
+            "theme": "default",
+            "title": "Earth Temple - Chest",
+            "groups": "group_Earth Temple - Chest "
+        },
+        "section_Earth Temple - Many Mirrors Room ": {
+            "theme": "default",
+            "title": "Earth Temple - Many Mirrors Room",
+            "groups": "group_Earth Temple - Many Mirrors Room "
+        },
+        "section_Earth Temple - Transparent Chest ": {
+            "theme": "default",
+            "title": "Earth Temple - Transparent Chest",
+            "groups": "group_Earth Temple - Transparent Chest "
+        },
+        "section_Earth Temple - Behind Curtain ": {
+            "theme": "default",
+            "title": "Earth Temple - Behind Curtain",
+            "groups": "group_Earth Temple - Behind Curtain "
+        },
+        "section_Earth Temple - Stalfos ": {
+            "theme": "default",
+            "title": "Earth Temple - Stalfos",
+            "groups": "group_Earth Temple - Stalfos "
+        },
+        "section_Tower of the Gods ": {
+            "theme": "default",
+            "title": "Tower of the Gods",
+            "groups": "group_Tower of the Gods ",
+            "children": ["section_Tower of the Gods"]
+        },
+        "section_Tower of the Gods": {
+            "theme": "default",
+            "title": "Tower of the Gods",
+            "groups": "group_Tower of the Gods"
+        },
+        "section_Wind Temple": {
+            "theme": "default",
+            "title": "Wind Temple",
+            "groups": "group_Wind Temple",
+            "children": [
+                "section_Wind Temple - Behind Stone Head in ",
+                "section_Wind Temple - Chest ",
+                "section_Wind Temple - Spike Wall Room"
+            ]
+        },
+        "section_Wind Temple - Chest ": {
+            "theme": "default",
+            "title": "Wind Temple - Chest",
+            "groups": "group_Wind Temple - Chest "
+        },
+        "section_Wind Temple - Behind Stone Head in ": {
+            "theme": "default",
+            "title": "Wind Temple - Behind Stone Head in",
+            "groups": "group_Wind Temple - Behind Stone Head in "
+        },
+        "section_Wind Temple - Spike Wall Room": {
+            "theme": "default",
+            "title": "Wind Temple - Spike Wall Room",
+            "groups": "group_Wind Temple - Spike Wall Room"
+        },
+        "section_Mailbox - Letter ": {
+            "theme": "default",
+            "title": "Mailbox - Letter",
+            "groups": null,
+            "children": [
+                "section_Mailbox - Letter Advertising ",
+                "section_Mailbox - Letter from "
+            ]
+        },
+        "section_Mailbox - Letter from ": {
+            "theme": "default",
+            "title": "Mailbox - Letter from",
+            "groups": "group_Mailbox - Letter from "
+        },
+        "section_Mailbox - Letter Advertising ": {
+            "theme": "default",
+            "title": "Mailbox - Letter Advertising",
+            "groups": "group_Mailbox - Letter Advertising "
+        },
+        "section_Rock Spire Isle": {
+            "theme": "default",
+            "title": "Rock Spire Isle",
+            "groups": "group_Rock Spire Isle",
+            "children": ["section_Rock Spire Isle - Beedle's Special Shop Ship"]
+        },
+        "section_Rock Spire Isle - Beedle's Special Shop Ship": {
+            "theme": "default",
+            "title": "Rock Spire Isle - Beedle's Special Shop Ship",
+            "groups": "group_Rock Spire Isle - Beedle's Special Shop Ship"
+        },
+        "section_Outset Island": {
+            "theme": "default",
+            "title": "Outset Island",
+            "groups": "group_Outset Island",
+            "children": ["section_Outset Island - Savage Labyrinth - Floor "]
+        },
+        "section_Outset Island - Savage Labyrinth - Floor ": {
+            "theme": "default",
+            "title": "Outset Island - Savage Labyrinth - Floor",
+            "groups": "group_Outset Island - Savage Labyrinth - Floor "
+        },
+        "section_Dragon Roost Island": {
+            "theme": "default",
+            "title": "Dragon Roost Island",
+            "groups": "group_Dragon Roost Island",
+            "children": ["section_Dragon Roost Island - Rito Aerie"]
+        },
+        "section_Dragon Roost Island - Rito Aerie": {
+            "theme": "default",
+            "title": "Dragon Roost Island - Rito Aerie",
+            "groups": "group_Dragon Roost Island - Rito Aerie"
+        },
+        "section_Pawprint Isle": {
+            "theme": "default",
+            "title": "Pawprint Isle",
+            "groups": "group_Pawprint Isle",
+            "children": ["section_Pawprint Isle - Chuchu Cave"]
+        },
+        "section_Pawprint Isle - Chuchu Cave": {
+            "theme": "default",
+            "title": "Pawprint Isle - Chuchu Cave",
+            "groups": "group_Pawprint Isle - Chuchu Cave"
+        },
+        "section_Forsaken Fortress": {
+            "theme": "default",
+            "title": "Forsaken Fortress",
+            "groups": "group_Forsaken Fortress",
+            "children": ["section_Forsaken Fortress - Chest "]
+        },
+        "section_Forsaken Fortress - Chest ": {
+            "theme": "default",
+            "title": "Forsaken Fortress - Chest",
+            "groups": "group_Forsaken Fortress - Chest "
+        },
+        "section_The Great Sea": {
+            "theme": "default",
+            "title": "The Great Sea",
+            "groups": "group_The Great Sea"
+        },
+        "section_Horseshoe Island": {
+            "theme": "default",
+            "title": "Horseshoe Island",
+            "groups": "group_Horseshoe Island"
+        },
+        "section_Seven-Star Isles": {
+            "theme": "default",
+            "title": "Seven-Star Isles",
+            "groups": "group_Seven-Star Isles"
+        },
+        "section_Fire Mountain": {
+            "theme": "default",
+            "title": "Fire Mountain",
+            "groups": "group_Fire Mountain",
+            "children": ["section_Fire Mountain - Lookout Platform "]
+        },
+        "section_Fire Mountain - Lookout Platform ": {
+            "theme": "default",
+            "title": "Fire Mountain - Lookout Platform",
+            "groups": "group_Fire Mountain - Lookout Platform "
+        },
+        "section_Private Oasis": {
+            "theme": "default",
+            "title": "Private Oasis",
+            "groups": "group_Private Oasis",
+            "children": ["section_Private Oasis - Cabana Labyrinth"]
+        },
+        "section_Private Oasis - Cabana Labyrinth": {
+            "theme": "default",
+            "title": "Private Oasis - Cabana Labyrinth",
+            "groups": "group_Private Oasis - Cabana Labyrinth"
+        },
+        "section_Diamond Steppe Island": {
+            "theme": "default",
+            "title": "Diamond Steppe Island",
+            "groups": "group_Diamond Steppe Island",
+            "children": ["section_Diamond Steppe Island - Warp Maze Cave"]
+        },
+        "section_Diamond Steppe Island - Warp Maze Cave": {
+            "theme": "default",
+            "title": "Diamond Steppe Island - Warp Maze Cave",
+            "groups": "group_Diamond Steppe Island - Warp Maze Cave"
+        },
+        "section_Southern Fairy Island": {
+            "theme": "default",
+            "title": "Southern Fairy Island",
+            "groups": "group_Southern Fairy Island",
+            "children": [
+                "section_Southern Fairy Island - Lookout Platform - Destroy the "
+            ]
+        },
+        "section_Southern Fairy Island - Lookout Platform - Destroy the ": {
+            "theme": "default",
+            "title": "Southern Fairy Island - Lookout Platform - Destroy the",
+            "groups": "group_Southern Fairy Island - Lookout Platform - Destroy the "
+        },
+        "section_Stone Watcher Island": {
+            "theme": "default",
+            "title": "Stone Watcher Island",
+            "groups": "group_Stone Watcher Island",
+            "children": ["section_Stone Watcher Island - Lookout Platform "]
+        },
+        "section_Stone Watcher Island - Lookout Platform ": {
+            "theme": "default",
+            "title": "Stone Watcher Island - Lookout Platform",
+            "groups": "group_Stone Watcher Island - Lookout Platform "
+        },
+        "section_Thorned Fairy Island": {
+            "theme": "default",
+            "title": "Thorned Fairy Island",
+            "groups": "group_Thorned Fairy Island"
+        },
+        "section_Cliff Plateau Isles": {
+            "theme": "default",
+            "title": "Cliff Plateau Isles",
+            "groups": "group_Cliff Plateau Isles"
+        },
+        "section_Needle Rock Isle": {
+            "theme": "default",
+            "title": "Needle Rock Isle",
+            "groups": "group_Needle Rock Isle"
+        },
+        "section_Five-Star Isles": {
+            "theme": "default",
+            "title": "Five-Star Isles",
+            "groups": "group_Five-Star Isles"
+        },
+        "section_Ice Ring Isle": {
+            "theme": "default",
+            "title": "Ice Ring Isle",
+            "groups": "group_Ice Ring Isle"
+        },
+        "section_Six-Eye Reef": {
+            "theme": "default",
+            "title": "Six-Eye Reef",
+            "groups": "group_Six-Eye Reef"
+        },
+        "section_Two-Eye Reef": {
+            "theme": "default",
+            "title": "Two-Eye Reef",
+            "groups": "group_Two-Eye Reef"
+        },
+        "section_Bomb Island": {
+            "theme": "default",
+            "title": "Bomb Island",
+            "groups": "group_Bomb Island"
+        },
+        "section_Flight Control Platform": {
+            "theme": "default",
+            "title": "Flight Control Platform",
+            "groups": "group_Flight Control Platform"
+        },
+        "section_Northern Fairy Island": {
+            "theme": "default",
+            "title": "Northern Fairy Island",
+            "groups": "group_Northern Fairy Island"
+        },
+        "section_Crescent Moon Island": {
+            "theme": "default",
+            "title": "Crescent Moon Island",
+            "groups": "group_Crescent Moon Island"
+        },
+        "section_Eastern Fairy Island": {
+            "theme": "default",
+            "title": "Eastern Fairy Island",
+            "groups": "group_Eastern Fairy Island"
+        },
+        "section_Western Fairy Island": {
+            "theme": "default",
+            "title": "Western Fairy Island",
+            "groups": "group_Western Fairy Island"
+        },
+        "section_Headstone Island": {
+            "theme": "default",
+            "title": "Headstone Island",
+            "groups": "group_Headstone Island"
+        },
+        "section_Spectacle Island": {
+            "theme": "default",
+            "title": "Spectacle Island",
+            "groups": "group_Spectacle Island",
+            "children": ["section_Spectacle Island - Barrel Shooting"]
+        },
+        "section_Spectacle Island - Barrel Shooting": {
+            "theme": "default",
+            "title": "Spectacle Island - Barrel Shooting",
+            "groups": "group_Spectacle Island - Barrel Shooting"
+        },
+        "section_Boating Course": {
+            "theme": "default",
+            "title": "Boating Course",
+            "groups": "group_Boating Course"
+        },
+        "section_Islet of Steel": {
+            "theme": "default",
+            "title": "Islet of Steel",
+            "groups": "group_Islet of Steel"
+        },
+        "section_Angular Isles": {
+            "theme": "default",
+            "title": "Angular Isles",
+            "groups": "group_Angular Isles"
+        },
+        "section_Five-Eye Reef": {
+            "theme": "default",
+            "title": "Five-Eye Reef",
+            "groups": "group_Five-Eye Reef"
+        },
+        "section_Tingle Island": {
+            "theme": "default",
+            "title": "Tingle Island",
+            "groups": "group_Tingle Island"
+        },
+        "section_Cyclops Reef": {
+            "theme": "default",
+            "title": "Cyclops Reef",
+            "groups": "group_Cyclops Reef"
+        },
+        "section_Forest Haven": {
+            "theme": "default",
+            "title": "Forest Haven",
+            "groups": "group_Forest Haven"
+        },
+        "section_Star Island": {
+            "theme": "default",
+            "title": "Star Island",
+            "groups": "group_Star Island"
+        },
+        "section_Mother and Child Isles": {
+            "theme": "default",
+            "title": "Mother and Child Isles",
+            "groups": "group_Mother and Child Isles"
+        },
+        "section_Star Belt Archipelago": {
+            "theme": "default",
+            "title": "Star Belt Archipelago",
+            "groups": "group_Star Belt Archipelago"
+        },
+        "section_Bird's Peak Rock": {
+            "theme": "default",
+            "title": "Bird's Peak Rock",
+            "groups": "group_Bird's Peak Rock"
+        },
+        "section_Overlook Island": {
+            "theme": "default",
+            "title": "Overlook Island",
+            "groups": "group_Overlook Island"
+        },
+        "section_Greatfish Isle": {
+            "theme": "default",
+            "title": "Greatfish Isle",
+            "groups": "group_Greatfish Isle"
+        },
+        "section_Three-Eye Reef": {
+            "theme": "default",
+            "title": "Three-Eye Reef",
+            "groups": "group_Three-Eye Reef"
+        },
+        "section_Four-Eye Reef": {
+            "theme": "default",
+            "title": "Four-Eye Reef",
+            "groups": "group_Four-Eye Reef"
+        },
+        "section_Shark Island": {
+            "theme": "default",
+            "title": "Shark Island",
+            "groups": "group_Shark Island"
+        }
+    },
+    "groups": {
+        "group_root": {
+            "locations": [
+                "Eastern Triangle Island - Sunken Treasure",
+                "Forsaken Fortress Sector - Sunken Treasure",
+                "Gale Isle - Sunken Treasure",
+                "Ganon's Tower - Maze Chest",
+                "Hyrule - Master Sword Chamber",
+                "Northern Triangle Island - Sunken Treasure",
+                "Southern Triangle Island - Sunken Treasure"
+            ]
+        },
+        "group_Windfall Island": {
+            "locations": [
+                "Windfall Island - 40 Rupee Auction",
+                "Windfall Island - 5 Rupee Auction",
+                "Windfall Island - 60 Rupee Auction",
+                "Windfall Island - 80 Rupee Auction",
+                "Windfall Island - Cafe Bar - Postman",
+                "Windfall Island - House of Wealth Chest",
+                "Windfall Island - Ivan - Catch Killer Bees",
+                "Windfall Island - Kamo - Full Moon Photo",
+                "Windfall Island - Kreeb - Light Up Lighthouse",
+                "Windfall Island - Linda and Anton",
+                "Windfall Island - Maggie's Father - Give 20 Skull Necklaces",
+                "Windfall Island - Mila - Follow the Thief",
+                "Windfall Island - Minenco - Miss Windfall Photo",
+                "Windfall Island - Pirate Ship",
+                "Windfall Island - Pompie and Vera - Secret Meeting Photo",
+                "Windfall Island - Sam - Decorate the Town",
+                "Windfall Island - Sunken Treasure",
+                "Windfall Island - Tott - Teach Rhythm",
+                "Windfall Island - Transparent Chest",
+                "Windfall Island - Zunari - Stock Exotic Flower in Zunari's Shop"
+            ]
+        },
+        "group_Windfall Island - Lenzo's House": {
+            "locations": [
+                "Windfall Island - Lenzo's House - Become Lenzo's Assistant",
+                "Windfall Island - Lenzo's House - Bring Forest Firefly",
+                "Windfall Island - Lenzo's House - Left Chest",
+                "Windfall Island - Lenzo's House - Right Chest"
+            ]
+        },
+        "group_Windfall Island - Mrs. Marie": {
+            "locations": [
+                "Windfall Island - Mrs. Marie - Catch Killer Bees",
+                "Windfall Island - Mrs. Marie - Give 1 Joy Pendant",
+                "Windfall Island - Mrs. Marie - Give 21 Joy Pendants",
+                "Windfall Island - Mrs. Marie - Give 40 Joy Pendants"
+            ]
+        },
+        "group_Windfall Island - Battlesquid": {
+            "locations": [
+                "Windfall Island - Battlesquid - First Prize",
+                "Windfall Island - Battlesquid - Second Prize",
+                "Windfall Island - Battlesquid - Under 20 Shots Prize"
+            ]
+        },
+        "group_Windfall Island - Jail": {
+            "locations": [
+                "Windfall Island - Jail - Maze Chest",
+                "Windfall Island - Jail - Tingle - First Gift",
+                "Windfall Island - Jail - Tingle - Second Gift"
+            ]
+        },
+        "group_Windfall Island - Chu Jelly Juice Shop - Give 15 ": {
+            "locations": [
+                "Windfall Island - Chu Jelly Juice Shop - Give 15 Blue Chu Jelly",
+                "Windfall Island - Chu Jelly Juice Shop - Give 15 Green Chu Jelly"
+            ]
+        },
+        "group_Windfall Island - Maggie": {
+            "locations": [
+                "Windfall Island - Maggie - Delivery Reward",
+                "Windfall Island - Maggie - Free Item"
+            ]
+        },
+        "group_Dragon Roost Cavern": {
+            "locations": [
+                "Dragon Roost Cavern - Alcove With Water Jugs",
+                "Dragon Roost Cavern - Big Key Chest",
+                "Dragon Roost Cavern - Bird's Nest",
+                "Dragon Roost Cavern - Boarded Up Chest",
+                "Dragon Roost Cavern - Chest Across Lava Pit",
+                "Dragon Roost Cavern - Dark Room",
+                "Dragon Roost Cavern - First Room",
+                "Dragon Roost Cavern - Gohma Heart Container",
+                "Dragon Roost Cavern - Miniboss",
+                "Dragon Roost Cavern - Under Rope Bridge",
+                "Dragon Roost Cavern - Water Jug on Upper Shelf"
+            ]
+        },
+        "group_Dragon Roost Cavern - Boss Stairs ": {
+            "locations": [
+                "Dragon Roost Cavern - Boss Stairs Left Chest",
+                "Dragon Roost Cavern - Boss Stairs Right Chest",
+                "Dragon Roost Cavern - Boss Stairs Right Pot"
+            ]
+        },
+        "group_Dragon Roost Cavern - Rat Room": {
+            "locations": [
+                "Dragon Roost Cavern - Rat Room",
+                "Dragon Roost Cavern - Rat Room Boarded Up Chest"
+            ]
+        },
+        "group_Dragon Roost Cavern - Tingle ": {
+            "locations": [
+                "Dragon Roost Cavern - Tingle Chest in Hub Room",
+                "Dragon Roost Cavern - Tingle Statue Chest"
+            ]
+        },
+        "group_Dragon Roost Cavern - Pot ": {
+            "locations": [
+                "Dragon Roost Cavern - Pot Room Chest",
+                "Dragon Roost Cavern - Pot on Upper Shelf in Pot Room"
+            ]
+        },
+        "group_Forbidden Woods": {
+            "locations": [
+                "Forbidden Woods - Big Key Chest",
+                "Forbidden Woods - Climb to Top Using Boko Baba Bulbs",
+                "Forbidden Woods - Double Mothula Room",
+                "Forbidden Woods - First Room",
+                "Forbidden Woods - Highest Pot in Vine Maze",
+                "Forbidden Woods - Hole in Tree",
+                "Forbidden Woods - Inside Hollow Tree's Mouth",
+                "Forbidden Woods - Kalle Demos Heart Container",
+                "Forbidden Woods - Morth Pit",
+                "Forbidden Woods - Mothula Miniboss Room",
+                "Forbidden Woods - Past Seeds Hanging by Vines",
+                "Forbidden Woods - Pot High Above Hollow Tree",
+                "Forbidden Woods - Tall Room Before Miniboss",
+                "Forbidden Woods - Tingle Statue Chest"
+            ]
+        },
+        "group_Forbidden Woods - Vine Maze ": {
+            "locations": [
+                "Forbidden Woods - Vine Maze Left Chest",
+                "Forbidden Woods - Vine Maze Right Chest"
+            ]
+        },
+        "group_Forbidden Woods - Chest ": {
+            "locations": [
+                "Forbidden Woods - Chest Across Red Hanging Flower",
+                "Forbidden Woods - Chest in Locked Tree Trunk"
+            ]
+        },
+        "group_Earth Temple": {
+            "locations": [
+                "Earth Temple - Big Key Chest",
+                "Earth Temple - Casket in Second Crypt",
+                "Earth Temple - End of Foggy Room With Floormasters",
+                "Earth Temple - Jalhalla Heart Container",
+                "Earth Temple - Kill All Floormasters in Foggy Room",
+                "Earth Temple - Tingle Statue Chest"
+            ]
+        },
+        "group_Earth Temple - Chest ": {
+            "locations": [
+                "Earth Temple - Chest Behind Destructible Walls",
+                "Earth Temple - Chest Behind Statues",
+                "Earth Temple - Chest In Three Blocks Room",
+                "Earth Temple - Chest in Third Crypt"
+            ]
+        },
+        "group_Earth Temple - Many Mirrors Room ": {
+            "locations": [
+                "Earth Temple - Many Mirrors Room Left Chest",
+                "Earth Temple - Many Mirrors Room Right Chest"
+            ]
+        },
+        "group_Earth Temple - Transparent Chest ": {
+            "locations": [
+                "Earth Temple - Transparent Chest In Warp Pot Room",
+                "Earth Temple - Transparent Chest in First Crypt"
+            ]
+        },
+        "group_Earth Temple - Behind Curtain ": {
+            "locations": [
+                "Earth Temple - Behind Curtain In Warp Pot Room",
+                "Earth Temple - Behind Curtain Next to Hammer Button"
+            ]
+        },
+        "group_Earth Temple - Stalfos ": {
+            "locations": [
+                "Earth Temple - Stalfos Crypt Room",
+                "Earth Temple - Stalfos Miniboss Room"
+            ]
+        },
+        "group_Tower of the Gods ": {
+            "locations": ["Tower of the Gods Sector - Sunken Treasure"]
+        },
+        "group_Tower of the Gods": {
+            "locations": [
+                "Tower of the Gods - Big Key Chest",
+                "Tower of the Gods - Chest Behind Bombable Walls",
+                "Tower of the Gods - Darknut Miniboss Room",
+                "Tower of the Gods - Eastern Pot in Big Key Chest Room",
+                "Tower of the Gods - First Chest Guarded by Armos Knights",
+                "Tower of the Gods - Floating Platforms Room",
+                "Tower of the Gods - Gohdan Heart Container",
+                "Tower of the Gods - Hop Across Floating Boxes",
+                "Tower of the Gods - Light Two Torches",
+                "Tower of the Gods - Pot Behind Bombable Walls",
+                "Tower of the Gods - Second Chest Guarded by Armos Knights",
+                "Tower of the Gods - Shoot Eye Above Skulls Room Chest",
+                "Tower of the Gods - Skulls Room Chest",
+                "Tower of the Gods - Stone Tablet",
+                "Tower of the Gods - Tingle Statue Chest",
+                "Tower of the Gods - Top of Floating Platforms Room"
+            ]
+        },
+        "group_Wind Temple": {
+            "locations": [
+                "Wind Temple - Big Key Chest",
+                "Wind Temple - Kill All Enemies in Tall Basement Room",
+                "Wind Temple - Molgera Heart Container",
+                "Wind Temple - Tingle Statue Chest",
+                "Wind Temple - Wizzrobe Miniboss Room"
+            ]
+        },
+        "group_Wind Temple - Chest ": {
+            "locations": [
+                "Wind Temple - Chest Behind Seven Armos",
+                "Wind Temple - Chest Behind Stone Head",
+                "Wind Temple - Chest Between Two Dirt Patches",
+                "Wind Temple - Chest In Many Cyclones Room",
+                "Wind Temple - Chest In Middle Of Hub Room",
+                "Wind Temple - Chest at Top of Hub Room",
+                "Wind Temple - Chest in Left Alcove"
+            ]
+        },
+        "group_Wind Temple - Behind Stone Head in ": {
+            "locations": [
+                "Wind Temple - Behind Stone Head in Hidden Upper Room",
+                "Wind Temple - Behind Stone Head in Many Cyclones Room"
+            ]
+        },
+        "group_Wind Temple - Spike Wall Room": {
+            "locations": [
+                "Wind Temple - Spike Wall Room - Destroy All Cracked Floors",
+                "Wind Temple - Spike Wall Room - First Chest"
+            ]
+        },
+        "group_Mailbox - Letter from ": {
+            "locations": [
+                "Mailbox - Letter from Aryll",
+                "Mailbox - Letter from Baito",
+                "Mailbox - Letter from Baito's Mother",
+                "Mailbox - Letter from Grandma",
+                "Mailbox - Letter from Hoskit's Girlfriend",
+                "Mailbox - Letter from Komali's Father",
+                "Mailbox - Letter from Orca",
+                "Mailbox - Letter from Tingle"
+            ]
+        },
+        "group_Mailbox - Letter Advertising ": {
+            "locations": [
+                "Mailbox - Letter Advertising Bombs in Beedle's Shop",
+                "Mailbox - Letter Advertising Rock Spire Shop Ship"
+            ]
+        },
+        "group_Rock Spire Isle": {
+            "locations": [
+                "Rock Spire Isle - Cave",
+                "Rock Spire Isle - Center Lookout Platform",
+                "Rock Spire Isle - Eastern Lookout Platform - Destroy the Cannons",
+                "Rock Spire Isle - Southeast Gunboat",
+                "Rock Spire Isle - Sunken Treasure",
+                "Rock Spire Isle - Western Lookout Platform - Destroy the Cannons"
+            ]
+        },
+        "group_Rock Spire Isle - Beedle's Special Shop Ship": {
+            "locations": [
+                "Rock Spire Isle - Beedle's Special Shop Ship - 500 Rupee Item",
+                "Rock Spire Isle - Beedle's Special Shop Ship - 900 Rupee Item",
+                "Rock Spire Isle - Beedle's Special Shop Ship - 950 Rupee Item"
+            ]
+        },
+        "group_Outset Island": {
+            "locations": [
+                "Outset Island - Dig up Black Soil",
+                "Outset Island - Great Fairy",
+                "Outset Island - Jabun's Cave",
+                "Outset Island - Mesa the Grasscutter's House",
+                "Outset Island - Orca - Give 10 Knight's Crests",
+                "Outset Island - Sunken Treasure",
+                "Outset Island - Underneath Link's House"
+            ]
+        },
+        "group_Outset Island - Savage Labyrinth - Floor ": {
+            "locations": [
+                "Outset Island - Savage Labyrinth - Floor 30",
+                "Outset Island - Savage Labyrinth - Floor 50"
+            ]
+        },
+        "group_Dragon Roost Island": {
+            "locations": [
+                "Dragon Roost Island - Chest on Top of Boulder",
+                "Dragon Roost Island - Fly Across Platforms Around Island",
+                "Dragon Roost Island - Secret Cave",
+                "Dragon Roost Island - Sunken Treasure",
+                "Dragon Roost Island - Wind Shrine"
+            ]
+        },
+        "group_Dragon Roost Island - Rito Aerie": {
+            "locations": [
+                "Dragon Roost Island - Rito Aerie - Give Hoskit 20 Golden Feathers",
+                "Dragon Roost Island - Rito Aerie - Mail Sorting"
+            ]
+        },
+        "group_Pawprint Isle": {
+            "locations": [
+                "Pawprint Isle - Lookout Platform - Defeat the Enemies",
+                "Pawprint Isle - Sunken Treasure",
+                "Pawprint Isle - Wizzrobe Cave"
+            ]
+        },
+        "group_Pawprint Isle - Chuchu Cave": {
+            "locations": [
+                "Pawprint Isle - Chuchu Cave - Behind Left Boulder",
+                "Pawprint Isle - Chuchu Cave - Behind Right Boulder",
+                "Pawprint Isle - Chuchu Cave - Chest",
+                "Pawprint Isle - Chuchu Cave - Scale the Wall"
+            ]
+        },
+        "group_Forsaken Fortress": {
+            "locations": [
+                "Forsaken Fortress - Helmaroc King Heart Container",
+                "Forsaken Fortress - Phantom Ganon"
+            ]
+        },
+        "group_Forsaken Fortress - Chest ": {
+            "locations": [
+                "Forsaken Fortress - Chest Guarded By Bokoblin",
+                "Forsaken Fortress - Chest Inside Lower Jail Cell",
+                "Forsaken Fortress - Chest Outside Upper Jail Cell",
+                "Forsaken Fortress - Chest on Bed"
+            ]
+        },
+        "group_The Great Sea": {
+            "locations": [
+                "The Great Sea - Beedle's Shop Ship - 20 Rupee Item",
+                "The Great Sea - Cyclos",
+                "The Great Sea - Ghost Ship",
+                "The Great Sea - Goron Trading Reward",
+                "The Great Sea - Salvage Corp Gift",
+                "The Great Sea - Withered Trees"
+            ]
+        },
+        "group_Horseshoe Island": {
+            "locations": [
+                "Horseshoe Island - Cave",
+                "Horseshoe Island - Northwestern Lookout Platform",
+                "Horseshoe Island - Play Golf",
+                "Horseshoe Island - Southeastern Lookout Platform",
+                "Horseshoe Island - Sunken Treasure"
+            ]
+        },
+        "group_Seven-Star Isles": {
+            "locations": [
+                "Seven-Star Isles - Big Octo",
+                "Seven-Star Isles - Center Lookout Platform",
+                "Seven-Star Isles - Northern Lookout Platform",
+                "Seven-Star Isles - Southern Lookout Platform",
+                "Seven-Star Isles - Sunken Treasure"
+            ]
+        },
+        "group_Fire Mountain": {
+            "locations": [
+                "Fire Mountain - Big Octo",
+                "Fire Mountain - Cave - Chest",
+                "Fire Mountain - Sunken Treasure"
+            ]
+        },
+        "group_Fire Mountain - Lookout Platform ": {
+            "locations": [
+                "Fire Mountain - Lookout Platform - Destroy the Cannons",
+                "Fire Mountain - Lookout Platform Chest"
+            ]
+        },
+        "group_Private Oasis": {
+            "locations": [
+                "Private Oasis - Big Octo",
+                "Private Oasis - Chest at Top of Waterfall",
+                "Private Oasis - Sunken Treasure"
+            ]
+        },
+        "group_Private Oasis - Cabana Labyrinth": {
+            "locations": [
+                "Private Oasis - Cabana Labyrinth - Lower Floor Chest",
+                "Private Oasis - Cabana Labyrinth - Upper Floor Chest"
+            ]
+        },
+        "group_Diamond Steppe Island": {
+            "locations": [
+                "Diamond Steppe Island - Big Octo",
+                "Diamond Steppe Island - Sunken Treasure"
+            ]
+        },
+        "group_Diamond Steppe Island - Warp Maze Cave": {
+            "locations": [
+                "Diamond Steppe Island - Warp Maze Cave - First Chest",
+                "Diamond Steppe Island - Warp Maze Cave - Second Chest"
+            ]
+        },
+        "group_Southern Fairy Island": {
+            "locations": [
+                "Southern Fairy Island - Great Fairy",
+                "Southern Fairy Island - Sunken Treasure"
+            ]
+        },
+        "group_Southern Fairy Island - Lookout Platform - Destroy the ": {
+            "locations": [
+                "Southern Fairy Island - Lookout Platform - Destroy the Northwest Cannons",
+                "Southern Fairy Island - Lookout Platform - Destroy the Southeast Cannons"
+            ]
+        },
+        "group_Stone Watcher Island": {
+            "locations": [
+                "Stone Watcher Island - Cave",
+                "Stone Watcher Island - Sunken Treasure"
+            ]
+        },
+        "group_Stone Watcher Island - Lookout Platform ": {
+            "locations": [
+                "Stone Watcher Island - Lookout Platform - Destroy the Cannons",
+                "Stone Watcher Island - Lookout Platform Chest"
+            ]
+        },
+        "group_Thorned Fairy Island": {
+            "locations": [
+                "Thorned Fairy Island - Great Fairy",
+                "Thorned Fairy Island - Northeastern Lookout Platform - Destroy the Cannons",
+                "Thorned Fairy Island - Southwestern Lookout Platform - Defeat the Enemies",
+                "Thorned Fairy Island - Sunken Treasure"
+            ]
+        },
+        "group_Cliff Plateau Isles": {
+            "locations": [
+                "Cliff Plateau Isles - Cave",
+                "Cliff Plateau Isles - Highest Isle",
+                "Cliff Plateau Isles - Lookout Platform",
+                "Cliff Plateau Isles - Sunken Treasure"
+            ]
+        },
+        "group_Needle Rock Isle": {
+            "locations": [
+                "Needle Rock Isle - Cave",
+                "Needle Rock Isle - Chest",
+                "Needle Rock Isle - Golden Gunboat",
+                "Needle Rock Isle - Sunken Treasure"
+            ]
+        },
+        "group_Five-Star Isles": {
+            "locations": [
+                "Five-Star Isles - Lookout Platform - Destroy the Cannons",
+                "Five-Star Isles - Raft",
+                "Five-Star Isles - Submarine",
+                "Five-Star Isles - Sunken Treasure"
+            ]
+        },
+        "group_Ice Ring Isle": {
+            "locations": [
+                "Ice Ring Isle - Cave - Chest",
+                "Ice Ring Isle - Frozen Chest",
+                "Ice Ring Isle - Inner Cave - Chest",
+                "Ice Ring Isle - Sunken Treasure"
+            ]
+        },
+        "group_Six-Eye Reef": {
+            "locations": [
+                "Six-Eye Reef - Destroy the Cannons and Gunboats",
+                "Six-Eye Reef - Lookout Platform - Destroy the Cannons",
+                "Six-Eye Reef - Submarine",
+                "Six-Eye Reef - Sunken Treasure"
+            ]
+        },
+        "group_Two-Eye Reef": {
+            "locations": [
+                "Two-Eye Reef - Big Octo Great Fairy",
+                "Two-Eye Reef - Destroy the Cannons and Gunboats",
+                "Two-Eye Reef - Lookout Platform",
+                "Two-Eye Reef - Sunken Treasure"
+            ]
+        },
+        "group_Bomb Island": {
+            "locations": [
+                "Bomb Island - Cave",
+                "Bomb Island - Lookout Platform - Defeat the Enemies",
+                "Bomb Island - Submarine",
+                "Bomb Island - Sunken Treasure"
+            ]
+        },
+        "group_Flight Control Platform": {
+            "locations": [
+                "Flight Control Platform - Bird-Man Contest - First Prize",
+                "Flight Control Platform - Submarine",
+                "Flight Control Platform - Sunken Treasure"
+            ]
+        },
+        "group_Northern Fairy Island": {
+            "locations": [
+                "Northern Fairy Island - Great Fairy",
+                "Northern Fairy Island - Submarine",
+                "Northern Fairy Island - Sunken Treasure"
+            ]
+        },
+        "group_Crescent Moon Island": {
+            "locations": [
+                "Crescent Moon Island - Chest",
+                "Crescent Moon Island - Submarine",
+                "Crescent Moon Island - Sunken Treasure"
+            ]
+        },
+        "group_Eastern Fairy Island": {
+            "locations": [
+                "Eastern Fairy Island - Great Fairy",
+                "Eastern Fairy Island - Lookout Platform - Defeat the Cannons and Enemies",
+                "Eastern Fairy Island - Sunken Treasure"
+            ]
+        },
+        "group_Western Fairy Island": {
+            "locations": [
+                "Western Fairy Island - Great Fairy",
+                "Western Fairy Island - Lookout Platform",
+                "Western Fairy Island - Sunken Treasure"
+            ]
+        },
+        "group_Headstone Island": {
+            "locations": [
+                "Headstone Island - Submarine",
+                "Headstone Island - Sunken Treasure",
+                "Headstone Island - Top of the Island"
+            ]
+        },
+        "group_Spectacle Island": {
+            "locations": ["Spectacle Island - Sunken Treasure"]
+        },
+        "group_Spectacle Island - Barrel Shooting": {
+            "locations": [
+                "Spectacle Island - Barrel Shooting - First Prize",
+                "Spectacle Island - Barrel Shooting - Second Prize"
+            ]
+        },
+        "group_Boating Course": {
+            "locations": [
+                "Boating Course - Cave",
+                "Boating Course - Raft",
+                "Boating Course - Sunken Treasure"
+            ]
+        },
+        "group_Islet of Steel": {
+            "locations": [
+                "Islet of Steel - Interior",
+                "Islet of Steel - Lookout Platform - Defeat the Enemies",
+                "Islet of Steel - Sunken Treasure"
+            ]
+        },
+        "group_Angular Isles": {
+            "locations": [
+                "Angular Isles - Cave",
+                "Angular Isles - Peak",
+                "Angular Isles - Sunken Treasure"
+            ]
+        },
+        "group_Five-Eye Reef": {
+            "locations": [
+                "Five-Eye Reef - Destroy the Cannons",
+                "Five-Eye Reef - Lookout Platform",
+                "Five-Eye Reef - Sunken Treasure"
+            ]
+        },
+        "group_Tingle Island": {
+            "locations": [
+                "Tingle Island - Ankle - Reward for All Tingle Statues",
+                "Tingle Island - Big Octo",
+                "Tingle Island - Sunken Treasure"
+            ]
+        },
+        "group_Cyclops Reef": {
+            "locations": [
+                "Cyclops Reef - Destroy the Cannons and Gunboats",
+                "Cyclops Reef - Lookout Platform - Defeat the Enemies",
+                "Cyclops Reef - Sunken Treasure"
+            ]
+        },
+        "group_Forest Haven": {
+            "locations": [
+                "Forest Haven - On Tree Branch",
+                "Forest Haven - Small Island Chest",
+                "Forest Haven - Sunken Treasure"
+            ]
+        },
+        "group_Star Island": {
+            "locations": [
+                "Star Island - Cave",
+                "Star Island - Lookout Platform",
+                "Star Island - Sunken Treasure"
+            ]
+        },
+        "group_Mother and Child Isles": {
+            "locations": [
+                "Mother and Child Isles - Inside Mother Isle",
+                "Mother and Child Isles - Sunken Treasure"
+            ]
+        },
+        "group_Star Belt Archipelago": {
+            "locations": [
+                "Star Belt Archipelago - Lookout Platform",
+                "Star Belt Archipelago - Sunken Treasure"
+            ]
+        },
+        "group_Bird's Peak Rock": {
+            "locations": [
+                "Bird's Peak Rock - Cave",
+                "Bird's Peak Rock - Sunken Treasure"
+            ]
+        },
+        "group_Overlook Island": {
+            "locations": [
+                "Overlook Island - Cave",
+                "Overlook Island - Sunken Treasure"
+            ]
+        },
+        "group_Greatfish Isle": {
+            "locations": [
+                "Greatfish Isle - Hidden Chest",
+                "Greatfish Isle - Sunken Treasure"
+            ]
+        },
+        "group_Three-Eye Reef": {
+            "locations": [
+                "Three-Eye Reef - Destroy the Cannons and Gunboats",
+                "Three-Eye Reef - Sunken Treasure"
+            ]
+        },
+        "group_Four-Eye Reef": {
+            "locations": [
+                "Four-Eye Reef - Destroy the Cannons and Gunboats",
+                "Four-Eye Reef - Sunken Treasure"
+            ]
+        },
+        "group_Shark Island": {
+            "locations": [
+                "Shark Island - Cave",
+                "Shark Island - Sunken Treasure"
+            ]
+        }
+    },
+    "themes": {
+        "default": {
+            "color": "#888888"
+        }
+    }
+}
