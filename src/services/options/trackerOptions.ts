@@ -25,6 +25,12 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         type: OptionType.boolean,
         default: true,
     },
+    "InventoryTracker:show_server_items": {
+        name: "InventoryTracker:show_server_items",
+        display: "Show Server Items",
+        type: OptionType.boolean,
+        default: true,
+    },
     "InventoryTracker:item_order": {
         name: "InventoryTracker:item_order",
         display: "Item Order",

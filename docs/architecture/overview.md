@@ -41,16 +41,13 @@ graph TD;
     connector[Connector Service];
     text_client_manager[Text Client Manager];
     location_manager[Location Manager];
-    tag_manager[Tag Manager];
     inventory_manager[Inventory Manager];
-    group_manager[Group Manager];
-    section_manager[Section Manager];
+    tag_manager[Tag Manager];
     saved_connection_manager[Saved Connection Manager];
     save_data[Save Data Manager];
     localstorage[Local Storage];
     tracker_manager[Tracker Manager];
-    custom_tracker_manager[Custom Tracker Manager];
-    generic_tracker_generator[Generic Tracker Generator];
+    tracker_repo[Tracker Repositories];
 
     ap_js-->|Calls event callbacks|connector;
     connector-->|Sets callbacks on|ap_js;
@@ -61,20 +58,13 @@ graph TD;
     connector-->|Syncs Locations from AP|location_manager;
     connector-->|Hints from AP|tag_manager;
     connector-->|Items from AP|inventory_manager;
-    section_manager-->|Reads from|location_manager;
-    section_manager-->|Reads from|group_manager;
     tag_manager-->|Adds tags to|location_manager;
-    tracker_manager-->|Configures|section_manager;
-    tracker_manager-->|Configures|group_manager;
     tracker_manager-->|Reads/Stores setting data|localstorage;
-    custom_tracker_manager-->|Sends tracker to|tracker_manager;
-    custom_tracker_manager-->|Reads/Stores tracker data|save_data;
-    custom_tracker_manager-->|Reads/Stores directory data|localstorage;
+    tracker_repo-->|Sends tracker to|tracker_manager;
+    tracker_repo-->|Reads/Stores tracker data|save_data;
+    tracker_repo-->|Reads/Stores directory data|localstorage;
     saved_connection_manager-->|Saves connection data to|localstorage;
     saved_connection_manager-->|Cleans datastorage cache|save_data;
-    generic_tracker_generator-->|Provides base trackers for|tracker_manager;
-    generic_tracker_generator-->|Reads from|location_manager;
-    connector-->|Provides location groups to|generic_tracker_generator;
 ```
 
 #### Notes on graph:
@@ -204,18 +194,6 @@ Maintains a saved list of previous connections as well as per-session save data.
 
 Related hook: none but should have one, this is currently subscribed to using `useSyncExternalStore`
 
-#### [GroupManager](../../src/services/sections/groupManager.ts):
-
-Maintains a list of groups and what locations are contained with-in. Has some unused properties related to entrances and section collapsing that is currently not used.
-
-No hooks.
-
-#### [SectionManager](../../src/services/sections/sectionManager.ts):
-
-Maintains the state of the sections and which locations each one has. Build and maintains reports related to tags and location counts.
-
-Related hook: [useSection](../../src/hooks/sectionHooks.ts).
-
 #### [TagManager](../../src/services/tags/tagManager.ts):
 
 Manages tags placed on locations by submitting them as updates to the LocationManager, and saving appropriate ones to the SavedConnectionManager.
@@ -240,15 +218,9 @@ Related hooks: [useTextClientMessages, useTextClientHistory](../../src/hooks/tex
 
 #### [TrackerManager](../../src/games/TrackerManager.ts):
 
-Manages the loading and creation of trackers by updating the Group and Section managers.
+Manages the loading and creation of trackers.
 
 Related Hooks: [useCurrentGameTracker, useTrackerDirectory](../../src/hooks/trackerHooks.ts)
-
-#### [CustomTrackerManager](../../src/games/generic/categoryGenerators/customTrackerManager.ts) (singleton, defined in the games folder):
-
-Manages the loading, storing, creation and validation of custom trackers loaded by the user.
-
-Related Hooks: [useCustomTrackerDirectory](../../src/hooks/trackerHooks.ts)
 
 #### [GenericTrackerGenerator](../../src/games/generic/genericGame.ts):
 

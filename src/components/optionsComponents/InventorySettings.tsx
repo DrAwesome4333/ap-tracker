@@ -2,6 +2,7 @@ import React from "react";
 import {
     normalItem,
     progressionItem,
+    textClient,
     trapItem,
     usefulItem,
 } from "../../constants/colors";
@@ -28,6 +29,12 @@ const InventorySettings = () => {
                     baseTrackerOptions["InventoryTracker:show_normal_items"]
                 }
                 style={{ color: normalItem }}
+            />
+            <OptionView
+                option={
+                    baseTrackerOptions["InventoryTracker:show_server_items"]
+                }
+                style={{ color: textClient.yellow }}
             />
             <OptionView
                 option={baseTrackerOptions["InventoryTracker:show_trap_items"]}

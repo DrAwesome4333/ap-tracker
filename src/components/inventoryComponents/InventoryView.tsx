@@ -67,6 +67,11 @@ const InventoryView = () => {
         "InventoryTracker:show_trap_items",
         "global"
     ) as boolean;
+    const showServer = useOption(
+        optionManager,
+        "InventoryTracker:show_server_items",
+        "global"
+    ) as boolean;
     const itemOrder = useOption(
         optionManager,
         "InventoryTracker:item_order",
@@ -84,12 +89,14 @@ const InventoryView = () => {
         return items
             ?.filter(
                 (collection) =>
-                    (collection.progression && (showProgression ?? true)) ||
-                    (collection.useful && (showUseful ?? true)) ||
-                    (collection.trap && (showTrap ?? true)) ||
+                    (collection.progression && showProgression) ||
+                    (collection.useful && showUseful) ||
+                    (collection.trap && showTrap) ||
+                    (collection.sender === "Archipelago" && showServer) ||
                     (!collection.progression &&
                         !collection.useful &&
                         !collection.trap &&
+                        collection.sender !== "Archipelago" &&
                         (showNormal ?? true))
             )
             .sort((a, b) => {
@@ -115,6 +122,7 @@ const InventoryView = () => {
         showUseful,
         showTrap,
         showNormal,
+        showServer,
         itemOrderDirection_desc,
         itemOrder,
         items,

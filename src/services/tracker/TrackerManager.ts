@@ -247,7 +247,7 @@ class TrackerManager {
         game: string,
         tracker: TrackerResourceId | { type: string }
     ) => {
-        console.log(`Updating ${game} to:`, tracker);
+        // console.log(`Updating ${game} to:`, tracker);
         if (game) {
             const currentValue =
                 (this.#optionsStore.read(game) as TrackerResourceIds) ?? {};
