@@ -12,11 +12,6 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
-        "paths": {
-            "@external/*" : ["./external/"]
-        },
-        "baseUrl": ".",
-        "composite": true,
         "plugins": [
             {
                 "name": "next"
@@ -32,5 +27,5 @@
         "next-env.d.ts",
         ".next/types/**/*.ts"
     ],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "external"]
 }
