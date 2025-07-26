@@ -21,9 +21,17 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  submodules: true
 
             - name: Setup Node.js - Cache dependencies - Install dependencies
               uses: ./.github/workflows/setup-node
+
+            - name: Build archipelago.js
+              run: |
+                cd external/archipelago.js
+                npm install
+                npm run build
 
             - name: Setup Pages
               uses: actions/configure-pages@v4
