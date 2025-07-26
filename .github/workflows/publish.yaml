@@ -31,7 +31,7 @@ jobs:
             - name: Build archipelago.js
               run: |
                 cd external/archipelago.js
-                npm ci
+                npm i
                 npm run build
 
             - name: Setup Pages
