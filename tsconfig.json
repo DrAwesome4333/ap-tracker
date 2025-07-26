@@ -12,6 +12,11 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "preserve",
+        "paths": {
+            "@external/*" : ["./external/"]
+        },
+        "baseUrl": ".",
+        "composite": true,
         "plugins": [
             {
                 "name": "next"
