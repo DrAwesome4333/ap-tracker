@@ -352,7 +352,7 @@ const createConnector = (
                     }
                 );
                 enableDataSync(client, tagManager);
-                // SavedConnectionManager.cacheDataPackage(savedConnectionInfo.seed, client.package.exportPackage());
+                SavedConnectionManager.cacheDataPackage(savedConnectionInfo.seed, client.package.exportPackage());
             })
             .catch((e) => {
                 statusMessageHandle.update({
