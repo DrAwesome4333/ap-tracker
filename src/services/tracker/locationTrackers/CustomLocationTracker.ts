@@ -181,10 +181,9 @@ class CustomLocationTracker implements DropdownLocationTracker {
             sectionGroups.forEach((name) => remainingGroups.delete(name));
         });
         remainingGroups
-            .values()
             .forEach((name) => this.errors.push(`Group ${name} is unused.`));
 
-        this.sections.values().forEach((section) => {
+        [...this.sections.values()].forEach((section) => {
             Object.freeze(section);
             Object.freeze(section.locations);
             Object.freeze(section.parents);
