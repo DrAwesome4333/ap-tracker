@@ -231,7 +231,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
     };
 
     protected callListeners = (_sectionName?: string) => {
-        this.listeners.values().forEach((listener) => listener());
+        this.listeners.forEach((listener) => listener());
     };
 
     getUpdateSubscriber = (_name?: string) => {
