@@ -66,19 +66,21 @@ $ git clone https://github.com/DrAwesome4333/ap-tracker.git
 $ cd ./ap-tracker
 ```
 
-4. Now it is time to install the app's dependencies, run the command:
+4. Now we need to install and build archipelago.js. Navigate to the `external/archipelago.js` folder and follow the instructions listed [here](https://github.com/DrAwesome4333/archipelago.js) to build it.
+
+5. Now it is time to install the app's dependencies, run the command:
 
 ```sh
 $ npm install
 ```
 
-5. After everything is installed it is time to compile and run the app. Run the command:
+6. After everything is installed it is time to compile and run the app. Run the command:
 
 ```sh
 $ npm run dev
 ```
 
-6. The app should start compiling (it may take a minute). When it is finished you should see something saying the development server has started and ready to go. Navigate to [http://localhost:3000](http://localhost:3000) to use the app.
+7. The app should start compiling (it may take a minute). When it is finished you should see something saying the development server has started and ready to go. Navigate to [http://localhost:3000](http://localhost:3000) to use the app.
 
 **Note:** To enable hot reloading you need to comment out the `assetPrefix` portion of the `next.config.js` file. Remember to return it back when creating dedicated build or certain resources, such as images and manifest files, may not be accessible.
 
