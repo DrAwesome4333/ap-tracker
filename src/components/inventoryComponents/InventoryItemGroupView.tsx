@@ -10,6 +10,7 @@ import {
     trapItem,
     usefulItem,
 } from "../../constants/colors";
+import Icon from "../icons/icons";
 
 const InventoryItemGroupView = ({
     name,
@@ -52,8 +53,25 @@ const InventoryItemGroupView = ({
                 onClick={() => setDetailsOpen((x) => !x)}
             >
                 <TextButton style={{ outlineColor: color, fontWeight: "bold" }}>
-                    {count} - {name}
-                    {detailsOpen ? " \u2B9D " : " \u2B9F "}
+                    {count} - {name}{" "}
+                    {
+                        <Icon
+                            iconParams={{
+                                fill: 0,
+                                opticalSize: 20,
+                                weight: 700,
+                                grade: 200,
+                            }}
+                            type="arrow_drop_down_circle"
+                            fontSize="20px"
+                            style={{
+                                transform: detailsOpen
+                                    ? "rotate(-180deg)"
+                                    : "rotate(0deg)",
+                                transition: "all 0.25s",
+                            }}
+                        />
+                    }
                 </TextButton>
             </CollectionContainer>
             {detailsOpen && (

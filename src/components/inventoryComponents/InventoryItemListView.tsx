@@ -12,6 +12,7 @@ import InventoryItemView from "./InventoryItemView";
 import { TextButton } from "../buttons";
 import { InventoryItem } from "../../services/inventory/inventoryManager";
 import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
+import Icon from "../icons/icons";
 
 const virtualizationThreshold = 50;
 
@@ -65,7 +66,24 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
             >
                 <TextButton style={{ outlineColor: color }}>
                     {count} - {name}
-                    {detailsOpen ? " ▲ " : " ▼ "}
+                    {
+                        <Icon
+                            iconParams={{
+                                fill: 0,
+                                opticalSize: 20,
+                                weight: 700,
+                                grade: 200,
+                            }}
+                            type="arrow_drop_down"
+                            fontSize="20px"
+                            style={{
+                                transform: detailsOpen
+                                    ? "rotate(-180deg)"
+                                    : "rotate(0deg)",
+                                transition: "all 0.25s",
+                            }}
+                        />
+                    }
                 </TextButton>
             </CollectionContainer>
             {detailsOpen && (

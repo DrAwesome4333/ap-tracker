@@ -3,7 +3,7 @@ name: publish-to-github-pages
 on:
     push:
         branches:
-            - test-site
+            - main
 
 permissions:
     contents: read
@@ -30,9 +30,9 @@ jobs:
             - uses: oven-sh/setup-bun@v1
             - name: Build archipelago.js
               run: |
-                cd external/archipelago.js
-                npm i
-                npm run build
+                  cd external/archipelago.js
+                  npm i
+                  npm run build
 
             - name: Setup Pages
               uses: actions/configure-pages@v4

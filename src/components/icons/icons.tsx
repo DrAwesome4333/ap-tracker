@@ -1,29 +1,39 @@
 import React from "react";
+import styled from "styled-components";
+type IconParams = {
+    /** 0 for no fill, 1 for fill */
+    fill?: number;
+    /** Line weight */
+    weight?: 100 | 200 | 300 | 400 | 500 | 600 | 700;
+    /** Emphasis */
+    grade?: -25 | 0 | 200;
+    /** Optical Size, px */
+    opticalSize?: 20 | 24 | 40 | 48;
+};
+const IconContainer = styled.span.attrs({
+    className: "material-symbols-rounded",
+})<{ $: IconParams }>`
+    font-variation-settings:
+        "FILL" ${(props) => props.$.fill ?? 1},
+        "wght" ${(props) => props.$.weight ?? 400},
+        "GRAD" ${(props) => props.$.grade ?? 0},
+        "opsz" ${(props) => props.$.opticalSize ?? 24};
+`;
 const supportedIcons = [
-    "home",
-    "palette",
-    "settings",
-    "check_indeterminate_small",
-    "star",
-    "bolt",
-    "label",
-    "bookmark",
-    "block",
     "add",
-    "beenhere",
-    "new_label",
-    "pentagon",
-    "filter_alt",
-    "sticky_note",
-    "sync_arrow_down",
-    "sync_arrow_up",
-    "sync",
-    "check_small",
-    "price_check",
-    "flag",
-    "flag_check",
-    "search_check",
     "add_circle",
+    "add_location_alt",
+    "attach_money",
+    "arrow_drop_down",
+    "arrow_drop_down_circle",
+    "beenhere",
+    "block",
+    "bolt",
+    "bookmark",
+    "check_circle",
+    "check_indeterminate_small",
+    "check_small",
+    "checklist",
     "counter_1",
     "counter_2",
     "counter_3",
@@ -33,25 +43,38 @@ const supportedIcons = [
     "counter_7",
     "counter_8",
     "counter_9",
-    "mystery",
-    "location_on",
-    "not_listed_location",
-    "wrong_location",
-    "fmd_bad",
-    "add_location_alt",
-    "location_off",
-    "price_change",
-    "attach_money",
-    "info",
-    "check_circle",
-    "checklist",
-    "delete_forever",
     "delete",
+    "delete_forever",
     "download",
-    "upload_file",
     "eject",
+    "expand_circle_down",
+    "filter_alt",
+    "flag",
+    "flag_check",
+    "fmd_bad",
+    "home",
+    "info",
+    "label",
+    "location_off",
+    "location_on",
+    "mystery",
+    "new_label",
+    "not_listed_location",
+    "palette",
+    "pentagon",
+    "price_change",
+    "price_check",
     "radio_button_checked",
     "radio_button_unchecked",
+    "search_check",
+    "settings",
+    "star",
+    "sticky_note",
+    "sync",
+    "sync_arrow_down",
+    "sync_arrow_up",
+    "upload_file",
+    "wrong_location",
 ];
 
 const link = document.createElement("link");
@@ -65,19 +88,25 @@ document.head.appendChild(link);
 const Icon = ({
     type,
     fontSize,
+    iconParams,
     style,
 }: {
     type: string;
     fontSize?: string;
     style?: React.CSSProperties;
+    iconParams?: IconParams;
 }) => {
     return (
-        <span
-            className={"material-symbols-rounded"}
-            style={{ ...style, fontSize: fontSize ?? "24px" }}
+        <IconContainer
+            style={{
+                ...style,
+                fontSize: fontSize ?? "24px",
+                verticalAlign: "middle",
+            }}
+            $={iconParams ?? {}}
         >
             {type}
-        </span>
+        </IconContainer>
     );
 };
 
