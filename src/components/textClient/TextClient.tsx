@@ -75,7 +75,7 @@ const TextClient = () => {
                         style={{ height: "20px" }}
                         onClick={() => setShowFilterModal(true)}
                     >
-                        <Icon fontSize="12pt" type="filter_alt" />
+                        <Icon fontSize="12pt" type="settings" />
                     </PrimaryButton>
                 </PanelHeader>
 

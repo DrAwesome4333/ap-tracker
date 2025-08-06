@@ -1,14 +1,22 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useContext } from "react";
 import MessagePart from "./MessagePart";
 import { APMessage } from "../../services/textClientManager";
 import NotificationManager from "../../services/notifications/notifications";
 import { MessageType } from "../../services/notifications/notifications";
+import ServiceContext from "../../contexts/serviceContext";
+import useOption from "../../hooks/optionHook";
 
 const ClientMessage = forwardRef(
     (
         { message }: { message: APMessage },
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
+        const services = useContext(ServiceContext);
+        const copyOnDblClick = useOption(
+            services.optionManager,
+            "TextClient:DoubleClickToCopy",
+            "global"
+        );
         const text = message.parts
             .map((part) => part.text)
             .reduce((a, b) => a + b, "");
@@ -16,6 +24,9 @@ const ClientMessage = forwardRef(
             <div
                 ref={ref}
                 onDoubleClick={async () => {
+                    if (!copyOnDblClick) {
+                        return;
+                    }
                     try {
                         if (navigator.clipboard) {
                             await navigator.clipboard.writeText(text);
