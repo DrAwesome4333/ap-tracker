@@ -255,6 +255,7 @@ const SectionView = ({
                                             ? "rotate(-180deg)"
                                             : "rotate(0deg)",
                                         transition: "all 0.25s",
+                                        userSelect: "none",
                                     }}
                                 />
                             ) : (

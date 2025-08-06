@@ -32,6 +32,7 @@ const TextButton = styled.button`
     font: inherit;
     cursor: pointer;
     text-align: left;
+    user-select: text;
     &:hover {
         text-decoration: underline;
     }
