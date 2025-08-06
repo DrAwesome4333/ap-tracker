@@ -117,8 +117,13 @@ const App = (): React.ReactNode => {
         () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
         () => trackerManager.getCurrentTracker(ResourceType.itemTracker)
     ) as ItemTracker;
+    const titleParts = ["AP Checklist Tracker"];
+    if (connector.connection?.slotInfo.alias) {
+        titleParts.unshift(connector.connection?.slotInfo.alias);
+    }
     return (
         <div className="App" data-theme={readThemeValue(themeValue)}>
+            <title>{titleParts.join(" | ")}</title>
             <AppScreen data-theme={readThemeValue(themeValue)}>
                 <TrackerStateContext.Provider
                     value={{
