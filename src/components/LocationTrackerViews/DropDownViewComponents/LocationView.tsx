@@ -4,6 +4,7 @@ import Icon from "../../icons/icons";
 import { tertiary, textPrimary } from "../../../constants/colors";
 import { GhostButton, TextButton } from "../../buttons";
 import { useLocationStatus } from "../../../hooks/sectionHooks";
+import TagBar from "../../tags/TagBar";
 
 const LocationView = forwardRef(
     (
@@ -11,6 +12,7 @@ const LocationView = forwardRef(
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const [showDetails, setShowDetails] = useState(false);
+        const [showTagBar, setShowTagBar] = useState(false);
         const serviceContext = useContext(ServiceContext);
         const locationManager = serviceContext.locationManager;
         if (!locationManager) {
@@ -48,13 +50,17 @@ const LocationView = forwardRef(
             iconColor = selectedTagType.iconColor ?? iconColor;
         }
         return (
-            <div ref={ref}>
+            <div ref={ref}
+                onFocus={() => setShowTagBar(true)}
+                onBlur={() => setShowTagBar(false)}
+            >
                 <span
                     className={[...classes].join(" ")}
                     onClick={() => {
                         setShowDetails(!showDetails);
                     }}
                 >
+                    {showTagBar && <TagBar/>}
                     <TextButton
                         style={{
                             textDecoration:
