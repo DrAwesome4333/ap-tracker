@@ -10,7 +10,7 @@ import ServiceContext from "../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
 import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
-import { createTagManager } from "../../services/tags/tagManager";
+import { TagManager } from "../../services/tags/tagManager";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,
@@ -48,7 +48,7 @@ const templateLocationTracker = new TemplateLocationTracker(
     previewLocationManager
 );
 const previewEntranceManager = createEntranceManager();
-const previewTagManager = createTagManager(previewLocationManager);
+const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
     open,

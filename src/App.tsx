@@ -9,7 +9,8 @@ import OptionsScreen from "./components/optionsComponents/OptionsScreen";
 import { createEntranceManager } from "./services/entrances/entranceManager";
 import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
-import { createTagManager } from "./services/tags/tagManager";
+import { TagManager } from "./services/tags/tagManager";
+import { LocationTagger } from "./services/tags/LocationTagger";
 import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
@@ -53,7 +54,9 @@ const inventoryManager = new InventoryManager();
 const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 
-const tagManager = createTagManager(locationManager);
+const tagManager = new TagManager();
+const locationTagger = new LocationTagger();
+tagManager.addSource(locationTagger);
 const mainTrackerManagerStore = new LocalStorageDataStore(
     "AP_ChecklistTracker_TrackerChoices"
 );
@@ -145,6 +148,7 @@ const App = (): React.ReactNode => {
                             textClientManager,
                             customTrackerRepository,
                             genericTrackerRepository,
+                            locationTagger,
                         }}
                     >
                         <NotificationContainer />

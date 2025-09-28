@@ -9,6 +9,8 @@ import { useSection } from "../../../hooks/sectionHooks";
 import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
 import { TextButton } from "../../buttons";
 import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
+import { TagEntityType } from "../../../services/tags/tagManager";
+import { useTagCounters } from "../../../hooks/tagHook";
 
 const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
     return (
@@ -161,6 +163,27 @@ const SectionView = ({
         return indexA - indexB;
     };
 
+    const locationNames = section?.locationReport
+        ? [...section.locationReport.existing.values()]
+        : [];
+    const locationStatuses = locationNames.map((locationName) =>
+        locationManager.getLocationStatus(locationName)
+    );
+
+    const locationIds = locationStatuses.map((status) => status.id ?? 0);
+    const locationCounterStatuses = locationStatuses.map((status) => ({
+        checked: status.checked,
+        ignored: status.ignored,
+        exists: status.exists,
+    }));
+
+    const tagCounts = useTagCounters(
+        tagManager,
+        TagEntityType.location,
+        locationIds,
+        locationCounterStatuses
+    );
+
     /**
      * Removes any section that should be hidden by settings such as empty and cleared sections
      * @param sectionName The name of the section being filtered
@@ -215,7 +238,24 @@ const SectionView = ({
                                 {"/"}
                                 {totalLocationCount}
                             </i>{" "}
-                            {[...(section?.locationReport.tagCounts ?? [])].map(
+                            {tagCounts.map((counter) => {
+                                return (
+                                    <i
+                                        key={counter.counter_id}
+                                        style={{ color: counter.color }}
+                                        title={counter.display_name}
+                                    >
+                                        <Icon
+                                            fontSize="14px"
+                                            type={counter.icon_id}
+                                        />
+                                        {counter.count}
+                                        {counter.total !== null &&
+                                            `/${counter.total}`}{" "}
+                                    </i>
+                                );
+                            })}
+                            {/* {[...(section?.locationReport.tagCounts ?? [])].map(
                                 ([id, values]) => {
                                     const counterType =
                                         tagManager?.getCounter(id);
@@ -239,7 +279,7 @@ const SectionView = ({
                                         </i>
                                     );
                                 }
-                            )}
+                            )} */}
                             {isClosable ? (
                                 <Icon
                                     iconParams={{
@@ -279,9 +319,10 @@ const SectionView = ({
                                     rowGenerator={rowGenerator}
                                     style={{
                                         width: "95%",
-                                        overflow: "hidden",
+                                        // overflow: "show",
                                         resize: "vertical",
                                         height: "25vh",
+                                        margin: "1em",
                                         boxShadow:
                                             "2px 3px 5px rgba(0, 0, 0, 0.5)",
                                     }}

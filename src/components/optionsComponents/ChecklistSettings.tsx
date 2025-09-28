@@ -3,7 +3,7 @@ import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
 import { LocationManager } from "../../services/locations/locationManager";
 import { createEntranceManager } from "../../services/entrances/entranceManager";
-import { createTagManager } from "../../services/tags/tagManager";
+import { TagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
 import { SecondaryButton } from "../buttons";
 import OptionView from "./OptionView";
@@ -55,7 +55,7 @@ const mockLocationTracker = new CustomLocationTracker(mockLocationManager, {
     },
 });
 
-const mockTagManager = createTagManager(mockLocationManager);
+const mockTagManager = new TagManager();
 
 mockLocationManager.updateLocationStatus("Location 1", {
     exists: true,

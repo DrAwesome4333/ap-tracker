@@ -1,7 +1,7 @@
 /**  Represents the status of a location in a session */
 interface LocationStatus {
     exists: boolean;
-    tags: import("../tags/tagManager").Tag[];
+    tags: string[];
     ignored: boolean;
     checked: boolean;
     id: number;
@@ -11,7 +11,7 @@ interface LocationStatus {
 /** Represents an update to a {@link LocationStatus} */
 interface LocationStatusUpdate {
     exists?: boolean;
-    tags?: import("../tags/tagManager").Tag[];
+    tags?: string[];
     ignored?: boolean;
     checked?: boolean;
     id?: number;

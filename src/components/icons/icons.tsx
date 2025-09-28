@@ -111,3 +111,4 @@ const Icon = ({
 };
 
 export default Icon;
+export type { IconParams };

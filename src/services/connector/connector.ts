@@ -149,7 +149,7 @@ const createConnector = (
         "global"
     )(toggleText);
 
-    setupAPCheckSync(client, locationManager, tagManager, connection);
+    setupAPCheckSync(client, locationManager, tagManager);
     setupAPInventorySync(client, inventoryManger);
     setupAPTextSync(client, textClientManager);
 
@@ -348,7 +348,7 @@ const createConnector = (
                             groups
                         );
                         trackerManager.loadTrackers(savedConnectionInfo.game);
-                        tagManager.loadTags(connection.slotInfo.connectionId);
+                        // tagManager.loadTags(connection.slotInfo.connectionId);
                     }
                 );
                 enableDataSync(client, tagManager);

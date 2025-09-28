@@ -1,7 +1,5 @@
-// @ts-check
-
 import { DataPackage } from "archipelago.js";
-import { TagData } from "../tags/tagManager";
+// import { TagDataV2 } from "../tags/tagManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import { JSONValue } from "../dataStores/dataStore";
 
@@ -33,7 +31,7 @@ interface SavedConnection_V2 {
     saveData?: {
         locationGroups?: { [groupName: string]: string[] };
         tagData?: {
-            [tagId: string]: TagData;
+            [tagId: string]: unknown;
         };
     };
 }
@@ -62,7 +60,7 @@ interface SavedConnection_V3 {
     };
     saveData?: {
         tagData?: {
-            [tagId: string]: TagData;
+            [tagId: string]: unknown;
         };
     };
 }
