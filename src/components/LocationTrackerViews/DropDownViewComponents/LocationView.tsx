@@ -78,7 +78,7 @@ const LocationView = forwardRef(
                     backgroundColor: showDetails
                         ? "rgba(128, 128, 128, 0.25)"
                         : "",
-                    padding: "0.5em",
+                    padding: showDetails ? "0.5em 0.25em" : "0",
                 }}
                 onFocus={() => setShowDetails(true)}
                 onBlur={(e) => {
@@ -90,12 +90,7 @@ const LocationView = forwardRef(
                     }
                 }}
             >
-                <span
-                    className={[...classes].join(" ")}
-                    // onClick={() => {
-                    //     setShowDetails(!showDetails);
-                    // }}
-                >
+                <span className={[...classes].join(" ")}>
                     <TextButton
                         style={{
                             textDecoration:

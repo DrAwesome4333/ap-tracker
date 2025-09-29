@@ -1,7 +1,6 @@
 /**  Represents the status of a location in a session */
 interface LocationStatus {
     exists: boolean;
-    tags: string[];
     ignored: boolean;
     checked: boolean;
     id: number;
@@ -11,7 +10,6 @@ interface LocationStatus {
 /** Represents an update to a {@link LocationStatus} */
 interface LocationStatusUpdate {
     exists?: boolean;
-    tags?: string[];
     ignored?: boolean;
     checked?: boolean;
     id?: number;
@@ -21,7 +19,6 @@ interface LocationStatusUpdate {
 /** The default {@link LocationStatus} of a location */
 const defaultCheckStatus: LocationStatus = {
     exists: false,
-    tags: [],
     ignored: false,
     checked: false,
     id: 0,
@@ -32,7 +29,12 @@ Object.freeze(defaultCheckStatus);
  * Class for managing and broadcasting the state of locations
  */
 class LocationManager {
-    #locationStats: Map<string, LocationStatus> = new Map();
+    #locationStatsCache: Map<string, LocationStatus> = new Map();
+    #locationStatsModifiers: Map<
+        string,
+        { sourceId: string; update: LocationStatusUpdate }[]
+    > = new Map();
+    #sourcePriorities: Map<string, number> = new Map();
     #locationSubscribers: Map<Set<string>, (names: Set<string>) => void> =
         new Map();
     #updateQueue: Set<string> = new Set();
@@ -86,16 +88,53 @@ class LocationManager {
      * @param status The properties of the status to update
      */
     updateLocationStatus = (
+        sourceId: string,
         locationName: string,
-        status: LocationStatusUpdate
+        update: LocationStatusUpdate,
+        cleanSlateFromSource?: boolean
     ): void => {
-        const newStatus: LocationStatus = {
-            ...(this.#locationStats.get(locationName) ?? defaultCheckStatus),
-            ...status,
-        };
+        //check for status related to source id, if not add a new one
+
+        const statusModifiers =
+            this.#locationStatsModifiers.get(locationName) ?? [];
+        let statusIndex = statusModifiers.findIndex(
+            (modifier) => modifier.sourceId === sourceId
+        );
+        if (statusIndex === -1) {
+            const statusPriority = this.#sourcePriorities.get(sourceId) ?? 0;
+            statusIndex = 0;
+            while (
+                statusIndex < statusModifiers.length &&
+                this.#sourcePriorities.get(
+                    statusModifiers[statusIndex].sourceId
+                ) <= statusPriority
+            ) {
+                statusIndex++;
+            }
+            statusModifiers.splice(statusIndex, 0, { sourceId, update });
+        }
+
+        if (cleanSlateFromSource) {
+            statusModifiers[statusIndex].update = update;
+        } else {
+            statusModifiers[statusIndex].update = {
+                ...statusModifiers[statusIndex].update,
+                ...update,
+            };
+        }
+
+        this.#locationStatsModifiers.set(locationName, statusModifiers);
+        const newStatus: LocationStatus = statusModifiers.reduce(
+            (prev, curr) => ({
+                ...prev,
+                ...curr.update,
+            }),
+            defaultCheckStatus
+        );
+
         // make the object immutable
         Object.freeze(newStatus);
-        this.#locationStats.set(locationName, newStatus);
+        this.#locationStatsCache.set(locationName, newStatus);
         this.#broadcastUpdate(locationName);
     };
 
@@ -105,7 +144,7 @@ class LocationManager {
      * @returns An immutable {@link LocationStatus } object, returns a default status if location does not yet exist.
      */
     getLocationStatus = (locationName: string): LocationStatus => {
-        return this.#locationStats.get(locationName) ?? defaultCheckStatus;
+        return this.#locationStatsCache.get(locationName) ?? defaultCheckStatus;
     };
 
     /**
@@ -113,7 +152,8 @@ class LocationManager {
      * @param locationName The name of the location to delete
      */
     deleteLocation = (locationName: string) => {
-        this.#locationStats.delete(locationName);
+        this.#locationStatsCache.delete(locationName);
+        this.#locationStatsModifiers.delete(locationName);
         this.#broadcastUpdate(locationName);
     };
 
@@ -121,7 +161,7 @@ class LocationManager {
      * Deletes the status of all locations
      */
     deleteAllLocations = () => {
-        const names = [...this.#locationStats.keys()];
+        const names = [...this.#locationStatsCache.keys()];
         names.forEach((name) => this.deleteLocation(name));
     };
 
@@ -134,7 +174,7 @@ class LocationManager {
         filter: (status: LocationStatus) => boolean
     ): Set<string> => {
         const locations: Set<string> = new Set();
-        this.#locationStats.forEach((status, checkName) => {
+        this.#locationStatsCache.forEach((status, checkName) => {
             if (filter(status)) {
                 locations.add(checkName);
             }
@@ -161,6 +201,51 @@ class LocationManager {
                 this.#locationSubscribers.delete(locationNames);
             };
         };
+    };
+
+    /**
+     *
+     * @param sourceId
+     * @param priority Higher number means it will take precedence over lower priorities
+     */
+    registerSourcePriority = (sourceId: string, priority: number) => {
+        if (
+            this.#sourcePriorities.has(sourceId) &&
+            this.#sourcePriorities.get(sourceId) !== priority
+        ) {
+            throw new Error(
+                "Location Source Priority Error: Cannot change priority, must remove source first."
+            );
+        }
+        this.#sourcePriorities.set(sourceId, priority);
+    };
+
+    /**
+     * Removes a source's updates from the modifiers for a location
+     * Note this will resume update broadcasts.
+     * @param sourceId The source to remove
+     */
+    removeSource = (sourceId: string) => {
+        this.pauseUpdateBroadcast();
+        const allModifiers = [...this.#locationStatsModifiers.entries()];
+        allModifiers.forEach(([locationName, modifiers]) => {
+            const newModifiers = modifiers.filter(
+                (x) => x.sourceId !== sourceId
+            );
+            const newStatus: LocationStatus = newModifiers.reduce(
+                (prev, curr) => ({
+                    ...prev,
+                    ...curr.update,
+                }),
+                defaultCheckStatus
+            );
+            Object.freeze(newStatus);
+            this.#locationStatsModifiers.set(locationName, newModifiers);
+            this.#locationStatsCache.set(locationName, newStatus);
+            this.#broadcastUpdate(locationName);
+        });
+        this.#sourcePriorities.delete(sourceId);
+        this.resumeUpdateBroadcast();
     };
 
     /**

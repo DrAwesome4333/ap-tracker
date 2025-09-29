@@ -43,6 +43,8 @@ const AnalysisGrid = styled.div`
 `;
 
 const previewLocationManager = new LocationManager();
+const previewSourceId = "preview_source";
+previewLocationManager.registerSourcePriority(previewSourceId, 1);
 const previewInventoryManager = new InventoryManager();
 const templateLocationTracker = new TemplateLocationTracker(
     previewLocationManager
@@ -112,9 +114,13 @@ const NameAnalysisModal = ({
             previewLocationManager.deleteAllLocations();
             connection.slotInfo.groups.location["Everywhere"].forEach(
                 (location) => {
-                    previewLocationManager.updateLocationStatus(location, {
-                        exists: true,
-                    });
+                    previewLocationManager.updateLocationStatus(
+                        previewSourceId,
+                        location,
+                        {
+                            exists: true,
+                        }
+                    );
                 }
             );
             previewLocationManager.resumeUpdateBroadcast();

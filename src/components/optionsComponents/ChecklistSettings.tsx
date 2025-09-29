@@ -56,28 +56,39 @@ const mockLocationTracker = new CustomLocationTracker(mockLocationManager, {
 });
 
 const mockTagManager = new TagManager();
-
-mockLocationManager.updateLocationStatus("Location 1", {
+const mockSourceId = "mock_source";
+mockLocationManager.registerSourcePriority(mockSourceId, 1);
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 1", {
     exists: true,
     checked: true,
 });
-mockLocationManager.updateLocationStatus("Location 2", { exists: true });
-mockLocationManager.updateLocationStatus("Location 3", {
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 2", {
+    exists: true,
+});
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 3", {
     exists: true,
     checked: true,
 });
-mockLocationManager.updateLocationStatus("Location 4", { exists: true });
-mockLocationManager.updateLocationStatus("Location 5", { exists: true });
-mockLocationManager.updateLocationStatus("Location 6", {
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 4", {
+    exists: true,
+});
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 5", {
+    exists: true,
+});
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 6", {
     exists: true,
     checked: true,
 });
-mockLocationManager.updateLocationStatus("Location 7", { exists: true });
-mockLocationManager.updateLocationStatus("Location 8", {
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 7", {
+    exists: true,
+});
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 8", {
     exists: true,
     checked: true,
 });
-mockLocationManager.updateLocationStatus("Location 9", { exists: true });
+mockLocationManager.updateLocationStatus(mockSourceId, "Location 9", {
+    exists: true,
+});
 
 const ChecklistSettings = ({
     optionManager,

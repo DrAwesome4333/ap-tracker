@@ -12,6 +12,7 @@ import { LocationTracker } from "../services/tracker/locationTrackers/locationTr
 import { ItemTracker } from "../services/tracker/itemTrackers/itemTrackers";
 import GenericTrackerRepository from "../services/tracker/generic/genericTrackerRepository";
 import { LocationTagger } from "../services/tags/LocationTagger";
+import HintTagger from "../services/tags/HintTagger";
 
 const ServiceContext: React.Context<{
     locationManager?: LocationManager;
@@ -27,6 +28,7 @@ const ServiceContext: React.Context<{
     customTrackerRepository?: CustomTrackerRepository;
     genericTrackerRepository?: GenericTrackerRepository;
     locationTagger?: LocationTagger;
+    hintTagger?: HintTagger;
 }> = createContext({});
 
 export default ServiceContext;

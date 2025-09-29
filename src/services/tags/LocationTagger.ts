@@ -78,7 +78,7 @@ const types: TagTypeV2[] = [
         text_color: "grey",
         user_managed: true,
         effects: {
-            flag_location: ["ignored"],
+            ignored: true,
         },
     },
 ];
