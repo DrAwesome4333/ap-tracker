@@ -1,6 +1,6 @@
 // syncs checks with location manager
 
-import { Client, Hint, NetworkHint } from "archipelago.js";
+import { Client, Hint } from "archipelago.js";
 import { LocationManager } from "../locations/locationManager";
 import HintTagger from "../tags/HintTagger";
 
@@ -21,22 +21,16 @@ const hintToText = (client: Client, hint: Hint) => {
 
 const addHint = (client: Client, hint: Hint, hintTagger: HintTagger) => {
     if (hint.item.sender.slot === client.players.self.slot) {
-        hintTagger.addHint(hint.item.id, hintToText(client, hint));
-        // const tagData = tagManager.createTagData();
-        // tagData.checkName = hint.item.locationName;
-        // tagData.typeId = "hint";
-        // tagData.text = hintToText(client, hint);
-        // tagData.tagId = `hint-${hint.item.locationName}`;
-        // tagManager.addTag(tagData, saveId);
+        hintTagger.addHint(hint.item.locationId, hintToText(client, hint));
     }
 };
-const clientSourceId = "archipelago.js_source";
+const archipelagoJS_SourceId = "archipelago.js_source";
 const setAPLocations = (client: Client, locationManager: LocationManager) => {
-    locationManager.registerSourcePriority(clientSourceId, 1);
+    locationManager.registerSourcePriority(archipelagoJS_SourceId, 1);
     locationManager.deleteAllLocations();
     client.room.allLocations.forEach((locationId) =>
         locationManager.updateLocationStatus(
-            clientSourceId,
+            archipelagoJS_SourceId,
             client.package.lookupLocationName(client.game, locationId),
             {
                 exists: true,
@@ -46,7 +40,7 @@ const setAPLocations = (client: Client, locationManager: LocationManager) => {
     );
     client.room.checkedLocations.forEach((locationId) =>
         locationManager.updateLocationStatus(
-            clientSourceId,
+            archipelagoJS_SourceId,
             client.package.lookupLocationName(client.game, locationId),
             {
                 checked: true,
@@ -70,7 +64,7 @@ const setupAPCheckSync = (
         locationManager.pauseUpdateBroadcast();
         locationIds.forEach((id) =>
             locationManager.updateLocationStatus(
-                clientSourceId,
+                archipelagoJS_SourceId,
                 client.package.lookupLocationName(client.game, id),
                 {
                     checked: true,
@@ -82,35 +76,9 @@ const setupAPCheckSync = (
     });
 
     client.items
-        .on("hintsInitialized", (hints) => {
-            hints.forEach((hint) => addHint(client, hint, hintTagger));
-            // remove once ap.js hints are fixed
-            client.storage.notify(
-                [
-                    `_read_hints_${client.players.self.team}_${client.players.self.slot}`,
-                ],
-                (_key, value: NetworkHint[], _old_value?: NetworkHint[]) => {
-                    const seenLocations = new Set(
-                        _old_value
-                            ?.filter(
-                                (nHint) =>
-                                    nHint.finding_player ===
-                                    client.players.self.slot
-                            )
-                            .map((nHint) => nHint.location)
-                    );
-                    value.forEach((nHint) => {
-                        const hint = new Hint(client, nHint);
-                        if (
-                            nHint.finding_player === client.players.self.slot &&
-                            !seenLocations.has(nHint.location)
-                        ) {
-                            addHint(client, hint, hintTagger);
-                        }
-                    });
-                }
-            );
-        })
+        .on("hintsInitialized", (hints) =>
+            hints.forEach((hint) => addHint(client, hint, hintTagger))
+        )
         .on("hintReceived", (hint) => addHint(client, hint, hintTagger));
 };
 

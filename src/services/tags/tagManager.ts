@@ -1,6 +1,5 @@
 import { naturalSort } from "../../utility/comparisons";
 import { LocationManager } from "../locations/locationManager";
-// import { randomShortId, randomUUID } from "../../utility/uuid";
 
 /** A list of properties that must be true on the entities status for a tag */
 type TagCondition = string[];
@@ -447,9 +446,11 @@ class TagManager {
                 if (tagsOnEntity.size === 0) {
                     tagsOnEntityType.delete(tag.entity_id);
                 }
-                let updateCallbacks = this.#tagListUpdateCallbacks
-                    .get(tagType.entity_type)
-                    ?.get(tag.entity_id);
+                let updateCallbacks =
+                    this.#tagListUpdateCallbacks
+                        .get(tagType.entity_type)
+                        ?.get(tag.entity_id) ?? new Set();
+
                 updateCallbacks = updateCallbacks.union(
                     this.#tagUpdateCallbacks.get(tag.tag_id) ?? new Set()
                 );
