@@ -4,6 +4,14 @@ import * as colors from "../../constants/colors";
 import ServiceContext from "../../contexts/serviceContext";
 import { EchoMessageNode } from "../../services/textClientManager";
 
+const hintStatusToColorMap: { [status: number]: string } = {
+    0: null,
+    10: colors.tertiary,
+    20: colors.trapItem,
+    30: colors.progressionItem,
+    40: colors.textClient.green,
+};
+
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
     const services = useContext(ServiceContext);
     let textColor = colors.textPrimary;
@@ -42,6 +50,12 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
                 ];
         } else if (part.color) {
             textColor = colors.textClient[part.color];
+        }
+    } else if (part.type === "hint_status") {
+        const color = hintStatusToColorMap[part.hint_status];
+        if (color) {
+            textColor = color;
+            bold = true;
         }
     }
 

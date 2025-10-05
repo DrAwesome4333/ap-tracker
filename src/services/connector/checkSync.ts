@@ -1,6 +1,6 @@
 // syncs checks with location manager
 
-import { Client, Hint } from "archipelago.js";
+import { API, Client, Hint } from "archipelago.js";
 import { LocationManager } from "../locations/locationManager";
 import HintTagger from "../tags/HintTagger";
 
@@ -16,12 +16,28 @@ const hintToText = (client: Client, hint: Hint) => {
 
     const entranceString =
         hint.entrance !== "Vanilla" ? `(${hint.entrance})` : "";
-    return `${ownerString} ${hint.item.name} is at ${hint.item.locationName} in ${finderString} world. ${entranceString}`;
+    const priorityString =
+        hint.status === API.HintStatus.unspecified
+            ? "[unspecified]"
+            : hint.status === API.HintStatus.no_priority
+              ? "[no priority]"
+              : hint.status === API.HintStatus.avoid
+                ? "[avoid]"
+                : hint.status === API.HintStatus.priority
+                  ? "[priority]"
+                  : hint.status === API.HintStatus.found
+                    ? "[found]"
+                    : "[unknown priority]";
+    return `${ownerString} ${hint.item.name} is at ${hint.item.locationName} in ${finderString} world. ${entranceString} ${priorityString}`;
 };
 
 const addHint = (client: Client, hint: Hint, hintTagger: HintTagger) => {
     if (hint.item.sender.slot === client.players.self.slot) {
-        hintTagger.addHint(hint.item.locationId, hintToText(client, hint));
+        hintTagger.addHint(
+            hint.item.locationId,
+            hintToText(client, hint),
+            hint.status
+        );
     }
 };
 const archipelagoJS_SourceId = "archipelago.js_source";
@@ -79,7 +95,8 @@ const setupAPCheckSync = (
         .on("hintsInitialized", (hints) =>
             hints.forEach((hint) => addHint(client, hint, hintTagger))
         )
-        .on("hintReceived", (hint) => addHint(client, hint, hintTagger));
+        .on("hintReceived", (hint) => addHint(client, hint, hintTagger))
+        .on("hintUpdated", (hint) => addHint(client, hint, hintTagger));
 };
 
 export { setAPLocations, setupAPCheckSync };
