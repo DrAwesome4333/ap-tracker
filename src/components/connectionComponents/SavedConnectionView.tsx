@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { primary, secondary, filledTextPrimary } from "../../constants/colors";
+import { TextButton } from "../buttons";
 
-const SavedConnectionContainer = styled.div.attrs({
+const SavedConnectionContainer = styled(TextButton).attrs({
     className: "interactive",
 })<{
     $selected?: boolean;
@@ -44,8 +45,7 @@ const SavedConnectionView = ({
     return (
         <SavedConnectionContainer
             $selected={selected}
-            data-focused={selected.toString()}
-            data-disabled={disabled.toString()}
+            disabled={disabled}
             onClick={() => onClick(connectionId)}
         >
             <div>{name}</div>

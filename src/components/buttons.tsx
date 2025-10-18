@@ -22,6 +22,7 @@ const BaseButton = styled.button.attrs({ className: "interactive" })<{
     margin: ${(props) => (props.$tiny ? "0rem 0.25rem" : "0.25rem 0.75rem")};
     font-size: ${(props) => (props.$tiny ? "0.5em" : "1em")};
     background-color: transparent;
+    cursor: pointer;
 `;
 
 const TextButton = styled.button`
