@@ -10,7 +10,6 @@ import {
     usefulItem,
     textClient,
 } from "../../constants/colors";
-import { TagEntityType } from "../../services/tags/tagManager";
 
 const InventoryItemView = forwardRef(
     (
@@ -53,15 +52,12 @@ const InventoryItemView = forwardRef(
                                         item.location
                                     )?.id ?? -1;
                                 const existingTags = locationTagger
-                                    .queryTags(
-                                        TagEntityType.location,
-                                        locationId
-                                    )
-                                    .filter((tag) => tag.type_id === "star_1");
+                                    .queryTags("star", locationId)
+                                    .filter((tag) => tag.type_id === "star");
                                 event.stopPropagation();
                                 const found = existingTags.length > 0;
                                 if (!found) {
-                                    locationTagger.addTag("star_1", locationId);
+                                    locationTagger.addTag("star", locationId);
                                 } else if (found) {
                                     locationTagger.removeTag(
                                         existingTags[0].tag_id

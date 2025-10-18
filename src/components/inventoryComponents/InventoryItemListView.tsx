@@ -78,8 +78,8 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                             fontSize="20px"
                             style={{
                                 transform: detailsOpen
-                                    ? "rotate(-180deg)"
-                                    : "rotate(0deg)",
+                                    ? "rotate(0deg)"
+                                    : "rotate(-90deg)",
                                 transition: "all 0.25s",
                                 userSelect: "none",
                             }}
