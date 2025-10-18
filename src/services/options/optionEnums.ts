@@ -4,6 +4,7 @@ enum OptionType {
     multiselect = "multiselect",
     number = "number",
     hierarchical = "hierarchical",
+    color = "color",
 }
 
 export { OptionType };

@@ -9,12 +9,14 @@ import { OptionType } from "../../services/options/optionEnums";
 
 const OptionView = ({
     option,
+    hideTitle,
     ...props
 }: {
     option: TrackerOption;
     parent?: { [propName: string]: JSONValue };
     style?: React.CSSProperties;
     className?: string;
+    hideTitle?: boolean;
     onUpdate?: (optionName: string, value: JSONValue) => void;
 }) => {
     return (
@@ -24,9 +26,17 @@ const OptionView = ({
             ) : option.type === OptionType.boolean ? (
                 <CheckboxOptionView option={option} {...props} />
             ) : option.type === OptionType.multiselect ? (
-                <MultiselectOptionView option={option} {...props} />
+                <MultiselectOptionView
+                    option={option}
+                    {...props}
+                    hideTitle={hideTitle}
+                />
             ) : option.type === OptionType.hierarchical ? (
-                <HierarchicalOptionView option={option} {...props} />
+                <HierarchicalOptionView
+                    option={option}
+                    {...props}
+                    hideTitle={hideTitle}
+                />
             ) : (
                 <p style={{ color: "red" }}>
                     Not Implemented Option type {option.type} for {option.name}

@@ -146,6 +146,39 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
             { name: "flex", display: "Grid" },
         ],
     },
+    "Tags:hint_settings": {
+        name: "Tags:hint_settings",
+        display: "Hint Tag Settings",
+        type: OptionType.hierarchical,
+        children: [
+            {
+                name: "tag",
+                display: "Tags",
+                type: OptionType.multiselect,
+                default: ["priority"],
+                choices: [
+                    { name: "priority", display: "Priority" },
+                    { name: "avoid", display: "Avoid" },
+                    { name: "found", display: "Found" },
+                    { name: "unspecified", display: "Unspecified" },
+                    { name: "no_priority", display: "No Priority" },
+                ],
+            },
+            {
+                name: "counter",
+                display: "Display Counters",
+                type: OptionType.multiselect,
+                default: ["priority"],
+                choices: [
+                    { name: "priority", display: "Priority" },
+                    { name: "avoid", display: "Avoid" },
+                    { name: "found", display: "Found" },
+                    { name: "unspecified", display: "Unspecified" },
+                    { name: "no_priority", display: "No Priority" },
+                ],
+            },
+        ],
+    },
 };
 
 export { baseTrackerOptions };

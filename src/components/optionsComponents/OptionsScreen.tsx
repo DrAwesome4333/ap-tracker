@@ -8,6 +8,7 @@ import { baseTrackerOptions } from "../../services/options/trackerOptions";
 import OptionView from "./OptionView";
 import InventorySettings from "./InventorySettings";
 import LayoutSettings from "./LayoutSettings";
+import HintSettings from "./HintTagSettings";
 
 const OptionsScreen = () => {
     const serviceContext = useContext(ServiceContext);
@@ -54,6 +55,9 @@ const OptionsScreen = () => {
                 ) : (
                     <i>Failed to initiate tracker manager</i>
                 )}
+            </OptionBlock>
+            <OptionBlock title="Hint Tag Settings">
+                <HintSettings hideTitle />
             </OptionBlock>
 
             <OptionBlock title="Attributions">

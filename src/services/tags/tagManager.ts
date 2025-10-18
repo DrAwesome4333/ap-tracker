@@ -1,3 +1,4 @@
+import { IconParams } from "../../components/icons/icons";
 import { naturalSort } from "../../utility/comparisons";
 import { LocationManager } from "../locations/locationManager";
 
@@ -13,6 +14,8 @@ interface TagCounterV2 {
     color: string;
     /** Which icon to use for the counter */
     icon_id: string;
+    /** Tweak the appearance of icons */
+    icon_spec?: IconParams;
     /** If true counter wil display "count/total", else it will display as "count" */
     show_total: boolean;
     /**
@@ -34,6 +37,7 @@ type TagCounterResult = {
     display_name: string;
     color: string;
     icon_id: string;
+    icon_spec: IconParams;
     count: number;
     total?: number;
 };
@@ -51,6 +55,7 @@ interface TagTypeV2Data {
     display_name: string;
     type_id: string;
     icon_id: string;
+    icon_spec?: IconParams;
     entity_type: TagEntityType;
     icon_color?: string;
     text_color?: string;
@@ -65,6 +70,7 @@ interface TagTypeV2 {
     display_name: string;
     type_id: string;
     icon_id: string;
+    icon_spec: IconParams;
     source_id: string;
     entity_type: TagEntityType;
     icon_color?: string;
@@ -147,6 +153,9 @@ class TagManager {
         counters: Map<string, TagCounterResult>
     ) => {
         const counter = this.#tagCounters.get(counterId);
+        if (!counter) {
+            return false;
+        }
         const count = this.#evaluateTagCondition(
             counter.count_filter ?? [[]],
             status
@@ -159,6 +168,7 @@ class TagManager {
             display_name: counter.display_name,
             color: counter.color,
             icon_id: counter.icon_id,
+            icon_spec: counter.icon_spec ?? {},
             count: 0,
             total: counter.show_total ? 0 : null,
         };
@@ -238,7 +248,7 @@ class TagManager {
         status?: { [status_name: string]: boolean }
     ) => {
         let tagType = this.#tagTypes.get(typeId) ?? null;
-        if (tagType?.variants) {
+        if (tagType?.variants && status) {
             for (const variantDef of tagType.variants) {
                 if (variantDef[0].every((status_name) => status[status_name])) {
                     tagType = this.#tagTypes.get(
@@ -373,6 +383,7 @@ class TagManager {
     };
 
     #updateTags = (tags: TagDataV2[]) => {
+        console.log("Tags updated");
         let triggeredCallbacks: Set<() => void> = new Set();
         this.#locationManager?.pauseUpdateBroadcast();
         tags.forEach((tag) => {
@@ -473,12 +484,14 @@ class TagManager {
                 `Duplicate tag type ${tagTypeData.type_id}, a duplicate tag type cannot be added.`
             );
         }
-        const tagType = {
+        const tagType: TagTypeV2 = {
             ...tagTypeData,
             source_id: sourceId,
+            icon_spec: tagTypeData.icon_spec ?? {},
         };
         this.#tagTypes.set(tagTypeData.type_id, tagType);
         const variants = tagTypeData.variants ?? [];
+        Object.freeze(tagType);
         for (const variantDef of variants) {
             const [_, variance] = variantDef;
             const variant: TagTypeV2 = {
@@ -487,6 +500,7 @@ class TagManager {
                 type_id: computeVariantName(tagTypeData.type_id, variantDef),
                 source_id: sourceId,
                 user_managed: false,
+                icon_spec: tagTypeData.icon_spec ?? {},
             };
 
             delete variant.variants;
@@ -615,4 +629,5 @@ export type {
     TagSource,
     TagCounterResult,
     TagCounterV2,
+    TagVariantDef,
 };

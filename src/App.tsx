@@ -58,7 +58,7 @@ const optionManager = globalOptionManager;
 const tagManager = new TagManager();
 tagManager.enableLocationEffects(locationManager);
 const locationTagger = new LocationTagger();
-const hintTagger = new HintTagger();
+const hintTagger = new HintTagger(optionManager);
 tagManager.addSource(locationTagger);
 tagManager.addSource(hintTagger);
 const mainTrackerManagerStore = new LocalStorageDataStore(

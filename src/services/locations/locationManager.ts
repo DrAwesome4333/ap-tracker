@@ -189,6 +189,7 @@ class LocationManager {
      */
     getSubscriberCallback = (locationName: Set<string> | string) => {
         return (listener: (updatedLocations: Set<string>) => void) => {
+            //console.log("SUB")
             let locationNames: Set<string> = null;
             if (typeof locationName === "string") {
                 locationNames = new Set([locationName]);

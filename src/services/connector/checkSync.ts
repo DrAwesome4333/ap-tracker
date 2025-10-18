@@ -40,6 +40,22 @@ const addHint = (client: Client, hint: Hint, hintTagger: HintTagger) => {
         );
     }
 };
+
+const addHints = (
+    client: Client,
+    archipelagoHints: Hint[],
+    hintTagger: HintTagger
+) => {
+    const hints = archipelagoHints
+        .filter((hint) => hint.item.sender.slot === client.players.self.slot)
+        .map((hint) => ({
+            location: hint.item.locationId,
+            text: hintToText(client, hint),
+            status: hint.status,
+        }));
+    hintTagger.addHints(hints);
+};
+
 const archipelagoJS_SourceId = "archipelago.js_source";
 const setAPLocations = (client: Client, locationManager: LocationManager) => {
     locationManager.registerSourcePriority(archipelagoJS_SourceId, 1);
@@ -92,9 +108,7 @@ const setupAPCheckSync = (
     });
 
     client.items
-        .on("hintsInitialized", (hints) =>
-            hints.forEach((hint) => addHint(client, hint, hintTagger))
-        )
+        .on("hintsInitialized", (hints) => addHints(client, hints, hintTagger))
         .on("hintReceived", (hint) => addHint(client, hint, hintTagger))
         .on("hintUpdated", (hint) => addHint(client, hint, hintTagger));
 };

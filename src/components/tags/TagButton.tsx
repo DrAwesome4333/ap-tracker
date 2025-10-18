@@ -28,6 +28,7 @@ const TagButton = ({
     const iconStyle: IconParams = {
         fill: tagOnEntity ? 1 : 0,
         grade: tagOnEntity ? 200 : -25,
+        ...tagType.icon_spec,
     };
 
     return (

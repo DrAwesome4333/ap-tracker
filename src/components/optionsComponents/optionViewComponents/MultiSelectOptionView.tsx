@@ -10,12 +10,14 @@ const MultiselectOptionView = ({
     style,
     className,
     parent,
+    hideTitle,
     onUpdate,
 }: {
     option: MultiselectOption;
     style?: React.CSSProperties;
     className?: string;
     parent?: { [propName: string]: JSONValue };
+    hideTitle?: boolean;
     onUpdate?: (optionName: string, value: string[]) => void;
 }) => {
     const services = useContext(ServiceContext);
@@ -41,7 +43,7 @@ const MultiselectOptionView = ({
     };
     return (
         <div className={className} style={style}>
-            <h4>{option.display ?? option.name}</h4>
+            {!hideTitle && <h4>{option.display ?? option.name}</h4>}
             {option.choices.map((choice) => {
                 const name = typeof choice === "string" ? choice : choice.name;
                 const display =

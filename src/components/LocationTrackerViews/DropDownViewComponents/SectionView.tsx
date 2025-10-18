@@ -248,6 +248,7 @@ const SectionView = ({
                                         <Icon
                                             fontSize="14px"
                                             type={counter.icon_id}
+                                            iconParams={counter.icon_spec}
                                         />
                                         {counter.count}
                                         {counter.total !== null &&
@@ -255,31 +256,6 @@ const SectionView = ({
                                     </i>
                                 );
                             })}
-                            {/* {[...(section?.locationReport.tagCounts ?? [])].map(
-                                ([id, values]) => {
-                                    const counterType =
-                                        tagManager?.getCounter(id);
-                                    return (
-                                        <i
-                                            key={id}
-                                            style={{
-                                                color: counterType?.color,
-                                            }}
-                                            title={counterType?.displayName}
-                                        >
-                                            {counterType?.icon && (
-                                                <Icon
-                                                    fontSize="14px"
-                                                    type={counterType.icon}
-                                                />
-                                            )}
-                                            {values.size}
-                                            {counterType?.showTotal &&
-                                                `/${section?.locationReport.tagTotals.get(id)?.size ?? 0}`}{" "}
-                                        </i>
-                                    );
-                                }
-                            )} */}
                             {isClosable ? (
                                 <Icon
                                     iconParams={{
@@ -292,8 +268,8 @@ const SectionView = ({
                                     fontSize="24px"
                                     style={{
                                         transform: isOpen
-                                            ? "rotate(-180deg)"
-                                            : "rotate(0deg)",
+                                            ? "rotate(0deg)"
+                                            : "rotate(-90deg)",
                                         transition: "all 0.25s",
                                         userSelect: "none",
                                     }}

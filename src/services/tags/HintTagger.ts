@@ -12,86 +12,110 @@ import {
     TagEntityType,
     TagSource,
     TagTypeV2,
+    TagVariantDef,
 } from "./tagManager";
+import { OptionManager } from "../options/optionManager";
 
-const hintTag_unspecified: TagTypeV2 = {
-    type_id: "hint_unspecified",
-    icon_id: "bookmark_flag",
-    icon_color: usefulItem,
+const baseHint: {
+    entity_type: TagEntityType;
+    priority: number;
+    variants: TagVariantDef[];
+} = {
+    entity_type: TagEntityType.location,
+    priority: 60,
+    variants: [
+        [
+            ["ignored"],
+            { icon_color: "yellow", icon_id: "flag_check", counter_id: null },
+        ],
+    ],
+};
+
+const hintTagTypes: { [status: number]: TagTypeV2[] } = {
+    [API.HintStatus.unspecified]: [
+        {
+            ...baseHint,
+            type_id: "hint_unspecified",
+            icon_id: "bookmark_flag",
+            icon_color: usefulItem,
+            display_name: "Hint (Unspecified)",
+            counter_id: "hint_unspecified",
+            icon_spec: {
+                fill: 1,
+            },
+        },
+    ],
+    [API.HintStatus.no_priority]: [
+        {
+            ...baseHint,
+            type_id: "hint_no_priority",
+            icon_id: "bookmark_flag",
+            icon_color: normalItem,
+            display_name: "Hint (No priority)",
+            counter_id: "hint_no_priority",
+            icon_spec: {
+                fill: 1,
+            },
+        },
+    ],
+    [API.HintStatus.avoid]: [
+        {
+            ...baseHint,
+            type_id: "hint_avoid",
+            icon_id: "bomb",
+            icon_color: trapItem,
+            display_name: "Hint (avoid)",
+            counter_id: "hint_avoid",
+        },
+    ],
+    [API.HintStatus.priority]: [
+        {
+            ...baseHint,
+            type_id: "hint_priority",
+            icon_id: "flag",
+            icon_color: progressionItem,
+            display_name: "Hint (Priority)",
+            counter_id: "hint_priority",
+        },
+    ],
+    [API.HintStatus.found]: [
+        {
+            ...baseHint,
+            type_id: "hint_found",
+            icon_id: "flag_check",
+            icon_color: "green",
+            display_name: "Hint (Found)",
+            counter_id: "hint_found",
+            variants: null,
+        },
+    ],
+};
+
+// create no counter versions of types, create array with all types
+const hintTagTypeArray = [];
+Object.entries(hintTagTypes).forEach(([_name, types]) => {
+    const counterFreeCopy = { ...types[0] };
+    counterFreeCopy.counter_id = null;
+    counterFreeCopy.type_id += "_no_counter";
+    types.push(counterFreeCopy);
+    Object.freeze(types[0]);
+    Object.freeze(types[1]);
+    hintTagTypeArray.push(...types);
+});
+Object.freeze(hintTagTypeArray);
+
+const hintCounter_unspecified: TagCounterV2 = {
+    counter_id: "hint_unspecified",
     display_name: "Hint (Unspecified)",
-    entity_type: TagEntityType.location,
-    counter_id: "hint_unspecified_no-priority",
-    priority: 60,
-    variants: [
-        [
-            ["ignored"],
-            { icon_color: "yellow", icon_id: "flag_check", counter_id: null },
-        ],
-    ],
-};
-
-const hintTag_noPriority: TagTypeV2 = {
-    type_id: "hint_no_priority",
-    icon_id: "bookmark_flag",
-    icon_color: normalItem,
-    display_name: "Hint (No Priority)",
-    entity_type: TagEntityType.location,
-    counter_id: "hint_unspecified_no-priority",
-    priority: 60,
-    variants: [
-        [
-            ["ignored"],
-            { icon_color: "yellow", icon_id: "flag_check", counter_id: null },
-        ],
-    ],
-};
-
-const hintTag_avoid: TagTypeV2 = {
-    type_id: "hint_avoid",
-    icon_id: "bomb",
-    icon_color: trapItem,
-    display_name: "Hint (Avoid)",
-    entity_type: TagEntityType.location,
-    counter_id: "hint_avoid",
-    priority: 60,
-    variants: [
-        [
-            ["ignored"],
-            { icon_color: "yellow", icon_id: "flag_check", counter_id: null },
-        ],
-    ],
-};
-
-const hintTag_priority: TagTypeV2 = {
-    type_id: "hint_priority",
-    icon_id: "flag",
-    icon_color: progressionItem,
-    display_name: "Hint (Priority)",
-    entity_type: TagEntityType.location,
-    counter_id: "hint_priority",
-    priority: 60,
-    variants: [
-        [
-            ["ignored"],
-            { icon_color: "yellow", icon_id: "flag_check", counter_id: null },
-        ],
-    ],
-};
-
-const hintTag_found: TagTypeV2 = {
-    type_id: "hint_found",
-    icon_id: "flag_check",
-    icon_color: "green",
-    display_name: "Hint (Found)",
-    entity_type: TagEntityType.location,
-    priority: 60,
-    counter_id: "hint_found",
-};
-
-const hintCounter_unspecified_no_priority: TagCounterV2 = {
-    counter_id: "hint_unspecified_no-priority",
-    display_name: "Hint (Unspecified/No Priority)",
     color: usefulItem,
+    icon_id: "bookmark_flag",
+    show_total: false,
+};
+
+const hintCounter_no_priority: TagCounterV2 = {
+    counter_id: "hint_no_priority",
+    display_name: "Hint (No Priority)",
+    color: normalItem,
     icon_id: "bookmark_flag",
     show_total: false,
 };
@@ -120,36 +144,75 @@ const hintCounter_found: TagCounterV2 = {
     show_total: false,
 };
 
-const hintStatusTypeMap: { [status: number]: TagTypeV2 } = {
-    [API.HintStatus.unspecified]: hintTag_unspecified,
-    [API.HintStatus.no_priority]: hintTag_noPriority,
-    [API.HintStatus.avoid]: hintTag_avoid,
-    [API.HintStatus.priority]: hintTag_priority,
-    [API.HintStatus.found]: hintTag_found,
-};
+const nameToStatus = [
+    {
+        status: API.HintStatus.unspecified,
+        name: "unspecified",
+    },
+    {
+        status: API.HintStatus.no_priority,
+        name: "no_priority",
+    },
+    {
+        status: API.HintStatus.priority,
+        name: "priority",
+    },
+    {
+        status: API.HintStatus.avoid,
+        name: "avoid",
+    },
+    {
+        status: API.HintStatus.found,
+        name: "found",
+    },
+];
 
 class HintTagger implements TagSource {
     id = "hint_tagger";
     #hintTags: Map<string, TagDataV2> = new Map();
+    #hints: Map<
+        number,
+        { location: number; text: string; status: API.HintStatus }
+    > = new Map();
     #locationToTag: Map<number, string> = new Map();
+    #allowHintTypes: Set<API.HintStatus> = new Set();
+    #countedHintTypes: Set<API.HintStatus> = new Set();
     #updateCallbacks: Set<
         (tagChanges: { updated?: TagDataV2[]; removed?: string[] }) => void
     > = new Set();
-    constructor() {}
+    constructor(optionManager: OptionManager) {
+        const optionUpdate = () => {
+            const allowedCounters = optionManager.getOptionValue(
+                "Tags:hint_settings",
+                "global"
+            ) as { tag: string[]; counter: string[] };
+            const allowedHintTypes = nameToStatus
+                .filter((s) => allowedCounters.tag.includes(s.name))
+                .map((s) => s.status);
+            const allowedCounterTypes = nameToStatus
+                .filter((s) => allowedCounters.counter.includes(s.name))
+                .map((s) => s.status);
+            this.#allowHintTypes = new Set(allowedHintTypes);
+            this.#countedHintTypes = new Set(allowedCounterTypes);
+            this.#refreshHints();
+        };
+        const subscriber = optionManager.getSubscriberCallback(
+            "Tags:hint_settings",
+            "global"
+        );
+        subscriber(optionUpdate);
+        optionUpdate();
+    }
 
     getCounters = () => [
-        hintCounter_unspecified_no_priority,
+        hintCounter_unspecified,
+        hintCounter_no_priority,
         hintCounter_avoid,
         hintCounter_priority,
         hintCounter_found,
     ];
-    getTypes = () => [
-        hintTag_unspecified,
-        hintTag_noPriority,
-        hintTag_avoid,
-        hintTag_priority,
-        hintTag_found,
-    ];
+
+    getTypes = () => hintTagTypeArray;
     getTags = (ids?: string[]) => {
         if (ids) {
             const results = ids
@@ -171,18 +234,6 @@ class HintTagger implements TagSource {
         };
     };
 
-    removeHint = (locationId: number) => {
-        if (!this.#locationToTag.has(locationId)) {
-            return;
-        }
-        const tagId = this.#locationToTag.get(locationId);
-        this.#hintTags.delete(tagId);
-        this.#locationToTag.delete(locationId);
-        this.#updateCallbacks.forEach((callback) =>
-            callback({ removed: [tagId] })
-        );
-    };
-
     removeHints = (locationIds: number[]) => {
         const filteredIds = locationIds.filter((id) =>
             this.#locationToTag.has(id)
@@ -190,54 +241,79 @@ class HintTagger implements TagSource {
         const tagIds = filteredIds.map((id) => this.#locationToTag.get(id));
 
         tagIds.forEach((tagId) => this.#hintTags.delete(tagId));
-        filteredIds.forEach((locationId) =>
-            this.#locationToTag.delete(locationId)
-        );
+        filteredIds.forEach((locationId) => {
+            this.#locationToTag.delete(locationId);
+            this.#hints.delete(locationId);
+        });
         this.#updateCallbacks.forEach((callback) =>
             callback({ removed: tagIds })
         );
     };
 
-    addHint = (locationId: number, text: string, status: number) => {
-        if (this.#locationToTag.has(locationId)) {
-            this.removeHint(locationId);
-        }
-        const tagType = hintStatusTypeMap[status];
-        const tag: TagDataV2 = {
-            tag_id: randomShortId(),
-            type_id: tagType.type_id,
-            data: text,
-            entity_id: locationId,
-        };
-        this.#locationToTag.set(locationId, tag.tag_id);
-        this.#hintTags.set(tag.tag_id, tag);
+    removeHint = (location: number) => {
+        this.removeHints([location]);
+    };
+
+    addHints = (
+        hints: { location: number; text: string; status: API.HintStatus }[]
+    ) => {
+        hints.forEach((hint) => {
+            this.#hints.set(hint.location, hint);
+        });
+        this.#refreshHints();
+    };
+
+    addHint = (location: number, text: string, status: API.HintStatus) => {
+        this.addHints([{ location, text, status }]);
+    };
+
+    #refreshHints = () => {
+        const tagsToRemove = [];
+        const newTags = [];
+        this.#hints.forEach((hint) => {
+            const tagAllowed = this.#allowHintTypes.has(hint.status);
+            const useCounterType = this.#countedHintTypes.has(hint.status);
+            const existingTag = this.#hintTags.get(
+                this.#locationToTag.get(hint.location)
+            );
+            const typeIndex = useCounterType ? 0 : 1;
+            const desiredTagType = hintTagTypes[hint.status][typeIndex];
+
+            if (tagAllowed && existingTag?.type_id === desiredTagType.type_id) {
+                return; // no need to change anything
+            }
+
+            if (existingTag) {
+                tagsToRemove.push(existingTag.tag_id);
+            }
+
+            if (!tagAllowed) {
+                return; // tag only needed to be removed
+            }
+
+            // create new tag
+            const tag: TagDataV2 = {
+                tag_id: randomShortId(),
+                type_id: desiredTagType.type_id,
+                data: hint.text,
+                entity_id: hint.location,
+            };
+            this.#locationToTag.set(hint.location, tag.tag_id);
+            this.#hintTags.set(tag.tag_id, tag);
+            newTags.push(tag);
+        });
+        tagsToRemove.forEach((tagId) => this.#hintTags.delete(tagId));
+
         this.#updateCallbacks.forEach((callback) =>
-            callback({ updated: [tag] })
+            callback({
+                updated: newTags,
+                removed: tagsToRemove,
+            })
         );
     };
 
-    addHints = (locationIds: number[], texts: string[], statuses: number[]) => {
-        locationIds.forEach((locationId, index) => {
-            if (this.#locationToTag.has(locationId)) {
-                this.removeHint(locationId);
-            }
-            const tagType = hintStatusTypeMap[statuses[index]];
-            const tag: TagDataV2 = {
-                tag_id: randomShortId(),
-                type_id: tagType.type_id,
-                data: texts[index],
-                entity_id: locationId,
-            };
-            this.#locationToTag.set(locationId, tag.tag_id);
-            this.#hintTags.set(tag.tag_id, tag);
-        });
-        this.#updateCallbacks.forEach((callback) =>
-            callback({
-                updated: locationIds.map((id) =>
-                    this.#hintTags.get(this.#locationToTag.get(id))
-                ),
-            })
-        );
+    clear = () => {
+        this.removeHints([...this.#locationToTag.keys()]);
     };
 }
 

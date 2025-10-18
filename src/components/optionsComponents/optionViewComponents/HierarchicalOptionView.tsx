@@ -10,11 +10,13 @@ const HierarchicalOptionView = ({
     style,
     className,
     parent,
+    hideTitle,
     onUpdate,
 }: {
     option: HierarchicalOption;
     style?: React.CSSProperties;
     className?: string;
+    hideTitle?: boolean;
     parent?: { [propName: string]: JSONValue };
     onUpdate?: (
         optionName: string,
@@ -41,7 +43,7 @@ const HierarchicalOptionView = ({
     };
     return (
         <div className={className} style={style}>
-            <h3>{option.display ?? option.name}</h3>
+            {!hideTitle && <h3>{option.display ?? option.name}</h3>}
             <div
                 style={{
                     marginLeft: "0.5em",

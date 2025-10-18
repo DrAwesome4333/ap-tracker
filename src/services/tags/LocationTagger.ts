@@ -80,6 +80,9 @@ const types: TagTypeV2[] = [
         effects: {
             ignored: true,
         },
+        icon_spec: {
+            fill: 0,
+        },
     },
 ];
 

@@ -64,10 +64,12 @@ const LocationView = forwardRef(
             ? "check_small"
             : "check_indeterminate_small";
         let iconColor = textPrimary;
+        let iconSpec = {};
 
         if (displayedTagType) {
             iconType = displayedTagType.icon_id;
             iconColor = displayedTagType.icon_color ?? iconColor;
+            iconSpec = displayedTagType.icon_spec;
         }
 
         return (
@@ -103,6 +105,7 @@ const LocationView = forwardRef(
                             fontSize="14px"
                             type={iconType}
                             style={{ color: iconColor }}
+                            iconParams={iconSpec}
                         />{" "}
                         {status.displayName ?? location}
                     </TextButton>

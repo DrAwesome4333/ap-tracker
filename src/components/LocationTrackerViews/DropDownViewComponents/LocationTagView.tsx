@@ -35,6 +35,7 @@ const LocationTagView = ({
                 style={{
                     color: tagType.icon_color ?? textPrimary,
                 }}
+                iconParams={tagType.icon_spec}
             />{" "}
             {tag.data ?? tagType.display_name}
         </div>
