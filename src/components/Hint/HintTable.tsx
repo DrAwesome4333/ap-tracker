@@ -7,11 +7,12 @@ import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
 import { naturalSort } from "../../utility/comparisons";
 import { HintFilter } from "./HintOptionDef";
 
-const rowGenerator: RowGenerator<Hint> = ({ ref, item }) => {
+const rowGenerator: RowGenerator<Hint> = ({ ref, item, index }) => {
     return (
         <HintRow
             key={item.uniqueKey}
             hint={item}
+            odd={index % 2 === 1}
             ref={ref as React.ForwardedRef<HTMLDivElement>}
         />
     );
@@ -36,11 +37,11 @@ const HintTable = ({
         let passesPlayerFilter = false;
         let passesStatusFilter = false;
         let passesSearchKeyFilter = false;
-        if (filters.ownItems && hint.item.receiver.slot === playerSlot) {
+        if (filters.own.includes("items") && hint.item.receiver.slot === playerSlot) {
             passesPlayerFilter = true;
         }
 
-        if (filters.ownLocations && hint.item.sender.slot === playerSlot) {
+        if (filters.own.includes("locations") && hint.item.sender.slot === playerSlot) {
             passesPlayerFilter = true;
         }
 
@@ -86,7 +87,7 @@ const HintTable = ({
     return (
         <LargeList<Hint>
             items={filteredHints}
-            defaultRowSize={19}
+            defaultRowSize={24}
             rowGenerator={rowGenerator}
             style={{
                 boxSizing: "border-box",

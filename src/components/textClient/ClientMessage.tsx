@@ -23,6 +23,9 @@ const ClientMessage = forwardRef(
         return (
             <div
                 ref={ref}
+                style={{
+                    padding: "0.12em",
+                }}
                 onDoubleClick={async () => {
                     if (!copyOnDblClick) {
                         return;

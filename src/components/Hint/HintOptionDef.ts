@@ -7,8 +7,7 @@ import {
     setOptionDefaults,
 } from "../../services/options/optionManager";
 type HintFilter = {
-    ownItems: boolean;
-    ownLocations: boolean;
+    own: string[];
     status: string[];
     sort: "status" | "sender" | "receiver";
 };
@@ -28,17 +27,11 @@ const optionDef: HierarchicalOption = {
     scope: optionScope,
     children: [
         {
-            type: OptionType.boolean,
-            name: "ownItems",
-            default: true,
-            display: "Show My Hinted Items",
-            scope: optionScope,
-        },
-        {
-            type: OptionType.boolean,
-            name: "ownLocations",
-            default: true,
-            display: "Show My Hinted Locations",
+            type: OptionType.multiselect,
+            display: "Show My",
+            name: "own",
+            choices: [{display:"Items", name:"items"}, {display:"Locations", name:"locations"}],
+            default: ["items", "locations"],
             scope: optionScope,
         },
         {

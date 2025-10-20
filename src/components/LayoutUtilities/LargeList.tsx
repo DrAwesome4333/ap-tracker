@@ -11,9 +11,11 @@ import { VariableSizeList } from "react-window";
 type RowGenerator<T> = ({
     ref,
     item,
+    index,
 }: {
     ref: React.ForwardedRef<HTMLElement>;
     item: T;
+    index: number,
 }) => React.ReactNode;
 
 type ListContextData<T> = {
@@ -68,6 +70,7 @@ const Row = <T,>({
             {listContext.rowGenerator({
                 ref: rowRef,
                 item: listContext.items[index],
+                index,
             })}
         </div>
     );

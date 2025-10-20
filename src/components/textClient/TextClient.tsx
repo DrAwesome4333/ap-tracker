@@ -81,7 +81,7 @@ const TextClient = () => {
 
                 <LargeList<APMessage>
                     items={messages}
-                    defaultRowSize={19}
+                    defaultRowSize={23}
                     rowGenerator={rowGenerator}
                     style={{
                         boxSizing: "border-box",

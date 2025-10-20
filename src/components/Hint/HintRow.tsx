@@ -38,7 +38,7 @@ const getItemColor = (item: Item) => {
 };
 
 const HintRow = forwardRef(
-    ({ hint }: { hint: Hint }, ref: React.ForwardedRef<HTMLDivElement>) => {
+    ({ hint, odd }: { hint: Hint, odd: boolean }, ref: React.ForwardedRef<HTMLDivElement>) => {
         const services = useContext(ServiceContext);
         const playerSlot =
             services.connector?.connection.client.players.self.slot;
@@ -50,14 +50,13 @@ const HintRow = forwardRef(
             setUpdateInProgress(false);
         }, [setUpdateInProgress]);
         return (
-            <div ref={ref}>
-                <div
-                    style={{
+            <div ref={ref} style={{
                         display: "flex",
                         width: "100%",
                         gap: "0.25em",
-                    }}
-                >
+                        padding: "0.12em",
+                        background: odd ? "rgba(128, 128, 128, 0.12)" : "",
+                    }}>
                     <div>
                         <span
                             style={{
@@ -130,7 +129,7 @@ const HintRow = forwardRef(
                             <></>
                         )}
                     </div>
-                </div>
+
             </div>
         );
     }
