@@ -18,7 +18,7 @@ import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
 import GenericTrackerRepository from "../tracker/generic/genericTrackerRepository";
-import HintTagger from "../tags/HintTagger";
+import HintManager from "../HintManager";
 
 const CONNECTION_STATUS = {
     disconnected: "Disconnected",
@@ -63,7 +63,7 @@ const createConnector = (
     inventoryManger: InventoryManager,
     _entranceManager: EntranceManager,
     tagManager: TagManager,
-    hintTagger: HintTagger,
+    hintManager: HintManager,
     trackerManager: TrackerManager,
     textClientManager: TextClientManager,
     genericTrackerRepository: GenericTrackerRepository
@@ -151,7 +151,7 @@ const createConnector = (
         "global"
     )(toggleText);
 
-    setupAPCheckSync(client, locationManager, hintTagger);
+    setupAPCheckSync(client, locationManager, hintManager);
     setupAPInventorySync(client, inventoryManger);
     setupAPTextSync(client, textClientManager);
 

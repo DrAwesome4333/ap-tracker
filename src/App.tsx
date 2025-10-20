@@ -28,6 +28,7 @@ import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTr
 import { LocationTracker } from "./services/tracker/locationTrackers/locationTrackers";
 import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
 import HintTagger from "./services/tags/HintTagger";
+import HintManager from "./services/HintManager";
 
 const AppScreen = styled.div`
     position: absolute;
@@ -61,6 +62,7 @@ const locationTagger = new LocationTagger();
 const hintTagger = new HintTagger(optionManager);
 tagManager.addSource(locationTagger);
 tagManager.addSource(hintTagger);
+const hintManager = new HintManager(hintTagger);
 const mainTrackerManagerStore = new LocalStorageDataStore(
     "AP_ChecklistTracker_TrackerChoices"
 );
@@ -87,7 +89,7 @@ const connector = createConnector(
     inventoryManager,
     entranceManager,
     tagManager,
-    hintTagger,
+    hintManager,
     trackerManager,
     textClientManager,
     genericTrackerRepository
@@ -155,6 +157,7 @@ const App = (): React.ReactNode => {
                             genericTrackerRepository,
                             locationTagger,
                             hintTagger,
+                            hintManager,
                         }}
                     >
                         <NotificationContainer />

@@ -193,7 +193,7 @@ const parseOption = (
         } else {
             optionManager.setOptionDefault(
                 option.name,
-                "global",
+                option.scope ?? "global",
                 option.default
             );
         }
@@ -205,7 +205,11 @@ const parseOption = (
         if (parent) {
             parent[option.name] = value;
         } else {
-            optionManager.setOptionDefault(option.name, "global", value);
+            optionManager.setOptionDefault(
+                option.name,
+                option.scope ?? "global",
+                value
+            );
         }
     }
 };

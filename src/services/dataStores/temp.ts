@@ -19,7 +19,7 @@ class TempDataStore implements DataStore {
     };
 
     read = (itemName?: string) => {
-        return itemName ? this.#value[itemName] : this.#value;
+        return itemName ? this.#value?.[itemName] : this.#value;
     };
 
     write = async (value: JSONValue, itemName?: string) => {

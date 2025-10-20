@@ -1,60 +1,8 @@
 // syncs checks with location manager
 
-import { API, Client, Hint } from "archipelago.js";
+import { Client } from "archipelago.js";
 import { LocationManager } from "../locations/locationManager";
-import HintTagger from "../tags/HintTagger";
-
-const hintToText = (client: Client, hint: Hint) => {
-    let ownerString = `${hint.item.receiver.alias}'s`;
-    if (hint.item.receiver.slot === client.players.self.slot) {
-        ownerString = "Your";
-    }
-    let finderString = `${hint.item.sender.alias}'s`;
-    if (hint.item.sender.slot === client.players.self.slot) {
-        finderString = "your";
-    }
-
-    const entranceString =
-        hint.entrance !== "Vanilla" ? `(${hint.entrance})` : "";
-    const priorityString =
-        hint.status === API.HintStatus.unspecified
-            ? "[unspecified]"
-            : hint.status === API.HintStatus.no_priority
-              ? "[no priority]"
-              : hint.status === API.HintStatus.avoid
-                ? "[avoid]"
-                : hint.status === API.HintStatus.priority
-                  ? "[priority]"
-                  : hint.status === API.HintStatus.found
-                    ? "[found]"
-                    : "[unknown priority]";
-    return `${ownerString} ${hint.item.name} is at ${hint.item.locationName} in ${finderString} world. ${entranceString} ${priorityString}`;
-};
-
-const addHint = (client: Client, hint: Hint, hintTagger: HintTagger) => {
-    if (hint.item.sender.slot === client.players.self.slot) {
-        hintTagger.addHint(
-            hint.item.locationId,
-            hintToText(client, hint),
-            hint.status
-        );
-    }
-};
-
-const addHints = (
-    client: Client,
-    archipelagoHints: Hint[],
-    hintTagger: HintTagger
-) => {
-    const hints = archipelagoHints
-        .filter((hint) => hint.item.sender.slot === client.players.self.slot)
-        .map((hint) => ({
-            location: hint.item.locationId,
-            text: hintToText(client, hint),
-            status: hint.status,
-        }));
-    hintTagger.addHints(hints);
-};
+import HintManager from "../HintManager";
 
 const archipelagoJS_SourceId = "archipelago.js_source";
 const setAPLocations = (client: Client, locationManager: LocationManager) => {
@@ -90,7 +38,7 @@ const setAPLocations = (client: Client, locationManager: LocationManager) => {
 const setupAPCheckSync = (
     client: Client,
     locationManager: LocationManager,
-    hintTagger: HintTagger
+    hintManager: HintManager
 ) => {
     client.room.on("locationsChecked", (locationIds) => {
         locationManager.pauseUpdateBroadcast();
@@ -107,10 +55,7 @@ const setupAPCheckSync = (
         locationManager.resumeUpdateBroadcast();
     });
 
-    client.items
-        .on("hintsInitialized", (hints) => addHints(client, hints, hintTagger))
-        .on("hintReceived", (hint) => addHint(client, hint, hintTagger))
-        .on("hintUpdated", (hint) => addHint(client, hint, hintTagger));
+    hintManager.initializeListeners(client);
 };
 
 export { setAPLocations, setupAPCheckSync };
