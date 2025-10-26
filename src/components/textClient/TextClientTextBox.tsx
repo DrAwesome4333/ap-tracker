@@ -55,7 +55,11 @@ const TextClientTextBox = () => {
                 $small
                 disabled={sendingMessage}
             >
-                {sendingMessage ? <Spinner style={{height:"18px"}}/> : "Send"}
+                {sendingMessage ? (
+                    <Spinner style={{ height: "18px" }} />
+                ) : (
+                    "Send"
+                )}
             </PrimaryButton>
             <Input
                 label=""

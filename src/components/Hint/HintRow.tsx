@@ -9,6 +9,7 @@ import {
     usefulItem,
 } from "../../constants/colors";
 import Spinner from "../icons/spinner";
+import { RowComponentProps } from "react-window";
 const statusSelections = [
     API.HintStatus.priority,
     API.HintStatus.avoid,
@@ -38,7 +39,12 @@ const getItemColor = (item: Item) => {
 };
 
 const HintRow = forwardRef(
-    ({ hint, odd }: { hint: Hint, odd: boolean }, ref: React.ForwardedRef<HTMLDivElement>) => {
+    (
+        { hints, index, style }: RowComponentProps<{ hints: Hint[] }>,
+        ref: React.ForwardedRef<HTMLDivElement>
+    ) => {
+        const hint = hints[index];
+        const odd = index % 2 === 1;
         const services = useContext(ServiceContext);
         const playerSlot =
             services.connector?.connection.client.players.self.slot;
@@ -50,86 +56,89 @@ const HintRow = forwardRef(
             setUpdateInProgress(false);
         }, [setUpdateInProgress]);
         return (
-            <div ref={ref} style={{
-                        display: "flex",
-                        width: "100%",
-                        gap: "0.25em",
-                        padding: "0.12em",
-                        background: odd ? "rgba(128, 128, 128, 0.12)" : "",
-                    }}>
-                    <div>
-                        <span
-                            style={{
-                                color: getPlayerColor(
-                                    playerSlot,
-                                    hint.item.receiver.slot
-                                ),
+            <div
+                ref={ref}
+                style={{
+                    ...style,
+                    display: "flex",
+                    width: "98%",
+                    gap: "0.25em",
+                    padding: "0.12em",
+                    background: odd ? "rgba(128, 128, 128, 0.12)" : "",
+                }}
+            >
+                <div>
+                    <span
+                        style={{
+                            color: getPlayerColor(
+                                playerSlot,
+                                hint.item.receiver.slot
+                            ),
+                        }}
+                    >
+                        {hint.item.receiver.alias}
+                    </span>
+                    {"'s"}{" "}
+                    <span
+                        style={{
+                            color: getItemColor(hint.item),
+                        }}
+                    >
+                        {hint.item.name}
+                    </span>{" "}
+                    is at{" "}
+                    <span style={{ color: textClient.green }}>
+                        {hint.item.locationName}
+                    </span>{" "}
+                    (
+                    <span style={{ color: textClient.blue }}>
+                        {hint.entrance}
+                    </span>
+                    ) in{" "}
+                    <span
+                        style={{
+                            color: getPlayerColor(
+                                playerSlot,
+                                hint.item.sender.slot
+                            ),
+                        }}
+                    >
+                        {hint.item.sender.alias}
+                    </span>
+                    {"'s"} world.
+                </div>
+                <div>
+                    {canChangeStatus ? (
+                        <select
+                            value={hint.status}
+                            disabled={updateInProgress}
+                            onChange={(e) => {
+                                if (services.hintManager) {
+                                    setUpdateInProgress(true);
+                                    services.hintManager
+                                        .updateHintStatus(
+                                            hint,
+                                            parseInt(e.target.value)
+                                        )
+                                        .then(finishUpdate);
+                                }
                             }}
                         >
-                            {hint.item.receiver.alias}
-                        </span>
-                        {"'s"}{" "}
-                        <span
-                            style={{
-                                color: getItemColor(hint.item),
-                            }}
-                        >
-                            {hint.item.name}
-                        </span>{" "}
-                        is at{" "}
-                        <span style={{ color: textClient.green }}>
-                            {hint.item.locationName}
-                        </span>{" "}
-                        (
-                        <span style={{ color: textClient.blue }}>
-                            {hint.entrance}
-                        </span>
-                        ) in{" "}
-                        <span
-                            style={{
-                                color: getPlayerColor(
-                                    playerSlot,
-                                    hint.item.sender.slot
-                                ),
-                            }}
-                        >
-                            {hint.item.sender.alias}
-                        </span>
-                        {"'s"} world.
-                    </div>
-                    <div>
-                        {canChangeStatus ? (
-                            <select
-                                value={hint.status}
-                                disabled={updateInProgress}
-                                onChange={(e) => {
-                                    if (services.hintManager) {
-                                        setUpdateInProgress(true);
-                                        services.hintManager
-                                            .updateHintStatus(
-                                                hint,
-                                                parseInt(e.target.value)
-                                            )
-                                            .then(finishUpdate);
-                                    }
-                                }}
-                            >
-                                {statusSelections.map((status) => (
-                                    <option value={status} key={status}>
-                                        {statusToText[status]}
-                                    </option>
-                                ))}
-                            </select>
-                        ) : (
-                            statusToText[hint.status]
-                        )}
-                        {updateInProgress ? (
-                            <Spinner style={{ height: "14px" }} />
-                        ) : (
-                            <></>
-                        )}
-                    </div>
-
+                            {statusSelections.map((status) => (
+                                <option value={status} key={status}>
+                                    {statusToText[status]}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        statusToText[hint.status]
+                    )}
+                    {updateInProgress ? (
+                        <Spinner style={{ height: "14px" }} />
+                    ) : (
+                        <></>
+                    )}
+                </div>
             </div>
         );
     }

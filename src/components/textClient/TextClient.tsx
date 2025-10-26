@@ -1,24 +1,20 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { useTextClientMessages } from "../../hooks/textClientHook";
 import ServiceContext from "../../contexts/serviceContext";
 import ClientMessage from "./ClientMessage";
 import { PrimaryButton } from "../buttons";
 import { Checkbox } from "../inputs";
 import Icon from "../icons/icons";
-import { APMessage } from "../../services/textClientManager";
 import TextClientTextBox from "./TextClientTextBox";
 import TextClientFilterModal from "./TextClientFilterModal";
 import PanelHeader from "../shared/PanelHeader";
-import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
-
-const rowGenerator: RowGenerator<APMessage> = ({ ref, item }) => {
-    return (
-        <ClientMessage
-            ref={ref as React.ForwardedRef<HTMLDivElement>}
-            message={item}
-        />
-    );
-};
+import { List, ListImperativeAPI, useDynamicRowHeight } from "react-window";
 
 const TextClient = () => {
     const services = useContext(ServiceContext);
@@ -27,26 +23,30 @@ const TextClient = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [followMessages, setFollowMessages] = useState(true);
     const scrollDebounceTimer = useRef(0);
-    const listElementRef: React.ForwardedRef<HTMLElement> = useRef(null);
-
-    const scrollToBottom = () => {
-        const totalListHeight = listElementRef.current?.scrollHeight ?? 0;
+    const listRef: React.ForwardedRef<ListImperativeAPI> = useRef(null);
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 23 });
+    const scrollToBottom = useCallback(() => {
         scrollDebounceTimer.current = 0;
-        listElementRef.current?.scrollTo({
-            behavior: "smooth",
-            top: totalListHeight,
-        });
-    };
-
+        if (messages.length > 0) {
+            const element = listRef.current?.element;
+            element.scrollTo({
+                behavior: "smooth",
+                top: element.scrollHeight,
+            });
+        }
+    }, [scrollDebounceTimer, messages, listRef]);
     // Scroll to bottom when followMessages is enabled, new messages come in, or a row size change happens
     useEffect(() => {
-        if (followMessages && !scrollDebounceTimer.current) {
+        if (followMessages) {
+            if (scrollDebounceTimer.current) {
+                window.clearTimeout(scrollDebounceTimer.current);
+            }
             scrollDebounceTimer.current = window.setTimeout(
                 scrollToBottom,
                 100
             );
         }
-    }, [messages, followMessages]);
+    }, [messages, followMessages, scrollToBottom]);
 
     return (
         <>
@@ -78,16 +78,13 @@ const TextClient = () => {
                         <Icon fontSize="12pt" type="settings" />
                     </PrimaryButton>
                 </PanelHeader>
-
-                <LargeList<APMessage>
-                    items={messages}
-                    defaultRowSize={23}
-                    rowGenerator={rowGenerator}
-                    style={{
-                        boxSizing: "border-box",
-                        overflow: "hidden",
-                    }}
-                    ref={listElementRef}
+                <List
+                    listRef={listRef}
+                    rowComponent={ClientMessage}
+                    rowCount={messages.length}
+                    rowHeight={rowHeight}
+                    rowProps={{ messages }}
+                    overscanCount={5}
                 />
 
                 <TextClientTextBox />

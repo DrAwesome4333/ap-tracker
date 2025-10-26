@@ -11,8 +11,7 @@
         "nextjs": "^0.0.3",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
-        "react-virtualized": "^9.22.6",
-        "react-window": "^1.8.11",
+        "react-window": "^2.2.1",
         "styled-components": "^6.1.11",
         "typescript": "^5.7.3"
     },
@@ -39,8 +38,6 @@
         "@types/node": "22.13.5",
         "@types/react": "19.0.10",
         "@types/react-dom": "^19.0.4",
-        "@types/react-virtualized": "^9.22.2",
-        "@types/react-window": "^1.8.8",
         "eslint": "^9.22.0",
         "eslint-plugin-react": "^7.37.4",
         "globals": "^16.0.0",

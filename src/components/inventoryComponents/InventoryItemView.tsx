@@ -10,12 +10,14 @@ import {
     usefulItem,
     textClient,
 } from "../../constants/colors";
+import { RowComponentProps } from "react-window";
 
 const InventoryItemView = forwardRef(
     (
-        { item }: { item: InventoryItem },
+        { items, index, style }: RowComponentProps<{ items: InventoryItem[] }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
+        const item = items[index];
         const services = useContext(ServiceContext);
         const locationManager = services.locationManager;
         const tagManager = services.tagManager;
@@ -34,6 +36,7 @@ const InventoryItemView = forwardRef(
         return (
             <div
                 style={{
+                    ...style,
                     color,
                 }}
                 ref={ref}

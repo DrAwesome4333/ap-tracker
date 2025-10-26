@@ -1,4 +1,3 @@
-// @ts-check
 import React, { useContext, useMemo, useState } from "react";
 import LocationView from "./LocationView";
 import ServiceContext from "../../../contexts/serviceContext";
@@ -6,22 +5,11 @@ import Icon from "../../icons/icons";
 import useOption from "../../../hooks/optionHook";
 import { naturalSort } from "../../../utility/comparisons";
 import { useSection } from "../../../hooks/sectionHooks";
-import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
 import { TextButton } from "../../buttons";
 import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { useTagCounters } from "../../../hooks/tagHook";
-
-const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
-    return (
-        <LocationView
-            location={item}
-            ref={ref as React.ForwardedRef<HTMLDivElement>}
-        />
-    );
-};
-
-const virtualizationThreshold = 30;
+import { List, useDynamicRowHeight } from "react-window";
 
 /**
  *
@@ -38,6 +26,7 @@ const SectionView = ({
     name: string;
     startOpen?: boolean;
 }) => {
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
     const isClosable = name !== "root";
     const [isOpen, setIsOpen] = useState(
         isClosable ? (startOpen ?? false) : true
@@ -281,29 +270,22 @@ const SectionView = ({
                     </TextButton>
                     {isOpen && (
                         <>
-                            {locations.length < virtualizationThreshold ? (
-                                locations.map((location) => (
-                                    <LocationView
-                                        location={location}
-                                        key={location}
-                                    />
-                                ))
-                            ) : (
-                                <LargeList<string>
-                                    items={locations}
-                                    defaultRowSize={22}
-                                    rowGenerator={rowGenerator}
+                            {locations.length > 0 && (
+                                <List
                                     style={{
                                         width: "95%",
-                                        // overflow: "show",
-                                        resize: "vertical",
-                                        height: "25vh",
                                         margin: "1em",
                                         boxShadow:
                                             "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                                        maxHeight: "75vh",
                                     }}
+                                    rowComponent={LocationView}
+                                    rowHeight={rowHeight}
+                                    rowProps={{ locations }}
+                                    rowCount={locations.length}
                                 />
                             )}
+
                             {childSections.map((childName) => {
                                 return (
                                     <SectionView

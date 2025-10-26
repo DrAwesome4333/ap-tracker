@@ -5,10 +5,15 @@ import NotificationManager from "../../services/notifications/notifications";
 import { MessageType } from "../../services/notifications/notifications";
 import ServiceContext from "../../contexts/serviceContext";
 import useOption from "../../hooks/optionHook";
+import { RowComponentProps } from "react-window";
 
 const ClientMessage = forwardRef(
     (
-        { message }: { message: APMessage },
+        {
+            index,
+            style,
+            messages,
+        }: RowComponentProps<{ messages: APMessage[] }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const services = useContext(ServiceContext);
@@ -17,6 +22,7 @@ const ClientMessage = forwardRef(
             "TextClient:DoubleClickToCopy",
             "global"
         );
+        const message = messages[index];
         const text = message.parts
             .map((part) => part.text)
             .reduce((a, b) => a + b, "");
@@ -24,7 +30,9 @@ const ClientMessage = forwardRef(
             <div
                 ref={ref}
                 style={{
+                    ...style,
                     padding: "0.12em",
+                    width: "95%",
                 }}
                 onDoubleClick={async () => {
                     if (!copyOnDblClick) {

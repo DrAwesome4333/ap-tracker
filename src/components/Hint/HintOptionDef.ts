@@ -30,7 +30,10 @@ const optionDef: HierarchicalOption = {
             type: OptionType.multiselect,
             display: "Show My",
             name: "own",
-            choices: [{display:"Items", name:"items"}, {display:"Locations", name:"locations"}],
+            choices: [
+                { display: "Items", name: "items" },
+                { display: "Locations", name: "locations" },
+            ],
             default: ["items", "locations"],
             scope: optionScope,
         },

@@ -9,10 +9,11 @@ import { useTagList } from "../../../hooks/tagHook";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { naturalSort } from "../../../utility/comparisons";
 import LocationTagView from "./LocationTagView";
+import { RowComponentProps } from "react-window";
 
 const LocationView = forwardRef(
     (
-        { location }: { location: string },
+        { locations, index, style }: RowComponentProps<{ locations: string[] }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const [showDetails, setShowDetails] = useState(false);
@@ -23,6 +24,7 @@ const LocationView = forwardRef(
         }
         const tagManager = serviceContext.tagManager;
         const locationTagger = serviceContext.locationTagger;
+        const location = locations[index];
         const status = useLocationStatus(locationManager, location);
 
         const tagStatus = { checked: status.checked, ignored: status.ignored };
@@ -81,6 +83,7 @@ const LocationView = forwardRef(
                         ? "rgba(128, 128, 128, 0.25)"
                         : "",
                     padding: showDetails ? "0.5em 0.25em" : "0",
+                    ...style,
                 }}
                 onFocus={() => setShowDetails(true)}
                 onBlur={(e) => {
