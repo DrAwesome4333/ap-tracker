@@ -5,9 +5,10 @@ const DB_STORE_KEYS = {
     customTrackers_old: "custom_trackers",
     customTrackers: "custom_trackers_v2",
     customTrackersDirectory: "custom_tracker_manifests_v2",
+    tags: "tag_data",
 };
 
-const database_request = window.indexedDB.open("checklist_db", 7);
+const database_request = window.indexedDB.open("checklist_db", 8);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -76,6 +77,13 @@ database_request.onupgradeneeded = (_event) => {
             { keyPath: ["uuid", "version", "type"] }
         );
         customTrackerStore.createIndex("uuid", "uuid", { unique: false });
+    }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.tags)) {
+        const customTrackerStore = db.createObjectStore(DB_STORE_KEYS.tags, {
+            keyPath: ["seed", "slot"],
+        });
+        customTrackerStore.createIndex("seed", "seed", { unique: false });
     }
 };
 

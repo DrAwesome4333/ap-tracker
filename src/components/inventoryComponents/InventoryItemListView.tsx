@@ -86,10 +86,10 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                 >
                     <List
                         style={{
-                                overflow: "hidden",
-                                maxHeight: "75vh",
-                                boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
-                            }}
+                            overflow: "hidden",
+                            maxHeight: "75vh",
+                            boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                        }}
                         rowComponent={InventoryItemView}
                         rowCount={items.length}
                         rowHeight={rowHeight}

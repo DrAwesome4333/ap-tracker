@@ -19,6 +19,7 @@ import { setupAPTextSync } from "./textSync";
 import { globalOptionManager } from "../options/optionManager";
 import GenericTrackerRepository from "../tracker/generic/genericTrackerRepository";
 import HintManager from "../HintManager";
+import { LocationTagger } from "../tags/LocationTagger";
 
 const CONNECTION_STATUS = {
     disconnected: "Disconnected",
@@ -66,7 +67,8 @@ const createConnector = (
     hintManager: HintManager,
     trackerManager: TrackerManager,
     textClientManager: TextClientManager,
-    genericTrackerRepository: GenericTrackerRepository
+    genericTrackerRepository: GenericTrackerRepository,
+    locationTagger: LocationTagger
 ): Connector => {
     const client = new Client({ debugLogVersions: false });
     const connection = (() => {
@@ -354,6 +356,10 @@ const createConnector = (
                     }
                 );
                 enableDataSync(client, tagManager);
+                locationTagger.loadTags(
+                    client.room.seedName,
+                    client.players.self.slot
+                );
                 SavedConnectionManager.cacheDataPackage(
                     savedConnectionInfo.seed,
                     client.package.exportPackage()

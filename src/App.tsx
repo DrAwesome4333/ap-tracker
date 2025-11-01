@@ -92,7 +92,8 @@ const connector = createConnector(
     hintManager,
     trackerManager,
     textClientManager,
-    genericTrackerRepository
+    genericTrackerRepository,
+    locationTagger
 );
 
 const connection = connector.connection;

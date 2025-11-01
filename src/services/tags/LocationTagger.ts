@@ -1,4 +1,5 @@
 import { randomShortId } from "../../utility/uuid";
+import { DB_STORE_KEYS, SaveData } from "../saveData";
 import {
     TagCounterV2,
     TagDataV2,
@@ -92,6 +93,8 @@ types.forEach((tagType) => Object.freeze(tagType));
 class LocationTagger implements TagSource {
     id = "location_tagger";
     managedTypes = new Set(types.map((tagType) => tagType.type_id));
+    #seed: string;
+    #slot: string;
     #tags: Map<string, TagDataV2> = new Map();
     #updateCallbacks: Set<
         (tagUpdates: { updated?: TagDataV2[]; removed?: string[] }) => void
@@ -150,12 +153,42 @@ class LocationTagger implements TagSource {
         Object.freeze(tag);
         this.#tags.set(tag.tag_id, tag);
         this.#callUpdateCallbacks({ updated: [tag] });
+        this.saveTags();
         console.log("added tag");
     };
 
     removeTag = (tagId: string) => {
         this.#tags.delete(tagId);
         this.#callUpdateCallbacks({ removed: [tagId] });
+        this.saveTags();
+    };
+
+    loadTags = (seedName: string, slot: number) => {
+        this.#seed = seedName;
+        this.#slot = slot.toString();
+        const removedTags = [...this.#tags.entries()].map(([id, _]) => id);
+        this.#tags.clear();
+        this.#callUpdateCallbacks({ removed: removedTags });
+
+        SaveData.getItem(DB_STORE_KEYS.tags, [seedName, slot.toString()]).then(
+            (value: { seed: string; slot: string; tags: TagDataV2[] }) => {
+                if (!value?.tags) {
+                    return;
+                }
+                value.tags.forEach((tag) => {
+                    this.#tags.set(tag.tag_id, tag);
+                });
+                this.#callUpdateCallbacks({ updated: value.tags });
+            }
+        );
+    };
+
+    saveTags = async () => {
+        return SaveData.storeItem(DB_STORE_KEYS.tags, {
+            seed: this.#seed,
+            slot: this.#slot,
+            tags: [...this.#tags.values()],
+        });
     };
 }
 
