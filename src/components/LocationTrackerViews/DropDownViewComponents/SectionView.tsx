@@ -22,9 +22,13 @@ import { List, useDynamicRowHeight } from "react-window";
 const SectionView = ({
     name,
     startOpen,
+    selectedLocation,
+    onLocationSelect,
 }: {
     name: string;
     startOpen?: boolean;
+    selectedLocation?: string;
+    onLocationSelect?: (locationName: string) => void;
 }) => {
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
     const isClosable = name !== "root";
@@ -220,7 +224,7 @@ const SectionView = ({
                         >
                             {locationTracker?.manifest.locationTrackerType ===
                             LocationTrackerType.dropdown
-                                ? (section?.title ?? "Unloaded Section")
+                                ? (section?.title ?? "Loading...")
                                 : `Unsupported tracker type ${locationTracker?.manifest.locationTrackerType}`}{" "}
                             <i>
                                 {clearedLocationCount}
@@ -281,7 +285,11 @@ const SectionView = ({
                                     }}
                                     rowComponent={LocationView}
                                     rowHeight={rowHeight}
-                                    rowProps={{ locations }}
+                                    rowProps={{
+                                        locations,
+                                        onLocationSelect,
+                                        selectedLocation,
+                                    }}
                                     rowCount={locations.length}
                                 />
                             )}
@@ -292,6 +300,8 @@ const SectionView = ({
                                         name={childName}
                                         key={childName}
                                         startOpen={startOpen}
+                                        onLocationSelect={onLocationSelect}
+                                        selectedLocation={selectedLocation}
                                     />
                                 );
                             })}

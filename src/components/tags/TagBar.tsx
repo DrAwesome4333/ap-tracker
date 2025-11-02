@@ -8,11 +8,11 @@ import { background } from "../../constants/colors";
 const TagBar = ({
     entityType,
     entityId,
-    toggleTag,
+    tagClick,
 }: {
     entityType: TagEntityType;
     entityId: string | number;
-    toggleTag: (typeId: string) => void;
+    tagClick: (typeId: string) => void;
 }) => {
     const services = useContext(ServiceContext);
     const tagManager = services.tagManager;
@@ -23,11 +23,11 @@ const TagBar = ({
     return (
         <div
             style={{
-                position: "absolute",
-                top: "0",
-                right: "0",
                 boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
                 backgroundColor: background,
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
                 borderRadius: "0.25em",
                 padding: "0.25em",
                 margin: "0.25em",
@@ -38,7 +38,7 @@ const TagBar = ({
                     key={option.type_id}
                     entityId={entityId}
                     entityType={entityType}
-                    toggleTag={toggleTag}
+                    tagClick={tagClick}
                     typeId={option.type_id}
                 />
             ))}

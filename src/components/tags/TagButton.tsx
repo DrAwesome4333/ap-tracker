@@ -10,12 +10,12 @@ const TagButton = ({
     entityType,
     entityId,
     typeId,
-    toggleTag,
+    tagClick,
 }: {
     entityType: TagEntityType;
     entityId: string | number;
     typeId: string;
-    toggleTag: (typeId: string) => void;
+    tagClick: (typeId: string) => void;
 }) => {
     const services = useContext(ServiceContext);
     const tagManager = services.tagManager;
@@ -35,7 +35,7 @@ const TagButton = ({
         <TextButton
             onClick={(e) => {
                 e.stopPropagation();
-                toggleTag(typeId);
+                tagClick(typeId);
             }}
         >
             <Icon

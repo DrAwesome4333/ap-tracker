@@ -1,34 +1,41 @@
-import React, { forwardRef, Fragment, useContext, useState } from "react";
+import React, { forwardRef, useContext } from "react";
 import ServiceContext from "../../../contexts/serviceContext";
 import Icon from "../../icons/icons";
-import { tertiary, textPrimary } from "../../../constants/colors";
+import { textPrimary } from "../../../constants/colors";
 import { TextButton } from "../../buttons";
 import { useLocationStatus } from "../../../hooks/sectionHooks";
-import TagBar from "../../tags/TagBar";
 import { useTagList } from "../../../hooks/tagHook";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { naturalSort } from "../../../utility/comparisons";
-import LocationTagView from "./LocationTagView";
 import { RowComponentProps } from "react-window";
 
 const LocationView = forwardRef(
     (
-        { locations, index, style }: RowComponentProps<{ locations: string[] }>,
+        {
+            locations,
+            index,
+            style,
+            onLocationSelect,
+            selectedLocation,
+        }: RowComponentProps<{
+            locations: string[];
+            onLocationSelect?: (locationName: string) => void;
+            selectedLocation?: string;
+        }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
-        const [showDetails, setShowDetails] = useState(false);
         const serviceContext = useContext(ServiceContext);
         const locationManager = serviceContext.locationManager;
         if (!locationManager) {
             throw new Error("No location manager provided");
         }
         const tagManager = serviceContext.tagManager;
-        const locationTagger = serviceContext.locationTagger;
         const location = locations[index];
         const status = useLocationStatus(locationManager, location);
 
         const tagStatus = { checked: status.checked, ignored: status.ignored };
         const tags = useTagList(tagManager, TagEntityType.location, status.id);
+        const selected = selectedLocation === location;
 
         const sortedTags = [...(tags ?? [])];
         sortedTags.sort((a, b) => {
@@ -79,20 +86,11 @@ const LocationView = forwardRef(
                 ref={ref}
                 style={{
                     position: "relative",
-                    backgroundColor: showDetails
+                    backgroundColor: selected
                         ? "rgba(128, 128, 128, 0.25)"
                         : "",
-                    padding: showDetails ? "0.5em 0.25em" : "0",
+                    padding: "0",
                     ...style,
-                }}
-                onFocus={() => setShowDetails(true)}
-                onBlur={(e) => {
-                    if (
-                        !e.relatedTarget ||
-                        !e.currentTarget.contains(e.relatedTarget)
-                    ) {
-                        setShowDetails(false);
-                    }
                 }}
             >
                 <span className={[...classes].join(" ")}>
@@ -103,6 +101,7 @@ const LocationView = forwardRef(
                                     ? "line-through"
                                     : "",
                         }}
+                        onClick={() => onLocationSelect?.(location)}
                     >
                         <Icon
                             fontSize="14px"
@@ -112,42 +111,7 @@ const LocationView = forwardRef(
                         />{" "}
                         {status.displayName ?? location}
                     </TextButton>
-                    {showDetails && (
-                        <TagBar
-                            entityType={TagEntityType.location}
-                            entityId={status.id}
-                            toggleTag={(typeId) => {
-                                const existingTags = locationTagger.queryTags(
-                                    typeId,
-                                    status.id
-                                );
-                                if (existingTags.length === 0) {
-                                    locationTagger.addTag(typeId, status.id);
-                                } else {
-                                    existingTags.forEach((tag) =>
-                                        locationTagger.removeTag(tag.tag_id)
-                                    );
-                                }
-                            }}
-                        />
-                    )}
                 </span>
-                {showDetails && (
-                    <>
-                        {status.displayName && (
-                            <div
-                                style={{ marginLeft: "1em", color: tertiary }}
-                            >{`Server Name: ${location}`}</div>
-                        )}
-                        {sortedTags.map((tag) => (
-                            <LocationTagView
-                                key={tag}
-                                tagId={tag}
-                                locationStatus={status}
-                            />
-                        ))}
-                    </>
-                )}
             </div>
         );
     }

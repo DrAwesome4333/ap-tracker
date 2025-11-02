@@ -1,16 +1,22 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import ServiceContext from "../../../contexts/serviceContext";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
 import { LocationStatus } from "../../../services/locations/locationManager";
+import { Input } from "../../inputs";
+import { DangerButton, PrimaryButton, SecondaryButton } from "../../buttons";
 
 const LocationTagView = ({
     tagId,
     locationStatus,
+    onClear,
+    onText,
 }: {
     tagId: string;
     locationStatus: LocationStatus;
+    onClear: (tagId: string) => void;
+    onText: (tagId: string, text: string) => void;
 }) => {
     const services = useContext(ServiceContext);
     const tagManager = services.tagManager;
@@ -19,6 +25,11 @@ const LocationTagView = ({
         checked: locationStatus.checked,
         ignored: locationStatus.ignored,
     });
+
+    const [text, setText] = useState(tag.data ?? tagType.display_name);
+    const [editMode, setEditMode] = useState(false);
+    const canClear = tagType.user_managed && true;
+    const canEdit = tagType.allows_text && true;
 
     return (
         <div
@@ -37,7 +48,69 @@ const LocationTagView = ({
                 }}
                 iconParams={tagType.icon_spec}
             />{" "}
-            {tag.data ?? tagType.display_name}
+            {editMode ? (
+                <Input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                />
+            ) : (
+                text
+            )}
+            {editMode ? (
+                <>
+                    <PrimaryButton
+                        $tiny
+                        style={{
+                            margin: "1em",
+                        }}
+                        onClick={() => {
+                            onText(tagId, text.toString());
+                            setEditMode(false);
+                        }}
+                    >
+                        {" "}
+                        <Icon type="check_small" fontSize="14px" />{" "}
+                    </PrimaryButton>
+                    <SecondaryButton
+                        $tiny
+                        style={{
+                            margin: "1em",
+                        }}
+                        onClick={() => {
+                            setEditMode(false);
+                            setText(tag.data ?? tagType.display_name);
+                        }}
+                    >
+                        {" "}
+                        <Icon type="close_small" fontSize="14px" />{" "}
+                    </SecondaryButton>
+                </>
+            ) : canEdit ? (
+                <PrimaryButton
+                    style={{
+                        margin: "1em",
+                    }}
+                    $tiny
+                    onClick={() => setEditMode(true)}
+                >
+                    {" "}
+                    <Icon type="edit" fontSize="14px" />{" "}
+                </PrimaryButton>
+            ) : (
+                <></>
+            )}
+            {canClear && (
+                <DangerButton
+                    style={{
+                        margin: "1em",
+                    }}
+                    onClick={() => onClear(tagId)}
+                    $tiny
+                >
+                    <Icon fontSize="14px" type="delete" />
+                </DangerButton>
+            )}
         </div>
     );
 };

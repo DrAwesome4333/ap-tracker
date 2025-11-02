@@ -64,6 +64,7 @@ interface TagTypeV2Data {
     effects?: { [effect_name: string]: unknown };
     counter_id?: string;
     user_managed?: boolean;
+    allows_text?: boolean;
 }
 
 interface TagTypeV2 {
@@ -80,6 +81,7 @@ interface TagTypeV2 {
     effects?: { [effect_name: string]: unknown };
     counter_id?: string | string[];
     user_managed?: boolean;
+    allows_text?: boolean;
 }
 
 interface TagVariantType {

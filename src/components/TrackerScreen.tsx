@@ -34,9 +34,7 @@ const TrackerScreen = () => {
     );
     const checklist = (
         <>
-            <div style={{ display: "grid", gridTemplateRows: "3em 1fr" }}>
-                <LocationTrackerDropdownView />
-            </div>
+            <LocationTrackerDropdownView />
         </>
     );
 
