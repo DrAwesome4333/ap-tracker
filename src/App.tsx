@@ -6,7 +6,6 @@ import { createConnector } from "./services/connector/connector";
 import styled from "styled-components";
 import { CONNECTION_STATUS } from "./services/connector/connector";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
-import { createEntranceManager } from "./services/entrances/entranceManager";
 import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
 import { TagManager } from "./services/tags/tagManager";
@@ -24,7 +23,6 @@ import TextClientManager from "./services/textClientManager";
 import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
 import { ResourceType } from "./services/tracker/resourceEnums";
 import { LocalStorageDataStore } from "./services/dataStores";
-import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTrackers";
 import { LocationTracker } from "./services/tracker/locationTrackers/locationTrackers";
 import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
 import HintTagger from "./services/tags/HintTagger";
@@ -53,7 +51,6 @@ const AppScreen = styled.div`
 
 const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
-const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 
 const tagManager = new TagManager();
@@ -79,15 +76,11 @@ const genericTrackerRepository = new GenericTrackerRepository(
 );
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
-// Port from old version
-portTrackers(customTrackerRepository);
-
 const textClientManager = new TextClientManager();
 
 const connector = createConnector(
     locationManager,
     inventoryManager,
-    entranceManager,
     tagManager,
     hintManager,
     trackerManager,
@@ -147,7 +140,6 @@ const App = (): React.ReactNode => {
                             locationManager,
                             locationTracker,
                             inventoryTracker: itemTracker,
-                            entranceManager,
                             connector,
                             tagManager,
                             optionManager,

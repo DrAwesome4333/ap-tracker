@@ -5,7 +5,6 @@ import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton, PrimaryButton, SecondaryButton } from "../buttons";
 import Icon from "../icons/icons";
 import { LocationManager } from "../../services/locations/locationManager";
-import { createEntranceManager } from "../../services/entrances/entranceManager";
 import ServiceContext from "../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
@@ -49,7 +48,6 @@ const previewInventoryManager = new InventoryManager();
 const templateLocationTracker = new TemplateLocationTracker(
     previewLocationManager
 );
-const previewEntranceManager = createEntranceManager();
 const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
@@ -156,7 +154,6 @@ const NameAnalysisModal = ({
                     <ServiceContext.Provider
                         value={{
                             locationManager: previewLocationManager,
-                            entranceManager: previewEntranceManager,
                             inventoryManager: previewInventoryManager,
                             tagManager: previewTagManager,
                             optionManager: services.optionManager,

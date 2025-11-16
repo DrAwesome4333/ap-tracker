@@ -60,10 +60,15 @@ const UUIDBytesToUUID = (bytes: Uint8Array) => {
     return uuid;
 };
 
+/** Generates a random id between 0 and 2^53 - 1 */
+const randomNumericId = () => {
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+};
+
 /** Pseudo Randomly generate a v4 UUID */
 const randomUUID = () => {
     const byteArray = randomUUIDBytes();
     return UUIDBytesToUUID(byteArray);
 };
 
-export { randomUUID, randomShortId };
+export { randomUUID, randomShortId, randomNumericId };

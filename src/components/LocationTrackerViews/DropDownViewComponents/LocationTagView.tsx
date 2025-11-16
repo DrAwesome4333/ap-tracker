@@ -6,6 +6,7 @@ import Icon from "../../icons/icons";
 import { LocationStatus } from "../../../services/locations/locationManager";
 import { Input } from "../../inputs";
 import { DangerButton, PrimaryButton, SecondaryButton } from "../../buttons";
+import { TagId } from "../../../services/tags/tagManager";
 
 const LocationTagView = ({
     tagId,
@@ -13,10 +14,10 @@ const LocationTagView = ({
     onClear,
     onText,
 }: {
-    tagId: string;
+    tagId: TagId;
     locationStatus: LocationStatus;
-    onClear: (tagId: string) => void;
-    onText: (tagId: string, text: string) => void;
+    onClear: (tagId: TagId) => void;
+    onText: (tagId: TagId, text: string) => void;
 }) => {
     const services = useContext(ServiceContext);
     const tagManager = services.tagManager;

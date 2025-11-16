@@ -5,7 +5,6 @@ import {
     secondary,
     danger,
     textPrimary,
-    background,
 } from "../constants/colors";
 
 const BaseButton = styled.button.attrs({ className: "interactive" })<{
@@ -56,7 +55,8 @@ const SecondaryButton = styled(BaseButton)`
 
 const GhostButton = styled(BaseButton)`
     color: ${textPrimary};
-    background-color: ${background};
+    background-color: transparent;
+    box-shadow: none;
 `;
 
 export {

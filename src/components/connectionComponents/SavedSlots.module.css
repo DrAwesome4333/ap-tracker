@@ -1,0 +1,21 @@
+.saved_slot {
+    box-sizing: border-box;
+    width: 95%;
+    justify-self: center;
+    color: var(--filled-text-primary);
+    background-color: var(--background-secondary);
+    margin: 0.5rem 0.75rem;
+    padding: 0.5rem;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.slot_actions {
+    display: flex;
+    justify-items: right;
+    align-items: center;
+    height: 100%;
+    flex-shrink: 1;
+}

@@ -5,6 +5,7 @@ import { LocationManager } from "../locations/locationManager";
 /** A list of properties that must be true on the entities status for a tag */
 type TagCondition = string[];
 type TagEntityId = number | string;
+type TagId = number;
 interface TagCounterV2 {
     /** id for the counter */
     counter_id: string;
@@ -46,7 +47,7 @@ type TagVariantDef = [string[], TagVariantType];
 
 interface TagDataV2 {
     type_id: string;
-    tag_id: string;
+    tag_id: TagId;
     entity_id: number | string;
     data?: string | number;
 }
@@ -93,14 +94,14 @@ interface TagVariantType {
 
 interface TagSource {
     id: string;
-    getTags: (tags?: string[]) => TagDataV2[];
+    getTags: (tags?: TagId[]) => TagDataV2[];
     getTypes: () => TagTypeV2Data[];
     getCounters: () => TagCounterV2[];
     /** Subscribes provided callback to all updates to tags in this source, returns a clean up call */
     addUpdateCallback: (
         callback: (tagChanges: {
             updated?: TagDataV2[];
-            removed?: string[];
+            removed?: TagId[];
         }) => void
     ) => () => void;
 }
@@ -120,17 +121,16 @@ class TagManager {
     #sourceCleanUpCalls: Map<string, () => void> = new Map();
     #tagTypes: Map<string, TagTypeV2> = new Map();
     #tagTypeCache: TagTypeV2[] = null;
-    #tags: Map<string, TagDataV2> = new Map();
-    #tagsByEntity: Map<TagEntityType, Map<TagEntityId, Set<string>>> =
+    #tags: Map<TagId, TagDataV2> = new Map();
+    #tagsByEntity: Map<TagEntityType, Map<TagEntityId, Set<TagId>>> = new Map();
+    #tagsByEntityCache: Map<TagEntityType, Map<TagEntityId, TagId[]>> =
         new Map();
-    #tagsByEntityCache: Map<TagEntityType, Map<TagEntityId, string[]>> =
-        new Map();
-    #tagsByType: Map<string, Set<string>> = new Map();
+    #tagsByType: Map<string, Set<TagId>> = new Map();
     #tagListUpdateCallbacks: Map<
         TagEntityType,
         Map<TagEntityId, Set<() => void>>
     > = new Map();
-    #tagUpdateCallbacks: Map<string, Set<() => void>> = new Map();
+    #tagUpdateCallbacks: Map<TagId, Set<() => void>> = new Map();
     #typeListUpdateCallbacks: Set<() => void> = new Set();
     #tagCounters: Map<string, TagCounterV2> = new Map();
     #tagCounterResultCache: Map<string, TagCounterResult[]> = new Map();
@@ -196,7 +196,7 @@ class TagManager {
         const counters: Map<string, TagCounterResult> = new Map();
         const tagsForType: Map<
             TagEntityId,
-            Set<string>
+            Set<TagId>
         > = this.#tagsByEntity.get(entityType) ?? new Map();
         entityIds.forEach((entityId, index) => {
             const tagsOnEntity = tagsForType.get(entityId) ?? new Set();
@@ -263,7 +263,7 @@ class TagManager {
         return tagType;
     };
 
-    getTagById = (tagId: string) => {
+    getTagById = (tagId: TagId) => {
         return this.#tags.get(tagId) ?? null;
     };
 
@@ -273,7 +273,7 @@ class TagManager {
     ) => {
         let cache = this.#tagsByEntityCache.get(entityType)?.get(entityId);
         if (!cache) {
-            const entityTypeCache: Map<string | number, string[]> =
+            const entityTypeCache: Map<string | number, TagId[]> =
                 this.#tagsByEntityCache.get(entityType) ?? new Map();
             cache = [
                 ...(this.#tagsByEntity.get(entityType)?.get(entityId) ?? []),
@@ -314,7 +314,7 @@ class TagManager {
         };
     };
 
-    addTagUpdateCallback = (tagId: string, callback: () => void) => {
+    addTagUpdateCallback = (tagId: TagId, callback: () => void) => {
         const tagIdCallbacks = this.#tagUpdateCallbacks.get(tagId) ?? new Set();
         tagIdCallbacks.add(callback);
         this.#tagUpdateCallbacks.set(tagId, tagIdCallbacks);
@@ -360,7 +360,7 @@ class TagManager {
             this.addTagListUpdateCallback(entityType, entityId, callback);
     };
 
-    getTagUpdateCallbackHook = (tagId: string) => {
+    getTagUpdateCallbackHook = (tagId: TagId) => {
         return (callback: () => void) =>
             this.addTagUpdateCallback(tagId, callback);
     };
@@ -385,7 +385,6 @@ class TagManager {
     };
 
     #updateTags = (tags: TagDataV2[]) => {
-        console.log("Tags updated");
         let triggeredCallbacks: Set<() => void> = new Set();
         this.#locationManager?.pauseUpdateBroadcast();
         tags.forEach((tag) => {
@@ -397,7 +396,7 @@ class TagManager {
             if (tagType) {
                 const tagsOnEntityType: Map<
                     string | number,
-                    Set<string>
+                    Set<number>
                 > = this.#tagsByEntity.get(tagType.entity_type) ?? new Map();
                 const tagsOnEntity =
                     tagsOnEntityType.get(tag.entity_id) ?? new Set();
@@ -430,7 +429,7 @@ class TagManager {
         this.#locationManager?.resumeUpdateBroadcast();
     };
 
-    #removeTags = (tagIds: string[]) => {
+    #removeTags = (tagIds: TagId[]) => {
         let triggeredCallbacks: Set<() => void> = new Set();
         const tags = tagIds
             .map((tagId) => this.#tags.get(tagId))
@@ -446,7 +445,7 @@ class TagManager {
             if (tagType) {
                 const tagsOnEntityType: Map<
                     string | number,
-                    Set<string>
+                    Set<TagId>
                 > = this.#tagsByEntity.get(tagType.entity_type) ?? new Map();
                 const tagsOnEntity =
                     tagsOnEntityType.get(tag.entity_id) ?? new Set();
@@ -534,7 +533,7 @@ class TagManager {
             removed,
         }: {
             updated: TagDataV2[];
-            removed: string[];
+            removed: TagId[];
         }) => {
             if (updated) {
                 this.#updateTags(updated);
@@ -632,4 +631,5 @@ export type {
     TagCounterResult,
     TagCounterV2,
     TagVariantDef,
+    TagId,
 };

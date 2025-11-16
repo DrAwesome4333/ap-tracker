@@ -5,7 +5,7 @@ import {
     trapItem,
     usefulItem,
 } from "../../constants/colors";
-import { randomShortId } from "../../utility/uuid";
+import { randomNumericId } from "../../utility/uuid";
 import {
     TagCounterV2,
     TagDataV2,
@@ -13,6 +13,7 @@ import {
     TagSource,
     TagTypeV2,
     TagVariantDef,
+    TagId,
 } from "./tagManager";
 import { OptionManager } from "../options/optionManager";
 
@@ -169,16 +170,16 @@ const nameToStatus = [
 
 class HintTagger implements TagSource {
     id = "hint_tagger";
-    #hintTags: Map<string, TagDataV2> = new Map();
+    #hintTags: Map<TagId, TagDataV2> = new Map();
     #hints: Map<
         number,
         { location: number; text: string; status: API.HintStatus }
     > = new Map();
-    #locationToTag: Map<number, string> = new Map();
+    #locationToTag: Map<number, TagId> = new Map();
     #allowHintTypes: Set<API.HintStatus> = new Set();
     #countedHintTypes: Set<API.HintStatus> = new Set();
     #updateCallbacks: Set<
-        (tagChanges: { updated?: TagDataV2[]; removed?: string[] }) => void
+        (tagChanges: { updated?: TagDataV2[]; removed?: TagId[] }) => void
     > = new Set();
     constructor(optionManager: OptionManager) {
         const optionUpdate = () => {
@@ -213,7 +214,7 @@ class HintTagger implements TagSource {
     ];
 
     getTypes = () => hintTagTypeArray;
-    getTags = (ids?: string[]) => {
+    getTags = (ids?: TagId[]) => {
         if (ids) {
             const results = ids
                 .map((id) => this.#hintTags.get(id))
@@ -225,7 +226,7 @@ class HintTagger implements TagSource {
     addUpdateCallback = (
         callback: (tagChanges: {
             updated?: TagDataV2[];
-            removed?: string[];
+            removed?: TagId[];
         }) => void
     ) => {
         this.#updateCallbacks.add(callback);
@@ -293,7 +294,7 @@ class HintTagger implements TagSource {
 
             // create new tag
             const tag: TagDataV2 = {
-                tag_id: randomShortId(),
+                tag_id: randomNumericId(),
                 type_id: desiredTagType.type_id,
                 data: hint.text,
                 entity_id: hint.location,

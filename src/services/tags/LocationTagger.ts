@@ -1,4 +1,5 @@
-import { randomShortId } from "../../utility/uuid";
+import { randomNumericId } from "../../utility/uuid";
+import MultiWorldContext from "../MultiInfo/MultiWorldContext";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import {
     TagCounterV2,
@@ -6,6 +7,7 @@ import {
     TagEntityType,
     TagSource,
     TagTypeV2,
+    TagId,
 } from "./tagManager";
 
 const uniqueTagInfo = [
@@ -63,32 +65,6 @@ const counters: TagCounterV2[] = uniqueTagInfo.map((info) => ({
     show_total: true,
     count_filter: [["checked"]],
 }));
-// [
-//     {
-//         counter_id: "star",
-//         icon_id: "star",
-//         display_name: "Star",
-//         color: "orange",
-//         show_total: true,
-//         count_filter: [["checked"]],
-//     },
-//     {
-//         counter_id: "square",
-//         icon_id: "square",
-//         display_name: "square",
-//         color: "#009900",
-//         show_total: true,
-//         count_filter: [["checked"]],
-//     },
-//     {
-//         counter_id: "circle",
-//         icon_id: "circle",
-//         display_name: "circle",
-//         color: "red",
-//         show_total: true,
-//         count_filter: [["checked"]],
-//     },
-// ];
 
 const types: TagTypeV2[] = [
     ...uniqueTagInfo.map((info) => ({
@@ -118,60 +94,6 @@ const types: TagTypeV2[] = [
         },
     },
 ];
-// [
-//     {
-//         display_name: "Star",
-//         type_id: "star",
-//         icon_id: "star",
-//         priority: 100,
-//         counter_id: "star",
-//         entity_type: TagEntityType.location,
-//         icon_color: "Orange",
-//         text_color: "grey",
-//         user_managed: true,
-//         allows_text: true,
-//     },
-//     {
-//         display_name: "Square",
-//         type_id: "square",
-//         icon_id: "square",
-//         priority: 100,
-//         counter_id: "square",
-//         entity_type: TagEntityType.location,
-//         icon_color: "#009900",
-//         text_color: "grey",
-//         user_managed: true,
-//         allows_text: true,
-//     },
-//     {
-//         display_name: "Circle",
-//         type_id: "circle",
-//         icon_id: "circle",
-//         priority: 100,
-//         counter_id: "circle",
-//         entity_type: TagEntityType.location,
-//         icon_color: "red",
-//         text_color: "grey",
-//         user_managed: true,
-//         allows_text: true,
-//     },
-//     {
-//         display_name: "Ignored",
-//         type_id: "ignore",
-//         icon_id: "block",
-//         priority: 50,
-//         entity_type: TagEntityType.location,
-//         icon_color: "grey",
-//         text_color: "grey",
-//         user_managed: true,
-//         effects: {
-//             ignored: true,
-//         },
-//         icon_spec: {
-//             fill: 0,
-//         },
-//     },
-// ];
 
 Object.freeze(types);
 types.forEach((tagType) => Object.freeze(tagType));
@@ -179,21 +101,25 @@ types.forEach((tagType) => Object.freeze(tagType));
 class LocationTagger implements TagSource {
     id = "location_tagger";
     managedTypes = new Set(types.map((tagType) => tagType.type_id));
-    #seed: string;
-    #slot: string;
-    #tags: Map<string, TagDataV2> = new Map();
+    #multiWorldSaveId: string;
+    #slot: number;
+    #tags: Map<TagId, TagDataV2> = new Map();
     #updateCallbacks: Set<
-        (tagUpdates: { updated?: TagDataV2[]; removed?: string[] }) => void
+        (tagUpdates: { updated?: TagDataV2[]; removed?: TagId[] }) => void
     > = new Set();
+
+    constructor() {
+        MultiWorldContext.addDeleteCallback(this.deleteTags);
+    }
 
     #callUpdateCallbacks = (updates: {
         updated?: TagDataV2[];
-        removed?: string[];
+        removed?: TagId[];
     }) => {
         this.#updateCallbacks.forEach((callback) => callback(updates));
     };
 
-    getTags = (tagIds?: string[]) => {
+    getTags = (tagIds?: TagId[]) => {
         return tagIds
             ? tagIds
                   .map((tagId) => this.#tags.get(tagId))
@@ -210,7 +136,7 @@ class LocationTagger implements TagSource {
     addUpdateCallback = (
         callback: (tagChanges: {
             updated?: TagDataV2[];
-            removed?: string[];
+            removed?: TagId[];
         }) => void
     ) => {
         this.#updateCallbacks.add(callback);
@@ -225,7 +151,7 @@ class LocationTagger implements TagSource {
         );
     };
 
-    updateTag = (tagId: string, text: string) => {
+    updateTag = (tagId: TagId, text: string) => {
         const oldTag = this.#tags.get(tagId);
         if (!oldTag) {
             return;
@@ -244,7 +170,7 @@ class LocationTagger implements TagSource {
             );
         }
         const tag: TagDataV2 = {
-            tag_id: randomShortId(),
+            tag_id: randomNumericId(),
             type_id: type,
             entity_id: locationId,
             data: text,
@@ -255,21 +181,25 @@ class LocationTagger implements TagSource {
         this.saveTags();
     };
 
-    removeTag = (tagId: string) => {
+    removeTag = (tagId: TagId) => {
         this.#tags.delete(tagId);
         this.#callUpdateCallbacks({ removed: [tagId] });
         this.saveTags();
     };
 
-    loadTags = (seedName: string, slot: number) => {
-        this.#seed = seedName;
-        this.#slot = slot.toString();
+    loadTags = (multiWorldSaveId: string, slot: number) => {
+        this.#multiWorldSaveId = multiWorldSaveId;
+        this.#slot = slot;
         const removedTags = [...this.#tags.entries()].map(([id, _]) => id);
         this.#tags.clear();
         this.#callUpdateCallbacks({ removed: removedTags });
 
-        SaveData.getItem(DB_STORE_KEYS.tags, [seedName, slot.toString()]).then(
-            (value: { seed: string; slot: string; tags: TagDataV2[] }) => {
+        SaveData.getItem(DB_STORE_KEYS.tags, [multiWorldSaveId, slot]).then(
+            (value: {
+                multi_save_id: string;
+                slot: number;
+                tags: TagDataV2[];
+            }) => {
                 if (!value?.tags) {
                     return;
                 }
@@ -282,11 +212,22 @@ class LocationTagger implements TagSource {
     };
 
     saveTags = async () => {
-        return SaveData.storeItem(DB_STORE_KEYS.tags, {
-            seed: this.#seed,
-            slot: this.#slot,
+        const result = await SaveData.storeItem(DB_STORE_KEYS.tags, {
+            multi_save_id: this.#multiWorldSaveId,
+            slot_number: this.#slot,
             tags: [...this.#tags.values()],
         });
+        return result;
+    };
+
+    deleteTags = async (multi_save_id: string, slot_number?: number) => {
+        if (slot_number !== undefined) {
+            await SaveData.deleteItem(DB_STORE_KEYS.tags, [
+                multi_save_id,
+                slot_number,
+            ]);
+            return;
+        }
     };
 }
 

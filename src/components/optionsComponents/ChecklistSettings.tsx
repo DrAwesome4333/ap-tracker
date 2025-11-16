@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
 import { LocationManager } from "../../services/locations/locationManager";
-import { createEntranceManager } from "../../services/entrances/entranceManager";
 import { TagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
 import { SecondaryButton } from "../buttons";
@@ -14,7 +13,6 @@ import {
     LocationTrackerType,
 } from "../../services/tracker/resourceEnums";
 const mockLocationManager = new LocationManager();
-const mockEntranceManager = createEntranceManager();
 const mockLocationTracker = new CustomLocationTracker(mockLocationManager, {
     manifest: {
         type: ResourceType.locationTracker,
@@ -128,7 +126,6 @@ const ChecklistSettings = ({
                 <ServiceContext.Provider
                     value={{
                         locationManager: mockLocationManager,
-                        entranceManager: mockEntranceManager,
                         locationTracker: mockLocationTracker,
                         tagManager: mockTagManager,
                         optionManager,

@@ -1,6 +1,3 @@
-import { DataPackage } from "archipelago.js";
-// import { TagDataV2 } from "../tags/tagManager";
-import { DB_STORE_KEYS, SaveData } from "../saveData";
 import { JSONValue } from "../dataStores/dataStore";
 
 /** Data that can be used to create a new Saved Connection */
@@ -31,7 +28,7 @@ interface SavedConnection_V2 {
     saveData?: {
         locationGroups?: { [groupName: string]: string[] };
         tagData?: {
-            [tagId: string]: unknown;
+            [tagId: string]: { checkName: string; typeId: "star" | "ignore" };
         };
     };
 }
@@ -49,6 +46,7 @@ interface SavedConnection_V3 {
     lastUsedTime: number;
     createdTime: number;
     version: 3;
+    migrated?: boolean;
     settings: {
         /** Which trackers are in use for this slot */
         itemTracker?: string;
@@ -60,7 +58,7 @@ interface SavedConnection_V3 {
     };
     saveData?: {
         tagData?: {
-            [tagId: string]: unknown;
+            [tagId: string]: { checkName: string; typeId: "star" | "ignore" };
         };
     };
 }
@@ -177,28 +175,6 @@ const saveConnectionData = (data: SavedConnection_V3) => {
     save(currentSaveData);
 };
 
-const createNewSavedConnection = (
-    data: SavedConnectionInfo
-): SavedConnection_V3 => {
-    const connectionId = `${data.seed}-${data.slot}-${new Date().getTime()}`;
-    return {
-        connectionId,
-        seed: data.seed,
-        game: data.game,
-        name: `${data.playerAlias || data.slot}`,
-        host: data.host,
-        port: data.port,
-        slot: data.slot,
-        password: data.password,
-        playerAlias: data.playerAlias,
-        lastUsedTime: Date.now(),
-        createdTime: Date.now(),
-        version: SAVED_CONNECTION_VERSION,
-        settings: {},
-        saveData: {},
-    };
-};
-
 const getExistingConnections = (data: SavedConnectionInfo) => {
     const currentSaveData = loadSavedConnectionData();
     /** @type {Set<SavedConnection_V3>} */
@@ -242,84 +218,14 @@ const getConnectionInfo = (
     };
 };
 
-const getCachedDataPackage = async (seed: string): Promise<DataPackage> => {
-    const dataPackage = (await SaveData.getItem(
-        DB_STORE_KEYS.dataPackageCache,
-        seed
-    )) as {
-        seed: string;
-        package: DataPackage;
-    };
-    return dataPackage ? dataPackage.package : null;
-};
-
-const cacheDataPackage = (
-    seed: string,
-    dataPackage: DataPackage
-): Promise<boolean> => {
-    return SaveData.storeItem(DB_STORE_KEYS.dataPackageCache, {
-        seed,
-        package: dataPackage,
-    });
-};
-
-const deleteDataPackage = (seed: string): Promise<boolean> => {
-    return SaveData.deleteItem(DB_STORE_KEYS.dataPackageCache, seed);
-};
-
-const getCachedGroups = async (
-    connectionId: string
-): Promise<{
-    item: { [name: string]: string[] };
-    location: { [name: string]: string[] };
-}> => {
-    const groups = (await SaveData.getItem(
-        DB_STORE_KEYS.groupCache,
-        connectionId
-    )) as {
-        connectionId: string;
-        location: { [name: string]: string[] };
-        item: { [name: string]: string[] };
-    };
-    return groups && groups.location && groups.item
-        ? { location: groups.location, item: groups.item }
-        : null;
-};
-
-const cacheGroups = (
-    connectionId: string,
-    groups: {
-        item: { [name: string]: string[] };
-        location: { [name: string]: string[] };
-    }
-): Promise<boolean> => {
-    return SaveData.storeItem(DB_STORE_KEYS.groupCache, {
-        connectionId,
-        groups,
-    });
-};
-
-const deleteLocationGroups = (connectionId: string): Promise<boolean> => {
-    return SaveData.deleteItem(DB_STORE_KEYS.groupCache, connectionId);
-};
-
 /**
  *
  * @param {string} id
  */
 const deleteConnection = (id: string) => {
     const currentSaveData = loadSavedConnectionData();
-    const seed = currentSaveData.connections[id]?.seed ?? "";
     delete currentSaveData.connections[id];
     save(currentSaveData);
-    const dataPackageInUse =
-        Object.getOwnPropertyNames(currentSaveData.connections).filter(
-            (id) => currentSaveData.connections[id].seed === seed
-        ).length > 0;
-    if (!dataPackageInUse) {
-        deleteDataPackage(seed);
-    }
-    deleteLocationGroups(id);
 };
 
 /**
@@ -344,13 +250,8 @@ const updateConnectionSaveData = (id: string, newSaveData: unknown) => {
 };
 
 const SavedConnectionManager = {
-    createNewSavedConnection,
     saveConnectionData,
     getExistingConnections,
-    getCachedDataPackage,
-    getCachedGroups,
-    cacheDataPackage,
-    cacheGroups,
     getConnectionInfo,
     loadSavedConnectionData,
     deleteConnection,

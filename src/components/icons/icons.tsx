@@ -68,6 +68,7 @@ const supportedIcons = [
     "not_listed_location",
     "palette",
     "pentagon",
+    "play_arrow",
     "price_change",
     "price_check",
     "radio_button_checked",
@@ -81,6 +82,7 @@ const supportedIcons = [
     "sync_arrow_down",
     "sync_arrow_up",
     "upload_file",
+    "warning",
     "wrong_location",
 ];
 

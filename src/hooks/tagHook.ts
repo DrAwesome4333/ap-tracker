@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { TagEntityType, TagManager } from "../services/tags/tagManager";
+import { TagEntityType, TagId, TagManager } from "../services/tags/tagManager";
 import emptySyncCallback from "./emptyCallback";
 import { randomShortId } from "../utility/uuid";
 
@@ -54,7 +54,7 @@ const useTagTypeList = (tagManager: TagManager) => {
     );
 };
 
-const useTag = (tagManager: TagManager, tagId: string) => {
+const useTag = (tagManager: TagManager, tagId: TagId) => {
     return useSyncExternalStore(
         tagManager?.getTagUpdateCallbackHook(tagId) ?? emptySyncCallback,
         () => tagManager?.getTagById(tagId),

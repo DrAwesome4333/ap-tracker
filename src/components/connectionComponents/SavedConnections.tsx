@@ -1,15 +1,26 @@
-import React, { useContext, useState, useSyncExternalStore } from "react";
+import React, {
+    useCallback,
+    useContext,
+    useState,
+    useSyncExternalStore,
+} from "react";
 import styled from "styled-components";
-import { PrimaryButton, SecondaryButton } from "../buttons";
-import SavedConnectionManager, {
-    SavedConnection,
-} from "../../services/savedConnections/savedConnectionManager";
 import SavedConnectionView from "./SavedConnectionView";
 import ServiceContext from "../../contexts/serviceContext";
 import { TrackerStateContext } from "../../contexts/contexts";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
-import EditConnectionDialog from "./EditConnection";
-import NotificationManager from "../../services/notifications/notifications";
+import SlotDetails from "./SlotDetails";
+import NotificationManager, {
+    MessageType,
+} from "../../services/notifications/notifications";
+import SavedConnectionManager, {
+    SavedConnection,
+} from "../../services/savedConnections/savedConnectionManager";
+import MultiWorldContext, {
+    SavedSlotDetails,
+} from "../../services/MultiInfo/MultiWorldContext";
+import SavedSlotView from "./SavedSlotView";
+import Icon from "../icons/icons";
 
 const Container = styled.div`
     display: grid;
@@ -28,16 +39,17 @@ const Container = styled.div`
 
 const SavedConnections = ({ ...props }) => {
     const trackerState = useContext(TrackerStateContext);
-    const [editorOpen, setEditorOpen] = useState(false);
-    const [selectedConnection, setSelectedConnection] = useState(null);
-    const connectionData = useSyncExternalStore(
+    const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
+    const [editorConnection, setEditorConnection] = useState<string>(null);
+
+    const legacyConnectionData = useSyncExternalStore(
         SavedConnectionManager.getSubscriberCallback(),
         () => SavedConnectionManager.loadSavedConnectionData(),
         () => SavedConnectionManager.loadSavedConnectionData()
     );
-    const allConnections: SavedConnection[] = [];
-    const connectionIds = Object.getOwnPropertyNames(
-        connectionData.connections
+    const allLegacyConnections: SavedConnection[] = [];
+    const legacyConnectionIds = Object.getOwnPropertyNames(
+        legacyConnectionData.connections
     );
 
     const serviceContext = useContext(ServiceContext);
@@ -50,48 +62,61 @@ const SavedConnections = ({ ...props }) => {
         disabled = true;
     }
 
-    for (const key of connectionIds) {
-        allConnections.push(connectionData.connections[key]);
+    for (const key of legacyConnectionIds) {
+        allLegacyConnections.push(legacyConnectionData.connections[key]);
     }
-    const sortedConnections = [...allConnections];
-    sortedConnections.sort((a, b) => b.lastUsedTime - a.lastUsedTime);
+    const sortedLegacyConnections = allLegacyConnections.filter(
+        (x) => !x.migrated
+    );
+    sortedLegacyConnections.sort((a, b) => b.lastUsedTime - a.lastUsedTime);
 
-    const selectId = (id: string) => {
-        if (id !== selectedConnection?.connectionId) {
-            setSelectedConnection(connectionData.connections[id]);
-        } else {
-            connect();
-        }
-    };
+    const multiSlots = useSyncExternalStore(
+        MultiWorldContext.addUpdateCallback,
+        MultiWorldContext.getAllMultiWorldsWithSlots,
+        MultiWorldContext.getAllMultiWorldsWithSlots
+    );
 
-    const connect = () => {
-        if (selectedConnection) {
-            const connectionInfo =
-                SavedConnectionManager.getConnectionInfo(selectedConnection);
+    const slots = multiSlots.map((multi) => multi.slots).flat();
+
+    const onConnect = useCallback(
+        ({
+            slot,
+            connectionId,
+        }: {
+            slot?: SavedSlotDetails;
+            connectionId?: string;
+        }) => {
             connector
-                .connectToAP(connectionInfo, selectedConnection.seed)
+                .connectToAP({
+                    legacy_connection_id: connectionId,
+                    multi_slot: slot && {
+                        multi_save_id: slot.multi_save_id,
+                        slot_number: slot.slot_number,
+                    },
+                })
                 .catch((result) => {
-                    NotificationManager.createToast({
-                        ...result,
-                    });
+                    if (result instanceof Error) {
+                        console.error(result);
+                        NotificationManager.createToast({
+                            type: MessageType.error,
+                            message: `An unexpected error occurred: ${result.name}`,
+                            details: `${result.message}\n${result.stack}`,
+                            duration: 30,
+                        });
+                    } else {
+                        NotificationManager.createToast({
+                            ...result,
+                        });
+                    }
                 });
-        }
-    };
-
-    const openEditor = () => {
-        if (selectedConnection) {
-            setEditorOpen(true);
-        }
-    };
-
-    const closeEditor = () => {
-        setEditorOpen(false);
-        setSelectedConnection(null);
-    };
-
+        },
+        []
+    );
+    console.log("editor slot", editorSlot);
+    console.log("cid", editorConnection);
     return (
         <Container {...props}>
-            <h2>Saved Connections</h2>
+            <h2>Saved Slots</h2>
             <div
                 style={{
                     overflowY: "auto",
@@ -100,18 +125,38 @@ const SavedConnections = ({ ...props }) => {
                     width: "100%",
                 }}
             >
-                {sortedConnections.length > 0 ? (
+                {slots.length > 0 &&
+                    slots.map((slot) => (
+                        <SavedSlotView
+                            key={`${slot.multi_save_id}_${slot.slot_number}`}
+                            slot={slot}
+                            connect={() => onConnect({ slot })}
+                            edit={() => {
+                                setEditorSlot(slot);
+                                setEditorConnection(null);
+                                console.log("HEYYY");
+                            }}
+                            disabled={disabled}
+                        />
+                    ))}
+                {sortedLegacyConnections.length > 0 ? (
                     <>
-                        {sortedConnections.map((connection) => (
+                        {sortedLegacyConnections.map((connection) => (
                             <SavedConnectionView
                                 key={connection.connectionId}
                                 {...connection}
                                 disabled={disabled}
-                                selected={
-                                    connection.connectionId ===
-                                    selectedConnection?.connectionId
+                                connect={() =>
+                                    onConnect({
+                                        connectionId: connection.connectionId,
+                                    })
                                 }
-                                onClick={selectId}
+                                edit={() => {
+                                    setEditorSlot(null);
+                                    setEditorConnection(
+                                        connection.connectionId
+                                    );
+                                }}
                             />
                         ))}
                     </>
@@ -127,27 +172,28 @@ const SavedConnections = ({ ...props }) => {
                     </div>
                 )}
             </div>
-            <span>
-                <PrimaryButton
-                    onClick={connect}
-                    disabled={!selectedConnection || disabled}
-                >
-                    Connect
-                </PrimaryButton>
-                <SecondaryButton
-                    onClick={openEditor}
-                    disabled={!selectedConnection || disabled}
-                >
-                    Edit
-                </SecondaryButton>
-            </span>
-            {
-                <EditConnectionDialog
-                    open={editorOpen}
-                    onClose={closeEditor}
-                    connection={selectedConnection}
-                />
-            }
+            <div>
+                {sortedLegacyConnections.length > 0 && (
+                    <>
+                        <Icon
+                            type="warning"
+                            style={{ color: "orange" }}
+                            iconParams={{ fill: 0 }}
+                        />{" "}
+                        Please connect slots to the Multi-world server to update
+                        them. Old slots may be deleted in a future update in
+                        early 2026.
+                    </>
+                )}
+            </div>
+            <SlotDetails
+                slot={editorSlot}
+                connectionId={editorConnection}
+                onClose={() => {
+                    setEditorSlot(null);
+                    setEditorConnection(null);
+                }}
+            />
         </Container>
     );
 };
