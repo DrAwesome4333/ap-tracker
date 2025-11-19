@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ServiceContext from "../../../contexts/serviceContext";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
@@ -13,11 +13,13 @@ const LocationTagView = ({
     locationStatus,
     onClear,
     onText,
+    shouldFocus,
 }: {
     tagId: TagId;
     locationStatus: LocationStatus;
     onClear: (tagId: TagId) => void;
     onText: (tagId: TagId, text: string) => void;
+    shouldFocus: (tagId: TagId) => boolean;
 }) => {
     const services = useContext(ServiceContext);
     const tagManager = services.tagManager;
@@ -26,12 +28,25 @@ const LocationTagView = ({
         checked: locationStatus.checked,
         ignored: locationStatus.ignored,
     });
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const [text, setText] = useState(tag.data ?? tagType.display_name);
     const [editMode, setEditMode] = useState(false);
     const canClear = tagType.user_managed && true;
     const canEdit = tagType.allows_text && true;
 
+    useEffect(() => {
+        if (editMode) {
+            setText(tag.data ?? "");
+            inputRef.current?.focus();
+        }
+    }, [editMode]);
+
+    useEffect(() => {
+        if (shouldFocus?.(tagId)) {
+            setEditMode(true);
+        }
+    }, []);
     return (
         <div
             style={{
@@ -51,9 +66,20 @@ const LocationTagView = ({
             />{" "}
             {editMode ? (
                 <Input
+                    ref={inputRef}
                     type="text"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
+                    onKeyUp={(e) => {
+                        if (e.key === "Enter") {
+                            onText(tagId, text.toString());
+                            setEditMode(false);
+                        }
+                        if (e.key === "Escape") {
+                            setText(tag.data ?? tagType.display_name);
+                            setEditMode(false);
+                        }
+                    }}
                 />
             ) : (
                 text
@@ -101,7 +127,7 @@ const LocationTagView = ({
             ) : (
                 <></>
             )}
-            {canClear && (
+            {canClear && !editMode && (
                 <DangerButton
                     style={{
                         margin: "1em",

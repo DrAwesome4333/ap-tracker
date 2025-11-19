@@ -112,8 +112,7 @@ const SavedConnections = ({ ...props }) => {
         },
         []
     );
-    console.log("editor slot", editorSlot);
-    console.log("cid", editorConnection);
+
     return (
         <Container {...props}>
             <h2>Saved Slots</h2>
@@ -123,6 +122,7 @@ const SavedConnections = ({ ...props }) => {
                     minHeight: "5em",
                     maxHeight: "100%",
                     width: "100%",
+                    scrollbarGutter: "stable",
                 }}
             >
                 {slots.length > 0 &&
@@ -134,12 +134,11 @@ const SavedConnections = ({ ...props }) => {
                             edit={() => {
                                 setEditorSlot(slot);
                                 setEditorConnection(null);
-                                console.log("HEYYY");
                             }}
                             disabled={disabled}
                         />
                     ))}
-                {sortedLegacyConnections.length > 0 ? (
+                {sortedLegacyConnections.length > 0 && (
                     <>
                         {sortedLegacyConnections.map((connection) => (
                             <SavedConnectionView
@@ -160,7 +159,8 @@ const SavedConnections = ({ ...props }) => {
                             />
                         ))}
                     </>
-                ) : (
+                )}
+                {sortedLegacyConnections.length === 0 && slots.length === 0 && (
                     <div
                         style={{
                             padding: "1em",
@@ -172,7 +172,13 @@ const SavedConnections = ({ ...props }) => {
                     </div>
                 )}
             </div>
-            <div>
+            <div
+                style={{
+                    marginTop: "1em",
+                    maxWidth: "80%",
+                    textAlign: "center",
+                }}
+            >
                 {sortedLegacyConnections.length > 0 && (
                     <>
                         <Icon
@@ -180,9 +186,7 @@ const SavedConnections = ({ ...props }) => {
                             style={{ color: "orange" }}
                             iconParams={{ fill: 0 }}
                         />{" "}
-                        Please connect slots to the Multi-world server to update
-                        them. Old slots may be deleted in a future update in
-                        early 2026.
+                        Slots need updating, connect to server to update them.
                     </>
                 )}
             </div>

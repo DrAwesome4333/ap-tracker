@@ -15,7 +15,6 @@ const SavedSlotView = ({
     connect: () => void;
     disabled: boolean;
 }) => {
-    console.log(slot);
     return (
         <div className={styles.saved_slot}>
             <div>

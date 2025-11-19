@@ -37,18 +37,8 @@ const uniqueTagInfo = [
     },
 ];
 
-const colors = [
-    "red",
-    "orange",
-    "gold",
-    "green",
-    "cyan",
-    "blue",
-    "purple",
-    "pink",
-    "brown",
-];
-for (let i = 1; i < 10; i++) {
+const colors = ["red", "orange", "gold", "green", "cyan"];
+for (let i = 1; i < 5; i++) {
     uniqueTagInfo.push({
         display_name: `Number ${i}`,
         type_id: `number_${i}`,
@@ -179,6 +169,7 @@ class LocationTagger implements TagSource {
         this.#tags.set(tag.tag_id, tag);
         this.#callUpdateCallbacks({ updated: [tag] });
         this.saveTags();
+        return tag.tag_id;
     };
 
     removeTag = (tagId: TagId) => {

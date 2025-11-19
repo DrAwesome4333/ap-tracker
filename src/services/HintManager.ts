@@ -15,16 +15,16 @@ const hintToText = (client: Client, hint: Hint) => {
         hint.entrance !== "Vanilla" ? `(${hint.entrance})` : "";
     const priorityString =
         hint.status === API.HintStatus.unspecified
-            ? "[unspecified]"
+            ? "Unspecified"
             : hint.status === API.HintStatus.no_priority
-              ? "[no priority]"
+              ? "No Priority"
               : hint.status === API.HintStatus.avoid
-                ? "[avoid]"
+                ? "Avoid"
                 : hint.status === API.HintStatus.priority
-                  ? "[priority]"
+                  ? "Priority"
                   : hint.status === API.HintStatus.found
-                    ? "[found]"
-                    : "[unknown priority]";
+                    ? "Found"
+                    : "Unknown Priority";
     return `${ownerString} ${hint.item.name} is at ${hint.item.locationName} in ${finderString} world. ${entranceString} ${priorityString}`;
 };
 
@@ -35,6 +35,9 @@ export default class HintManager {
     #hintCache: Hint[] = null;
     #hintResolutions: Map<string, (hint: Hint) => void> = new Map();
     #updateCallbacks: Set<() => void> = new Set();
+    #hintQueue: Hint[] = [];
+    #updateDelay = 100;
+    #updateDelayTimer = 0;
 
     constructor(hintTagger: HintTagger) {
         this.#tagger = hintTagger;
@@ -42,6 +45,11 @@ export default class HintManager {
 
     initializeListeners = (client: Client) => {
         this.#client = client;
+        this.#client.socket.on("disconnected", () => {
+            this.#hints.clear();
+            this.#tagger.clear();
+            this.#callListeners();
+        });
         this.#client.items
             .on("hintsInitialized", (hints) => this.#addHints(hints))
             .on("hintReceived", (hint) => this.#addHint(hint))
@@ -53,21 +61,16 @@ export default class HintManager {
         this.#updateCallbacks.forEach((callback) => callback());
     };
 
-    /** Adds a hint */
+    /** Adds a hint, delays by 100ms for performance reasons*/
     #addHint = (hint: Hint) => {
-        if (hint.item.sender.slot === this.#client.players.self.slot) {
-            this.#tagger.addHint(
-                hint.item.locationId,
-                hintToText(this.#client, hint),
-                hint.status
-            );
+        this.#hintQueue.push(hint);
+        if (this.#updateDelayTimer === 0) {
+            this.#updateDelayTimer = window.setTimeout(() => {
+                this.#addHints(this.#hintQueue);
+                this.#hintQueue = [];
+                this.#updateDelayTimer = 0;
+            }, this.#updateDelay);
         }
-        this.#hints.set(hint.uniqueKey, hint);
-        if (this.#hintResolutions.has(hint.uniqueKey)) {
-            this.#hintResolutions.get(hint.uniqueKey)(hint);
-            this.#hintResolutions.delete(hint.uniqueKey);
-        }
-        this.#callListeners();
     };
 
     #addHints = (hints: Hint[]) => {
@@ -82,7 +85,10 @@ export default class HintManager {
                 status: hint.status,
             }));
         this.#tagger.addHints(hintsForTagging);
-        hints.forEach((hint) => this.#hints.set(hint.uniqueKey, hint));
+        hints.forEach((hint) => {
+            this.#hints.set(hint.uniqueKey, hint);
+            this.#hintResolutions.get(hint.uniqueKey)?.(hint);
+        });
         this.#callListeners();
     };
 

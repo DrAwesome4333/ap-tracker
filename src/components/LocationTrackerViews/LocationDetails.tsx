@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import { useTagList } from "../../hooks/tagHook";
-import { TagEntityType } from "../../services/tags/tagManager";
+import { TagEntityType, TagId } from "../../services/tags/tagManager";
 import { useLocationStatus } from "../../hooks/sectionHooks";
 import { naturalSort } from "../../utility/comparisons";
 import LocationTagView from "./DropDownViewComponents/LocationTagView";
@@ -17,6 +17,7 @@ const LocationDetails = ({
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
+    const lastTagAdded = useRef<TagId>(null);
     const locationTagger = services.locationTagger;
     const tagManager = services.tagManager;
     const locationManager = services.locationManager;
@@ -48,7 +49,16 @@ const LocationDetails = ({
     const title = locationStatus.displayName ?? locationName;
 
     return (
-        <div style={{ padding: "0.5em", overflow: "auto", height: "100%" }}>
+        <div
+            style={{
+                padding: "1em",
+                boxSizing: "border-box",
+                overflow: "auto",
+                height: "100%",
+                boxShadow: "3px 4px 0px rgba(0, 0, 0, 0.5)",
+                border: "1px solid black",
+            }}
+        >
             {title}
             <br />
             {locationStatus.displayName ? `(${locationName})` : ""}
@@ -56,7 +66,10 @@ const LocationDetails = ({
                 entityType={TagEntityType.location}
                 entityId={locationId}
                 tagClick={(typeId) => {
-                    locationTagger.addTag(typeId, locationId);
+                    lastTagAdded.current = locationTagger.addTag(
+                        typeId,
+                        locationId
+                    );
                 }}
             />
             {sortedTags.map((tag) => (
@@ -68,6 +81,11 @@ const LocationDetails = ({
                     onText={(tagId, text) =>
                         locationTagger.updateTag(tagId, text)
                     }
+                    shouldFocus={(id) => {
+                        const result = lastTagAdded.current === id;
+                        lastTagAdded.current = null;
+                        return result;
+                    }}
                 />
             ))}
             <ButtonRow>

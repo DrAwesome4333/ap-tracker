@@ -61,6 +61,5 @@ const optionDef: HierarchicalOption = {
 const filterDataStore = new TempDataStore();
 globalOptionManager.configureScope(optionScope, filterDataStore);
 setOptionDefaults(globalOptionManager, { [optionDef.name]: optionDef });
-console.log(globalOptionManager.getOptionValue(optionDef.name, optionScope));
 export { optionDef, optionScope };
 export type { HintFilter };

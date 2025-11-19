@@ -441,8 +441,6 @@ const createConnector = (
                     }
                 );
                 enableDataSync(client, tagManager);
-                console.log(MultiWorldContext.loadedMultiWorld);
-                console.log(MultiWorldContext.loadedSlot);
                 locationTagger.loadTags(
                     MultiWorldContext.loadedMultiWorld.multi_save_id,
                     MultiWorldContext.loadedSlot.slot_number

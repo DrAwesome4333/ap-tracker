@@ -6,22 +6,14 @@ import { PrimaryButton } from "../buttons";
 import Icon from "../icons/icons";
 import DropdownFilterModal from "./DropDownViewComponents/DropdownFilterModal";
 import LocationDetails from "./LocationDetails";
+import styles from "./LocationTracker.module.css";
 
 const LocationTrackerDropdownView = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [focusedLocation, setFocusedLocation] = useState("");
     return (
         <>
-            <div
-                style={{
-                    boxSizing: "border-box",
-                    padding: "0.25em",
-                    display: "grid",
-                    height: "100%",
-                    width: "100%",
-                    gridTemplateRows: "3em auto",
-                }}
-            >
+            <div className={styles.dropdown_view}>
                 <PanelHeader title="Locations">
                     <PrimaryButton
                         $tiny
@@ -32,14 +24,14 @@ const LocationTrackerDropdownView = () => {
                     </PrimaryButton>
                 </PanelHeader>
                 <div
-                    style={{
-                        display: "grid",
-                        minWidth: 0,
-                        minHeight: 0,
-                        gridTemplateColumns: focusedLocation
-                            ? "2fr 1fr"
-                            : "auto",
-                    }}
+                    className={[
+                        styles.dropdown_container,
+                        focusedLocation
+                            ? [styles.dropdown_container_with_details]
+                            : [],
+                    ]
+                        .flat()
+                        .join(" ")}
                 >
                     <div
                         style={{
