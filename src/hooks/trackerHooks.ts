@@ -2,15 +2,12 @@ import { useSyncExternalStore } from "react";
 import { CustomTrackerRepository } from "../services/tracker/customTrackerRepository";
 import { TrackerManager } from "../services/tracker/TrackerManager";
 import { ResourceType } from "../services/tracker/resourceEnums";
+import emptySyncCallback from "./emptyCallback";
 
 const useTrackerDirectory = (trackerManager: TrackerManager) => {
     const callback = trackerManager
         ? trackerManager.getDirectorySubscriberCallback()
-        : (_: () => void) => {
-              /* There is nothing to listen to*/ return () => {
-                  /* Empty clean up call */
-              };
-          };
+        : emptySyncCallback;
     return useSyncExternalStore(
         callback,
         () => trackerManager?.getDirectory(),
@@ -35,11 +32,7 @@ const useCurrentGameTracker = (
 ) => {
     const callback = trackerManager
         ? trackerManager.getTrackerSubscriberCallback()
-        : (_: () => void) => {
-              /* There is nothing to listen to*/ return () => {
-                  /* Empty clean up call */
-              };
-          };
+        : emptySyncCallback;
     return useSyncExternalStore(
         callback,
         () => trackerManager?.getCurrentGameTracker(game, type),

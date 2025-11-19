@@ -24,6 +24,11 @@ type NumberOption = {
     step?: number;
 } & BaseOption;
 
+type ColorOption = {
+    type: OptionType.color;
+    default: string;
+} & BaseOption;
+
 type HierarchicalOption = {
     type: OptionType.hierarchical;
     children: TrackerOption[];
@@ -44,4 +49,5 @@ type TrackerOption =
     | SelectOption
     | NumberOption
     | MultiselectOption
-    | HierarchicalOption;
+    | HierarchicalOption
+    | ColorOption;

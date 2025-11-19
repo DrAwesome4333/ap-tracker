@@ -3,7 +3,9 @@ import styled from "styled-components";
 import { PrimaryButton } from "../buttons";
 import { Input } from "../inputs";
 import ServiceContext from "../../contexts/serviceContext";
-import NotificationManager from "../../services/notifications/notifications";
+import NotificationManager, {
+    MessageType,
+} from "../../services/notifications/notifications";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
 
 const Container = styled.div`
@@ -29,7 +31,7 @@ const NewConnection = ({ ...props }) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
-        slot: "",
+        slot_name: "",
         password: "",
     });
 
@@ -61,7 +63,7 @@ const NewConnection = ({ ...props }) => {
                 disabled={disabled}
             />
             <Input
-                type="text"
+                type="password"
                 name="port"
                 value={connectionInfo.port}
                 onChange={defaultChangeHandler}
@@ -70,14 +72,14 @@ const NewConnection = ({ ...props }) => {
             />
             <Input
                 type="text"
-                name="slot"
-                value={connectionInfo.slot}
+                name="slot_name"
+                value={connectionInfo.slot_name}
                 onChange={defaultChangeHandler}
                 label="Slot"
                 disabled={disabled}
             />
             <Input
-                type="text"
+                type="password"
                 name="password"
                 value={connectionInfo.password}
                 onChange={defaultChangeHandler}
@@ -87,9 +89,19 @@ const NewConnection = ({ ...props }) => {
             <PrimaryButton
                 onClick={() => {
                     connector?.connectToAP(connectionInfo).catch((result) => {
-                        NotificationManager.createToast({
-                            ...result,
-                        });
+                        if (result instanceof Error) {
+                            console.error(result);
+                            NotificationManager.createToast({
+                                type: MessageType.error,
+                                message: `An unexpected error occurred: ${result.name}`,
+                                details: `${result.message}\n${result.stack}`,
+                                duration: 30,
+                            });
+                        } else {
+                            NotificationManager.createToast({
+                                ...result,
+                            });
+                        }
                     });
                 }}
                 disabled={disabled}

@@ -15,7 +15,7 @@ const PanelHeader = ({
             style={{
                 display: "grid",
                 gridTemplateColumns: "auto 1fr",
-                position: "sticky",
+                // position: "sticky",
                 top: "0px",
                 height: "100%",
                 width: "100%",

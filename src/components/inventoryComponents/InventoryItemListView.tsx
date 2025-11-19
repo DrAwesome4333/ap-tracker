@@ -11,22 +11,9 @@ import CollectionContainer from "./CollectionContainer";
 import InventoryItemView from "./InventoryItemView";
 import { TextButton } from "../buttons";
 import { InventoryItem } from "../../services/inventory/inventoryManager";
-import LargeList, { RowGenerator } from "../LayoutUtilities/LargeList";
 import Icon from "../icons/icons";
+import { List, useDynamicRowHeight } from "react-window";
 
-const virtualizationThreshold = 50;
-
-const rowGenerator: RowGenerator<InventoryItem> = ({ ref, item }) => {
-    return (
-        <InventoryItemView
-            item={item}
-            key={item.uuid}
-            ref={ref as React.ForwardedRef<HTMLDivElement>}
-        />
-    );
-};
-
-/** Renders a list of locations for a given item. Will throw warnings if all items do not have the same name */
 const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const count = items.length;
@@ -57,6 +44,7 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
     } else if (flags.server) {
         color = textClient.yellow;
     }
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
 
     return (
         <div>
@@ -78,8 +66,8 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                             fontSize="20px"
                             style={{
                                 transform: detailsOpen
-                                    ? "rotate(-180deg)"
-                                    : "rotate(0deg)",
+                                    ? "rotate(0deg)"
+                                    : "rotate(-90deg)",
                                 transition: "all 0.25s",
                                 userSelect: "none",
                             }}
@@ -96,24 +84,17 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                         color: tertiary,
                     }}
                 >
-                    {items.length < virtualizationThreshold ? (
-                        items.map((item) => (
-                            <InventoryItemView item={item} key={item.uuid} />
-                        ))
-                    ) : (
-                        <LargeList<InventoryItem>
-                            items={items}
-                            defaultRowSize={22}
-                            rowGenerator={rowGenerator}
-                            style={{
-                                width: "95%",
-                                overflow: "hidden",
-                                resize: "vertical",
-                                height: "50vh",
-                                boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
-                            }}
-                        />
-                    )}
+                    <List
+                        style={{
+                            overflow: "hidden",
+                            maxHeight: "75vh",
+                            boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                        }}
+                        rowComponent={InventoryItemView}
+                        rowCount={items.length}
+                        rowHeight={rowHeight}
+                        rowProps={{ items }}
+                    />
                 </div>
             )}
         </div>

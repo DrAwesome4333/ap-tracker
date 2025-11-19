@@ -1,13 +1,19 @@
 const DB_STORE_KEYS = {
-    dataPackageCache: "data_packages",
-    locationGroupCache_deprecated: "location_groups",
-    groupCache: "cached_groups",
-    customTrackers_old: "custom_trackers",
+    dataPackageCache: "data_package_cache",
+    groupCache: "cached_groups_v2",
     customTrackers: "custom_trackers_v2",
     customTrackersDirectory: "custom_tracker_manifests_v2",
+    tags: "tag_data",
 };
 
-const database_request = window.indexedDB.open("checklist_db", 7);
+const retiredKeys = [
+    "data_packages",
+    "location_groups",
+    "cached_groups",
+    "custom_trackers",
+];
+
+const database_request = window.indexedDB.open("checklist_db", 12);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -28,54 +34,53 @@ database_request.onblocked = () => {
 
 database_request.onupgradeneeded = (_event) => {
     const db = database_request.result;
+
+    retiredKeys.forEach((key) => {
+        if (db.objectStoreNames.contains(key)) {
+            db.deleteObjectStore(key);
+        }
+    });
+
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.dataPackageCache)) {
-        const dataPackageStore = db.createObjectStore(
-            DB_STORE_KEYS.dataPackageCache,
-            { keyPath: "seed" }
-        );
-        dataPackageStore.createIndex("seed", "seed", { unique: true });
-    }
-
-    if (
-        db.objectStoreNames.contains(
-            DB_STORE_KEYS.locationGroupCache_deprecated
-        )
-    ) {
-        db.deleteObjectStore(DB_STORE_KEYS.locationGroupCache_deprecated);
-    }
-
-    if (!db.objectStoreNames.contains(DB_STORE_KEYS.groupCache)) {
-        const locationGroupStore = db.createObjectStore(
-            DB_STORE_KEYS.groupCache,
-            { keyPath: "connectionId" }
-        );
-        locationGroupStore.createIndex("connectionId", "connectionId", {
+        const store = db.createObjectStore(DB_STORE_KEYS.dataPackageCache, {
+            keyPath: ["game", "checksum"],
+        });
+        store.createIndex("game-checksum", ["game", "checksum"], {
             unique: true,
         });
     }
 
-    if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers_old)) {
-        const customTrackerStore = db.createObjectStore(
-            DB_STORE_KEYS.customTrackers_old,
-            { keyPath: "id" }
-        );
-        customTrackerStore.createIndex("id", "id", { unique: true });
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.groupCache)) {
+        const store = db.createObjectStore(DB_STORE_KEYS.groupCache, {
+            keyPath: ["multi_save_id", "slot_number"],
+        });
+        store.createIndex("multi-slot", ["multi_save_id", "slot_number"], {
+            unique: true,
+        });
     }
 
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
-        const customTrackerStore = db.createObjectStore(
-            DB_STORE_KEYS.customTrackers,
-            { keyPath: ["uuid", "version", "type"] }
-        );
-        customTrackerStore.createIndex("uuid", "uuid", { unique: false });
+        const store = db.createObjectStore(DB_STORE_KEYS.customTrackers, {
+            keyPath: ["uuid", "version", "type"],
+        });
+        store.createIndex("uuid", "uuid", { unique: false });
     }
 
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackersDirectory)) {
-        const customTrackerStore = db.createObjectStore(
+        const store = db.createObjectStore(
             DB_STORE_KEYS.customTrackersDirectory,
             { keyPath: ["uuid", "version", "type"] }
         );
-        customTrackerStore.createIndex("uuid", "uuid", { unique: false });
+        store.createIndex("uuid", "uuid", { unique: false });
+    }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.tags)) {
+        const store = db.createObjectStore(DB_STORE_KEYS.tags, {
+            keyPath: ["multi_save_id", "slot_number"],
+        });
+        store.createIndex("multi-slot", ["multi_save_id", "slot_number"], {
+            unique: true,
+        });
     }
 };
 
@@ -87,7 +92,7 @@ database_request.onupgradeneeded = (_event) => {
  */
 const getItem = (
     storeName: string,
-    key: string | string[]
+    key: (string | number) | (string | number)[]
 ): Promise<unknown> => {
     return new Promise((resolve, _reject) => {
         let hasFailed = false;
@@ -170,7 +175,7 @@ const storeItem = (storeName: string, item: unknown): Promise<boolean> => {
  */
 const deleteItem = (
     storeName: string,
-    key: string | string[]
+    key: (string | number) | (string | number)[]
 ): Promise<boolean> => {
     return new Promise((resolve, _reject) => {
         let hasFailed = false;

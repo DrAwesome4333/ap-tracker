@@ -5,7 +5,6 @@ import {
     secondary,
     danger,
     textPrimary,
-    background,
 } from "../constants/colors";
 
 const BaseButton = styled.button.attrs({ className: "interactive" })<{
@@ -22,6 +21,7 @@ const BaseButton = styled.button.attrs({ className: "interactive" })<{
     margin: ${(props) => (props.$tiny ? "0rem 0.25rem" : "0.25rem 0.75rem")};
     font-size: ${(props) => (props.$tiny ? "0.5em" : "1em")};
     background-color: transparent;
+    cursor: pointer;
 `;
 
 const TextButton = styled.button`
@@ -55,7 +55,8 @@ const SecondaryButton = styled(BaseButton)`
 
 const GhostButton = styled(BaseButton)`
     color: ${textPrimary};
-    background-color: ${background};
+    background-color: transparent;
+    box-shadow: none;
 `;
 
 export {

@@ -6,6 +6,7 @@ import ButtonRow from "../../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../../buttons";
 import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
+import HintSettings from "../../optionsComponents/HintTagSettings";
 
 const DropdownFilterModal = ({
     open,
@@ -27,6 +28,9 @@ const DropdownFilterModal = ({
             <br />
             <br />
             <ChecklistSettings optionManager={services.optionManager} />
+            <br />
+            <br />
+            <HintSettings />
             <ButtonRow>
                 <GhostButton onClick={onClose}>Close</GhostButton>
             </ButtonRow>

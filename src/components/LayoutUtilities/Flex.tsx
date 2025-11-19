@@ -23,7 +23,7 @@ const FlexItem = forwardRef(
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const myStyle: React.CSSProperties = {
-            overflow: "auto",
+            overflow: "hidden",
             flex: `1 1 ${Math.floor(ratio * 100)}%`,
             ...style,
         };

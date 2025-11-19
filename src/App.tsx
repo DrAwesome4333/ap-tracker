@@ -6,10 +6,10 @@ import { createConnector } from "./services/connector/connector";
 import styled from "styled-components";
 import { CONNECTION_STATUS } from "./services/connector/connector";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
-import { createEntranceManager } from "./services/entrances/entranceManager";
 import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
-import { createTagManager } from "./services/tags/tagManager";
+import { TagManager } from "./services/tags/tagManager";
+import { LocationTagger } from "./services/tags/LocationTagger";
 import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
@@ -23,9 +23,10 @@ import TextClientManager from "./services/textClientManager";
 import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
 import { ResourceType } from "./services/tracker/resourceEnums";
 import { LocalStorageDataStore } from "./services/dataStores";
-import { portTrackers } from "./services/tracker/locationTrackers/loadV1CustomTrackers";
 import { LocationTracker } from "./services/tracker/locationTrackers/locationTrackers";
 import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
+import HintTagger from "./services/tags/HintTagger";
+import HintManager from "./services/HintManager";
 
 const AppScreen = styled.div`
     position: absolute;
@@ -50,10 +51,15 @@ const AppScreen = styled.div`
 
 const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
-const entranceManager = createEntranceManager();
 const optionManager = globalOptionManager;
 
-const tagManager = createTagManager(locationManager);
+const tagManager = new TagManager();
+tagManager.enableLocationEffects(locationManager);
+const locationTagger = new LocationTagger();
+const hintTagger = new HintTagger(optionManager);
+tagManager.addSource(locationTagger);
+tagManager.addSource(hintTagger);
+const hintManager = new HintManager(hintTagger);
 const mainTrackerManagerStore = new LocalStorageDataStore(
     "AP_ChecklistTracker_TrackerChoices"
 );
@@ -70,19 +76,17 @@ const genericTrackerRepository = new GenericTrackerRepository(
 );
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
-// Port from old version
-portTrackers(customTrackerRepository);
-
 const textClientManager = new TextClientManager();
 
 const connector = createConnector(
     locationManager,
     inventoryManager,
-    entranceManager,
     tagManager,
+    hintManager,
     trackerManager,
     textClientManager,
-    genericTrackerRepository
+    genericTrackerRepository,
+    locationTagger
 );
 
 const connection = connector.connection;
@@ -136,7 +140,6 @@ const App = (): React.ReactNode => {
                             locationManager,
                             locationTracker,
                             inventoryTracker: itemTracker,
-                            entranceManager,
                             connector,
                             tagManager,
                             optionManager,
@@ -145,6 +148,9 @@ const App = (): React.ReactNode => {
                             textClientManager,
                             customTrackerRepository,
                             genericTrackerRepository,
+                            locationTagger,
+                            hintTagger,
+                            hintManager,
                         }}
                     >
                         <NotificationContainer />

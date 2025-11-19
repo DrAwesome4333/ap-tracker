@@ -5,12 +5,11 @@ import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton, PrimaryButton, SecondaryButton } from "../buttons";
 import Icon from "../icons/icons";
 import { LocationManager } from "../../services/locations/locationManager";
-import { createEntranceManager } from "../../services/entrances/entranceManager";
 import ServiceContext from "../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../inputs";
 import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
-import { createTagManager } from "../../services/tags/tagManager";
+import { TagManager } from "../../services/tags/tagManager";
 import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,
@@ -43,12 +42,13 @@ const AnalysisGrid = styled.div`
 `;
 
 const previewLocationManager = new LocationManager();
+const previewSourceId = "preview_source";
+previewLocationManager.registerSourcePriority(previewSourceId, 1);
 const previewInventoryManager = new InventoryManager();
 const templateLocationTracker = new TemplateLocationTracker(
     previewLocationManager
 );
-const previewEntranceManager = createEntranceManager();
-const previewTagManager = createTagManager(previewLocationManager);
+const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
     open,
@@ -112,9 +112,13 @@ const NameAnalysisModal = ({
             previewLocationManager.deleteAllLocations();
             connection.slotInfo.groups.location["Everywhere"].forEach(
                 (location) => {
-                    previewLocationManager.updateLocationStatus(location, {
-                        exists: true,
-                    });
+                    previewLocationManager.updateLocationStatus(
+                        previewSourceId,
+                        location,
+                        {
+                            exists: true,
+                        }
+                    );
                 }
             );
             previewLocationManager.resumeUpdateBroadcast();
@@ -150,7 +154,6 @@ const NameAnalysisModal = ({
                     <ServiceContext.Provider
                         value={{
                             locationManager: previewLocationManager,
-                            entranceManager: previewEntranceManager,
                             inventoryManager: previewInventoryManager,
                             tagManager: previewTagManager,
                             optionManager: services.optionManager,

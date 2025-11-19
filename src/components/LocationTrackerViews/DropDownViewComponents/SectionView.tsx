@@ -1,4 +1,3 @@
-// @ts-check
 import React, { useContext, useMemo, useState } from "react";
 import LocationView from "./LocationView";
 import ServiceContext from "../../../contexts/serviceContext";
@@ -6,20 +5,11 @@ import Icon from "../../icons/icons";
 import useOption from "../../../hooks/optionHook";
 import { naturalSort } from "../../../utility/comparisons";
 import { useSection } from "../../../hooks/sectionHooks";
-import LargeList, { RowGenerator } from "../../LayoutUtilities/LargeList";
 import { TextButton } from "../../buttons";
 import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
-
-const rowGenerator: RowGenerator<string> = ({ ref, item }) => {
-    return (
-        <LocationView
-            location={item}
-            ref={ref as React.ForwardedRef<HTMLDivElement>}
-        />
-    );
-};
-
-const virtualizationThreshold = 30;
+import { TagEntityType } from "../../../services/tags/tagManager";
+import { useTagCounters } from "../../../hooks/tagHook";
+import { List, useDynamicRowHeight } from "react-window";
 
 /**
  *
@@ -32,10 +22,15 @@ const virtualizationThreshold = 30;
 const SectionView = ({
     name,
     startOpen,
+    selectedLocation,
+    onLocationSelect,
 }: {
     name: string;
     startOpen?: boolean;
+    selectedLocation?: string;
+    onLocationSelect?: (locationName: string) => void;
 }) => {
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
     const isClosable = name !== "root";
     const [isOpen, setIsOpen] = useState(
         isClosable ? (startOpen ?? false) : true
@@ -161,6 +156,27 @@ const SectionView = ({
         return indexA - indexB;
     };
 
+    const locationNames = section?.locationReport
+        ? [...section.locationReport.existing.values()]
+        : [];
+    const locationStatuses = locationNames.map((locationName) =>
+        locationManager.getLocationStatus(locationName)
+    );
+
+    const locationIds = locationStatuses.map((status) => status.id ?? 0);
+    const locationCounterStatuses = locationStatuses.map((status) => ({
+        checked: status.checked,
+        ignored: status.ignored,
+        exists: status.exists,
+    }));
+
+    const tagCounts = useTagCounters(
+        tagManager,
+        TagEntityType.location,
+        locationIds,
+        locationCounterStatuses
+    );
+
     /**
      * Removes any section that should be hidden by settings such as empty and cleared sections
      * @param sectionName The name of the section being filtered
@@ -208,38 +224,31 @@ const SectionView = ({
                         >
                             {locationTracker?.manifest.locationTrackerType ===
                             LocationTrackerType.dropdown
-                                ? (section?.title ?? "Unloaded Section")
+                                ? (section?.title ?? "Loading...")
                                 : `Unsupported tracker type ${locationTracker?.manifest.locationTrackerType}`}{" "}
                             <i>
                                 {clearedLocationCount}
                                 {"/"}
                                 {totalLocationCount}
                             </i>{" "}
-                            {[...(section?.locationReport.tagCounts ?? [])].map(
-                                ([id, values]) => {
-                                    const counterType =
-                                        tagManager?.getCounter(id);
-                                    return (
-                                        <i
-                                            key={id}
-                                            style={{
-                                                color: counterType?.color,
-                                            }}
-                                            title={counterType?.displayName}
-                                        >
-                                            {counterType?.icon && (
-                                                <Icon
-                                                    fontSize="14px"
-                                                    type={counterType.icon}
-                                                />
-                                            )}
-                                            {values.size}
-                                            {counterType?.showTotal &&
-                                                `/${section?.locationReport.tagTotals.get(id)?.size ?? 0}`}{" "}
-                                        </i>
-                                    );
-                                }
-                            )}
+                            {tagCounts.map((counter) => {
+                                return (
+                                    <i
+                                        key={counter.counter_id}
+                                        style={{ color: counter.color }}
+                                        title={counter.display_name}
+                                    >
+                                        <Icon
+                                            fontSize="14px"
+                                            type={counter.icon_id}
+                                            iconParams={counter.icon_spec}
+                                        />
+                                        {counter.count}
+                                        {counter.total !== null &&
+                                            `/${counter.total}`}{" "}
+                                    </i>
+                                );
+                            })}
                             {isClosable ? (
                                 <Icon
                                     iconParams={{
@@ -252,8 +261,8 @@ const SectionView = ({
                                     fontSize="24px"
                                     style={{
                                         transform: isOpen
-                                            ? "rotate(-180deg)"
-                                            : "rotate(0deg)",
+                                            ? "rotate(0deg)"
+                                            : "rotate(-90deg)",
                                         transition: "all 0.25s",
                                         userSelect: "none",
                                     }}
@@ -265,34 +274,34 @@ const SectionView = ({
                     </TextButton>
                     {isOpen && (
                         <>
-                            {locations.length < virtualizationThreshold ? (
-                                locations.map((location) => (
-                                    <LocationView
-                                        location={location}
-                                        key={location}
-                                    />
-                                ))
-                            ) : (
-                                <LargeList<string>
-                                    items={locations}
-                                    defaultRowSize={22}
-                                    rowGenerator={rowGenerator}
+                            {locations.length > 0 && (
+                                <List
                                     style={{
                                         width: "95%",
-                                        overflow: "hidden",
-                                        resize: "vertical",
-                                        height: "25vh",
+                                        margin: "1em",
                                         boxShadow:
                                             "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                                        maxHeight: "75vh",
                                     }}
+                                    rowComponent={LocationView}
+                                    rowHeight={rowHeight}
+                                    rowProps={{
+                                        locations,
+                                        onLocationSelect,
+                                        selectedLocation,
+                                    }}
+                                    rowCount={locations.length}
                                 />
                             )}
+
                             {childSections.map((childName) => {
                                 return (
                                     <SectionView
                                         name={childName}
                                         key={childName}
                                         startOpen={startOpen}
+                                        onLocationSelect={onLocationSelect}
+                                        selectedLocation={selectedLocation}
                                     />
                                 );
                             })}

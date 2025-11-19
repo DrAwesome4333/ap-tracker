@@ -3,6 +3,7 @@ import ServiceContext from "../../contexts/serviceContext";
 import { PrimaryButton } from "../buttons";
 import { Input } from "../inputs";
 import { useTextClientHistory } from "../../hooks/textClientHook";
+import Spinner from "../icons/spinner";
 
 const TextClientTextBox = () => {
     const services = useContext(ServiceContext);
@@ -54,7 +55,11 @@ const TextClientTextBox = () => {
                 $small
                 disabled={sendingMessage}
             >
-                Send
+                {sendingMessage ? (
+                    <Spinner style={{ height: "18px" }} />
+                ) : (
+                    "Send"
+                )}
             </PrimaryButton>
             <Input
                 label=""

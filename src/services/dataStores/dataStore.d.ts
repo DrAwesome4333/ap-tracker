@@ -3,7 +3,7 @@ type JSONValue =
     | number
     | boolean
     | null
-    | { [property: string]: JSONValue }
+    | { [property: string | number]: JSONValue }
     | JSONValue[];
 
 interface DataStore {

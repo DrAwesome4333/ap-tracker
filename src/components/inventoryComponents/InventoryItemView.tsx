@@ -10,16 +10,19 @@ import {
     usefulItem,
     textClient,
 } from "../../constants/colors";
+import { RowComponentProps } from "react-window";
 
 const InventoryItemView = forwardRef(
     (
-        { item }: { item: InventoryItem },
+        { items, index, style }: RowComponentProps<{ items: InventoryItem[] }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
+        const item = items[index];
         const services = useContext(ServiceContext);
         const locationManager = services.locationManager;
         const tagManager = services.tagManager;
-        const connection = services.connector.connection;
+        const locationTagger = services.locationTagger;
+        //const connection = services.connector.connection;
         let color = normalItem;
         if (item.progression) {
             color = progressionItem;
@@ -33,6 +36,7 @@ const InventoryItemView = forwardRef(
         return (
             <div
                 style={{
+                    ...style,
                     color,
                 }}
                 ref={ref}
@@ -46,33 +50,20 @@ const InventoryItemView = forwardRef(
                     {item.local && locationManager && tagManager && (
                         <GhostButton
                             onClick={(event) => {
-                                const location = item.location;
-                                const status =
-                                    locationManager.getLocationStatus(location);
+                                const locationId =
+                                    locationManager.getLocationStatus(
+                                        item.location
+                                    )?.id ?? -1;
+                                const existingTags = locationTagger
+                                    .queryTags("star", locationId)
+                                    .filter((tag) => tag.type_id === "star");
                                 event.stopPropagation();
-                                let found = false;
-                                status.tags?.forEach((tag) => {
-                                    if (tag.tagId === `${location}-star`) {
-                                        found = true;
-                                    }
-                                });
+                                const found = existingTags.length > 0;
                                 if (!found) {
-                                    const tagData = tagManager.createTagData();
-                                    tagData.typeId = "star";
-                                    tagData.checkName = location;
-                                    tagData.tagId = `${location}-star`;
-                                    tagManager.addTag(
-                                        tagData,
-                                        connection.slotInfo.connectionId
-                                    );
+                                    locationTagger.addTag("star", locationId);
                                 } else if (found) {
-                                    const starTag = tagManager.createTagData();
-                                    starTag.typeId = "star";
-                                    starTag.checkName = location;
-                                    starTag.tagId = `${location}-star`;
-                                    tagManager.removeTag(
-                                        starTag,
-                                        connection.slotInfo.connectionId
+                                    locationTagger.removeTag(
+                                        existingTags[0].tag_id
                                     );
                                 }
                             }}

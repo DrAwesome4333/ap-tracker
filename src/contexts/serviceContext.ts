@@ -1,7 +1,6 @@
 import { createContext } from "react";
 import { InventoryManager } from "../services/inventory/inventoryManager";
 import { LocationManager } from "../services/locations/locationManager";
-import { EntranceManager } from "../services/entrances/entranceManager";
 import { Connector } from "../services/connector/connector";
 import { TagManager } from "../services/tags/tagManager";
 import { OptionManager } from "../services/options/optionManager";
@@ -11,11 +10,13 @@ import { CustomTrackerRepository } from "../services/tracker/customTrackerReposi
 import { LocationTracker } from "../services/tracker/locationTrackers/locationTrackers";
 import { ItemTracker } from "../services/tracker/itemTrackers/itemTrackers";
 import GenericTrackerRepository from "../services/tracker/generic/genericTrackerRepository";
+import { LocationTagger } from "../services/tags/LocationTagger";
+import HintTagger from "../services/tags/HintTagger";
+import HintManager from "../services/HintManager";
 
 const ServiceContext: React.Context<{
     locationManager?: LocationManager;
     inventoryManager?: InventoryManager;
-    entranceManager?: EntranceManager;
     connector?: Connector;
     tagManager?: TagManager;
     optionManager?: OptionManager;
@@ -25,6 +26,9 @@ const ServiceContext: React.Context<{
     inventoryTracker?: ItemTracker;
     customTrackerRepository?: CustomTrackerRepository;
     genericTrackerRepository?: GenericTrackerRepository;
+    locationTagger?: LocationTagger;
+    hintTagger?: HintTagger;
+    hintManager?: HintManager;
 }> = createContext({});
 
 export default ServiceContext;

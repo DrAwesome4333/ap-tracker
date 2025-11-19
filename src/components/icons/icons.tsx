@@ -29,7 +29,11 @@ const supportedIcons = [
     "beenhere",
     "block",
     "bolt",
+    "bomb",
     "bookmark",
+    "bookmark_flag",
+    "close_small",
+    "circle",
     "check_circle",
     "check_indeterminate_small",
     "check_small",
@@ -46,6 +50,7 @@ const supportedIcons = [
     "delete",
     "delete_forever",
     "download",
+    "edit",
     "eject",
     "expand_circle_down",
     "filter_alt",
@@ -57,11 +62,13 @@ const supportedIcons = [
     "label",
     "location_off",
     "location_on",
+    "money_bag",
     "mystery",
     "new_label",
     "not_listed_location",
     "palette",
     "pentagon",
+    "play_arrow",
     "price_change",
     "price_check",
     "radio_button_checked",
@@ -70,10 +77,12 @@ const supportedIcons = [
     "settings",
     "star",
     "sticky_note",
+    "square",
     "sync",
     "sync_arrow_down",
     "sync_arrow_up",
     "upload_file",
+    "warning",
     "wrong_location",
 ];
 
@@ -111,3 +120,4 @@ const Icon = ({
 };
 
 export default Icon;
+export type { IconParams };
