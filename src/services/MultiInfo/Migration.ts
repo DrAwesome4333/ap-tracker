@@ -28,11 +28,13 @@ const migrateConnection = (
         });
     }
 
-    const slotDetails = MultiWorldContext.addSlot(existingMulti.multi_save_id, {
-        game,
-        slot_name,
-        slot_number,
-    });
+    const slotDetails = {
+        ...MultiWorldContext.addSlot(existingMulti.multi_save_id, {
+            game,
+            slot_name,
+            slot_number,
+        }),
+    };
 
     slotDetails.title = title;
     slotDetails.last_used_timestamp = last_used_timestamp;

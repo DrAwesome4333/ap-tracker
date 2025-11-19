@@ -218,7 +218,7 @@ const createConnector = (
                 host = connectionInfo.host;
                 slot_name = connectionInfo.slot;
                 port = connectionInfo.port;
-                password = connectionInfo.password;
+                password = connectionInfo.password ?? "";
                 if (connectionInfo.migrated) {
                     // don't try to use migrated content
                     legacy_connection_id = null;
