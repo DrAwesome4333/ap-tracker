@@ -16,12 +16,16 @@ class CustomLocationTracker implements DropdownLocationTracker {
     manifest: LocationTrackerManifest;
     type: LocationTrackerType.dropdown;
     locationManager: LocationManager;
+    optionOverrides?: {
+        locationOrder?: "natural" | "id" | "lexical" | "listed";
+    } = {};
     protected listeners: Set<() => void> = new Set();
     protected cleanupCalls: Set<() => void> = new Set();
     protected locations: Set<string> = new Set();
     protected sections: Map<string, Section> = new Map();
     protected errors: string[] = [];
     protected cachedErrors: string[] = [];
+
     #data: CustomLocationTrackerDef_V2;
 
     constructor(
@@ -65,6 +69,7 @@ class CustomLocationTracker implements DropdownLocationTracker {
         const groups = data.groups ?? {};
         const sections = data.sections;
         const themes = data.themes ?? { default: { color: "#888888" } };
+        this.optionOverrides = data.optionOverrides ?? {};
 
         // Finds a section at the root of the section tree and  parses it.
         const parseSection_string = (
