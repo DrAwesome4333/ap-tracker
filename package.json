@@ -7,10 +7,10 @@
         "@next/eslint-plugin-next": "^15.2.2",
         "archipelago.js": "file:external/archipelago.js",
         "eslint-config-next": "^15.4.5",
-        "next": "^15.4.5",
+        "next": "^15.5.7",
         "nextjs": "^0.0.3",
-        "react": "^19.1.1",
-        "react-dom": "^19.1.1",
+        "react": "^19.2.1",
+        "react-dom": "^19.2.1",
         "react-window": "^2.2.1",
         "styled-components": "^6.1.11",
         "typescript": "^5.7.3"
