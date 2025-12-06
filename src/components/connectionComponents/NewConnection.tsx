@@ -63,7 +63,7 @@ const NewConnection = ({ ...props }) => {
                 disabled={disabled}
             />
             <Input
-                type="password"
+                type="text"
                 name="port"
                 value={connectionInfo.port}
                 onChange={defaultChangeHandler}
