@@ -91,9 +91,15 @@ Here is the basic structure of the manifest within a tracker file.
     },
     "themes": {}, // see theme format below
     "sections": {}, // see section format below
-    "groups": {} // Now optional, see groups format below
+    "groups": {}, // Now optional, see groups format below
+    "optionOverrides": {
+        // Optional, can override certain options if enabled by user
+        "locationOrder": "listed" // Overrides "LocationTracker:location_order" setting**
+    }
 }
 ```
+
+> \*\* see [TrackerOptions.ts](/src/services/options/trackerOptions.ts) for list of valid options.
 
 ### Themes
 

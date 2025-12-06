@@ -22,4 +22,7 @@ type CustomLocationTrackerDef_V2 = {
     themes: { [themName: string]: ThemeDef_V2 };
     sections: SectionDefs_V2;
     groups?: { [groupName: string]: GroupData_V2 };
+    optionOverrides?: {
+        locationOrder?: "natural" | "id" | "lexical" | "listed";
+    };
 };

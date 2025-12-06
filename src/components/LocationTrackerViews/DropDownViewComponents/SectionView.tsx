@@ -73,7 +73,21 @@ const SectionView = ({
         optionManager,
         "LocationTracker:location_order",
         "global"
-    ) as "lexical" | "natural" | "id";
+    ) as "lexical" | "natural" | "id" | "listed";
+
+    const trackerOptionOverrides = useOption(
+        optionManager,
+        "LocationTracker:allow_tracker_option_overrides",
+        "global"
+    ) as boolean;
+
+    const trackerDefinedOrder =
+        locationTracker?.optionOverrides?.locationOrder ??
+        locationOrderBehavior;
+
+    const locationOrder = trackerOptionOverrides
+        ? trackerDefinedOrder
+        : locationOrderBehavior;
 
     /**
      * Compares two locations to determine their relative order
@@ -92,12 +106,15 @@ const SectionView = ({
             return statusA.checked ? 1 : -1;
         }
 
-        if (locationOrderBehavior === "natural") {
+        if (locationOrder === "natural") {
             return naturalSort(a, b);
-        } else if (locationOrderBehavior === "id") {
+        } else if (locationOrder === "id") {
             return statusA.id - statusB.id;
+        } else if (locationOrder === "lexical") {
+            return a < b ? -1 : 1;
         }
-        return a < b ? -1 : 1;
+        // leave ordering as listed
+        return -1;
     };
 
     /**
@@ -120,7 +137,7 @@ const SectionView = ({
         locationNames.sort(locationCompare);
         return locationNames;
     }, [
-        locationOrderBehavior,
+        locationOrder,
         checkedLocationBehavior,
         section?.locations,
         locationManager,

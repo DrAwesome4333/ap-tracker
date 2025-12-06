@@ -75,11 +75,18 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         display: "Location Order",
         type: OptionType.select,
         choices: [
-            { name: "natural", display: "Natural" },
-            { name: "lexical", display: "Lexical" },
-            { name: "id", display: "By id" },
+            { name: "natural", display: "Natural" }, // ex: A1, A2, A10, A11
+            { name: "lexical", display: "Lexical" }, // ex: A1, A10, A11, A2
+            { name: "id", display: "By Id" }, // Defined by assigned Archipelago id
+            { name: "listed", display: "Tracker Ordered" }, // Order as read from tracker file
         ],
-        default: "natural",
+        default: "listed",
+    },
+    "LocationTracker:allow_tracker_option_overrides": {
+        name: "LocationTracker:allow_tracker_option_overrides",
+        display: "Use Tracker Recommended Ordering",
+        type: OptionType.boolean,
+        default: true,
     },
     "TextClient:message_filter": {
         name: "TextClient:message_filter",

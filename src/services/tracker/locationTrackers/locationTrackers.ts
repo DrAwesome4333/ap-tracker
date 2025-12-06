@@ -25,6 +25,9 @@ interface LocationTrackerUpdatePack {
 interface BaseLocationTracker {
     readonly manifest: LocationTrackerManifest;
     readonly options?: { [optionName: string]: TrackerOption };
+    readonly optionOverrides?: {
+        locationOrder?: "natural" | "id" | "lexical" | "listed";
+    };
     getUpdateSubscriber: () => (listener: () => void) => () => void;
     update?: (updates: LocationTrackerUpdatePack) => void;
     reset?: () => void;

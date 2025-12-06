@@ -113,6 +113,13 @@ const ChecklistSettings = ({
             <OptionView
                 option={baseTrackerOptions["LocationTracker:location_order"]}
             />
+            <OptionView
+                option={
+                    baseTrackerOptions[
+                        "LocationTracker:allow_tracker_option_overrides"
+                    ]
+                }
+            />
             <br />
             <SecondaryButton
                 $small
