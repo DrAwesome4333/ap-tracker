@@ -61,7 +61,10 @@ const SavedConnections = ({ ...props }) => {
         MultiWorldContext.getAllMultiWorldsWithSlots
     );
 
-    const slots = multiSlots.map((multi) => multi.slots).flat();
+    const slots = multiSlots
+        .map((multi) => multi.slots)
+        .flat()
+        .sort((a, b) => b.last_used_timestamp - a.last_used_timestamp);
 
     const onConnect = useCallback(
         ({

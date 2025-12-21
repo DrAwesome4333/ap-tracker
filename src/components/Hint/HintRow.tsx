@@ -5,6 +5,8 @@ import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
 import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+import Icon from "../icons/icons";
+import { TextButton } from "../shared/buttons";
 
 const statusSelections = [
     API.HintStatus.priority,
@@ -18,6 +20,13 @@ const statusToText = {
     [API.HintStatus.avoid]: "Avoid",
     [API.HintStatus.priority]: "Priority",
     [API.HintStatus.found]: "Found",
+};
+const hintStatusToClassMap: { [status: number]: string } = {
+    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
+    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
+    [API.HintStatus.avoid]: ap_styles.hint_avoid,
+    [API.HintStatus.priority]: ap_styles.hint_priority,
+    [API.HintStatus.found]: ap_styles.hint_found,
 };
 
 const getPlayerClass = (player: number) => {
@@ -35,7 +44,9 @@ const getPlayerClass = (player: number) => {
 
 const getItemClass = (item: Item) => {
     const special = item.progression
-        ? ap_styles.item_prog
+        ? item.useful
+            ? ap_styles.item_prog_useful
+            : ap_styles.item_prog
         : item.useful
           ? ap_styles.item_useful
           : item.trap
@@ -66,41 +77,86 @@ const HintRow = forwardRef(
                 ref={ref}
                 style={{
                     ...style,
-                    display: "flex",
+                    display: "grid",
                     width: "100%",
                     boxSizing: "border-box",
                     gap: "0.25em",
                     padding: "0.5em",
                     background: odd ? "rgba(128, 128, 128, 0.12)" : "",
+                    gridTemplateColumns: "5fr 1fr",
                 }}
             >
-                <div>
-                    <span className={getPlayerClass(hint.item.receiver.slot)}>
-                        {hint.item.receiver.alias}
-                    </span>
-                    {"'s"}{" "}
-                    <span className={getItemClass(hint.item)}>
-                        {hint.item.name}
-                    </span>{" "}
-                    is at{" "}
-                    <span
-                        className={ap_styles.location + " " + ap_styles.ap_text}
-                    >
-                        {hint.item.locationName}
-                    </span>{" "}
-                    (
-                    <span
-                        className={ap_styles.entrance + " " + ap_styles.ap_text}
-                    >
-                        {hint.entrance}
-                    </span>
-                    ) in{" "}
-                    <span className={getPlayerClass(hint.item.sender.slot)}>
-                        {hint.item.sender.alias}
-                    </span>
-                    {"'s"} world.
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "auto repeat(2, 1fr)",
+                        alignItems: "center",
+                        columnGap: "0.5em",
+                    }}
+                >
+                    <div>
+                        <TextButton
+                            onClick={() => {
+                                if (window.navigator.clipboard) {
+                                    try {
+                                        window.navigator.clipboard.writeText(
+                                            `${hint.item.receiver.alias}'s ${hint.item.name} is at ${hint.item.locationName} ${hint.entrance === "Vanilla" ? "" : `(${hint.entrance}) `}in ${hint.item.sender}'s world. (${statusToText[hint.status]})`
+                                        );
+                                    } catch (e) {
+                                        console.error(e);
+                                    }
+                                }
+                            }}
+                        >
+                            <Icon type={"content_copy"} />
+                        </TextButton>
+                    </div>
+                    <div>
+                        <span
+                            className={getPlayerClass(hint.item.receiver.slot)}
+                        >
+                            {hint.item.receiver.alias}
+                        </span>
+                        {"'s"}
+                        <br />
+                        <span className={getItemClass(hint.item)}>
+                            {hint.item.name}
+                        </span>
+                    </div>
+                    <div>
+                        <span className={getPlayerClass(hint.item.sender.slot)}>
+                            {hint.item.sender.alias}
+                        </span>
+                        <br />
+                        <span
+                            className={
+                                ap_styles.location + " " + ap_styles.ap_text
+                            }
+                        >
+                            {hint.item.locationName}
+                        </span>
+                        {hint.entrance !== "Vanilla" && (
+                            <>
+                                <br />
+                                <span
+                                    className={
+                                        ap_styles.entrance +
+                                        " " +
+                                        ap_styles.ap_text
+                                    }
+                                >
+                                    {hint.entrance}
+                                </span>
+                            </>
+                        )}
+                    </div>
                 </div>
-                <div>
+                <div
+                    className={[
+                        ap_styles.ap_text,
+                        hintStatusToClassMap[hint.status],
+                    ].join(" ")}
+                >
                     {canChangeStatus ? (
                         <select
                             value={hint.status}

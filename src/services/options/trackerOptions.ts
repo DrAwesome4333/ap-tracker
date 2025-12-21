@@ -135,6 +135,12 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         type: OptionType.boolean,
         default: true,
     },
+    "TextClient:IncludeMyOtherSlots": {
+        name: "TextClient:IncludeMyOtherSlots",
+        display: "Consider my other slots",
+        type: OptionType.boolean,
+        default: true,
+    },
     "Theme:base": {
         name: "Theme:base",
         display: "Theme",

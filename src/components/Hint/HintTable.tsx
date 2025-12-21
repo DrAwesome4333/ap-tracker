@@ -18,7 +18,7 @@ const HintTable = ({
 }) => {
     const services = useContext(ServiceContext);
     const hints = useHints(services.hintManager);
-    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 24 });
+    const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
     const playerSlot =
         services.connector?.connection.client.players.self.slot ?? -1;
     const lowerSearchKey = searchKey.toLowerCase().trim();

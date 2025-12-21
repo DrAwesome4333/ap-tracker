@@ -7,6 +7,7 @@ import {
 } from "archipelago.js";
 import { globalOptionManager } from "./options/optionManager";
 import { randomUUID } from "../utility/uuid";
+import MultiWorldContext from "./MultiInfo/MultiWorldContext";
 interface APMessage {
     parts: (MessageNode | EchoMessageNode)[];
     key: string;
@@ -107,6 +108,10 @@ class TextClientManager {
             "TextClient:message_filter",
             "global"
         ) as MessageFilter;
+        const includeOtherSlots: boolean = globalOptionManager.getOptionValue(
+            "TextClient:IncludeMyOtherSlots",
+            "global"
+        ) as boolean;
         const simplifiedType: SimpleMessageType = messageTypeCategoryMap[type];
 
         if (!messageFilter.allowedTypes.includes(simplifiedType)) {
@@ -114,13 +119,18 @@ class TextClientManager {
         }
 
         if (simplifiedType === "item" && item) {
-            const self = client.players.self;
+            const mySlots = includeOtherSlots
+                ? MultiWorldContext.loadedMultiWorld.slots.map(
+                      (slot) => slot.slot_number
+                  )
+                : [MultiWorldContext.loadedSlot.slot_number];
+            const team = client.players.self.team;
             let matches = false;
             if (
-                (item.receiver.slot === self.slot &&
-                    item.receiver.team === self.team) ||
-                (item.sender.slot === self.slot &&
-                    item.sender.team === self.team)
+                (mySlots.includes(item.receiver.slot) &&
+                    item.receiver.team === team) ||
+                (mySlots.includes(item.sender.slot) &&
+                    item.sender.team === team)
             ) {
                 if (
                     item.progression &&

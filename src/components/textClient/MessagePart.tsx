@@ -1,40 +1,59 @@
-import React, { useContext } from "react";
+import React from "react";
 import { API, MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
-import ServiceContext from "../../contexts/serviceContext";
 import { EchoMessageNode } from "../../services/textClientManager";
 import ap_styles from "../sharedStyles/archipelago.module.css";
+import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
 const hintStatusToClassMap: { [status: number]: string } = {
     [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
     [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
     [API.HintStatus.avoid]: ap_styles.hint_avoid,
-    [API.HintStatus.priority]: ap_styles.hint_prioirty,
+    [API.HintStatus.priority]: ap_styles.hint_priority,
     [API.HintStatus.found]: ap_styles.hint_found,
 };
 
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
-    const services = useContext(ServiceContext);
     let textColor = null;
     let backgroundColor = undefined;
     let className = "";
+    let additionalInfo: string = null;
     if (part.type === "item") {
+        className = ap_styles.item_normal;
+        const itemClasses = [];
+        if (part.item.trap) {
+            className = ap_styles.item_trap;
+            itemClasses.push("Trap");
+        }
+        if (part.item.useful) {
+            className = ap_styles.item_useful;
+            itemClasses.push("Useful");
+        }
         if (part.item.progression) {
             className = ap_styles.item_prog;
-        } else if (part.item.useful) {
-            className = ap_styles.item_useful;
-        } else if (part.item.trap) {
-            className = ap_styles.item_trap;
-        } else {
-            className = ap_styles.item_normal;
+            itemClasses.push("Progression");
         }
+        if (part.item.progression && part.item.useful) {
+            className = ap_styles.item_prog_useful;
+        }
+        if (itemClasses.length === 0) {
+            itemClasses.push("Normal");
+        }
+        additionalInfo = `Game: ${part.item.game}, Class: ${itemClasses.join(", ")}`;
     } else if (part.type === "location") {
         className = ap_styles.location;
     } else if (part.type === "player") {
-        if (part.text === services.connector?.connection?.slotInfo.alias) {
+        if (part.player.slot === MultiWorldContext.loadedSlot.slot_number) {
             className = ap_styles.player;
+        } else if (
+            MultiWorldContext.loadedMultiWorld?.slots
+                .map((slot) => slot.slot_number)
+                .includes(part.player.slot)
+        ) {
+            className = ap_styles.player_alt;
         } else {
             className = ap_styles.player_other;
         }
+        additionalInfo = `Game: ${part.player.game}`;
     } else if (part.type === "entrance") {
         className = ap_styles.entrance;
     } else if (part.type === "color" || part.type === "echo") {
@@ -63,6 +82,7 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
         <span
             style={styles}
             className={className ? className + " " + ap_styles.ap_text : ""}
+            title={additionalInfo}
         >
             {part.text}
         </span>

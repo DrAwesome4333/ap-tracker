@@ -22,6 +22,11 @@ const TextClientFilterModal = ({
                 <OptionView
                     option={baseTrackerOptions["TextClient:DoubleClickToCopy"]}
                 />
+                <OptionView
+                    option={
+                        baseTrackerOptions["TextClient:IncludeMyOtherSlots"]
+                    }
+                />
                 <ButtonRow>
                     <GhostButton onClick={onClose}>Close</GhostButton>
                 </ButtonRow>

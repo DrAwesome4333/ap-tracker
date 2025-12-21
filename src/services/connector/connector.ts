@@ -365,7 +365,12 @@ const createConnector = (
                         slot_number,
                     };
                 }
-
+                // update time stamp
+                MultiWorldContext.updateSlot(
+                    multi_slot.multi_save_id,
+                    multi_slot.slot_number,
+                    {}
+                );
                 setAPLocations(client, locationManager);
                 MultiWorldContext.setLoadedSlot(
                     multi_slot.multi_save_id,
