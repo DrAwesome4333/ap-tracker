@@ -13,7 +13,7 @@ import useOption from "../../hooks/optionHook";
 import { InventoryItemOrder } from "../optionsComponents/InventorySettings";
 import { naturalSort } from "../../utility/comparisons";
 import PanelHeader from "../shared/PanelHeader";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import InventoryFilterOptionsModal from "./InventoryFilterOptionsModal";
 import { ItemTrackerType } from "../../services/tracker/resourceEnums";
@@ -211,7 +211,6 @@ const InventoryView = () => {
             <div
                 style={{
                     boxSizing: "border-box",
-                    padding: "0.25em",
                     display: "grid",
                     gridTemplateRows: "3em auto",
                     width: "100%",
@@ -220,7 +219,7 @@ const InventoryView = () => {
             >
                 <PanelHeader title="Inventory">
                     <PrimaryButton
-                        $tiny
+                        tiny
                         style={{ height: "20px" }}
                         onClick={() => setShowFilterModal(true)}
                     >

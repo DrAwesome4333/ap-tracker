@@ -4,7 +4,7 @@ import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionV
 import { LocationManager } from "../../services/locations/locationManager";
 import { TagManager } from "../../services/tags/tagManager";
 import { OptionManager } from "../../services/options/optionManager";
-import { SecondaryButton } from "../buttons";
+import { SecondaryButton } from "../shared/buttons";
 import OptionView from "./OptionView";
 import { baseTrackerOptions } from "../../services/options/trackerOptions";
 import CustomLocationTracker from "../../services/tracker/locationTrackers/CustomLocationTracker";
@@ -122,7 +122,7 @@ const ChecklistSettings = ({
             />
             <br />
             <SecondaryButton
-                $small
+                small
                 onClick={() => {
                     setPreviewOpen((x) => !x);
                 }}

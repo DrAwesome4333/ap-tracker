@@ -2,7 +2,7 @@ import React, { forwardRef, useContext } from "react";
 import ServiceContext from "../../../contexts/serviceContext";
 import Icon from "../../icons/icons";
 import { textPrimary } from "../../../constants/colors";
-import { TextButton } from "../../buttons";
+import { TextButton } from "../../shared/buttons";
 import { useLocationStatus } from "../../../hooks/sectionHooks";
 import { useTagList } from "../../../hooks/tagHook";
 import { TagEntityType } from "../../../services/tags/tagManager";
@@ -89,7 +89,7 @@ const LocationView = forwardRef(
                     backgroundColor: selected
                         ? "rgba(128, 128, 128, 0.25)"
                         : "",
-                    padding: "0",
+                    paddingLeft: "1em",
                     ...style,
                 }}
             >

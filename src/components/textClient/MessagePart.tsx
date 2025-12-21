@@ -1,49 +1,44 @@
 import React, { useContext } from "react";
-import { MessageNode } from "archipelago.js";
+import { API, MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
 import ServiceContext from "../../contexts/serviceContext";
 import { EchoMessageNode } from "../../services/textClientManager";
-
-const hintStatusToColorMap: { [status: number]: string } = {
-    0: null,
-    10: colors.tertiary,
-    20: colors.trapItem,
-    30: colors.progressionItem,
-    40: colors.textClient.green,
+import ap_styles from "../sharedStyles/archipelago.module.css";
+const hintStatusToClassMap: { [status: number]: string } = {
+    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
+    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
+    [API.HintStatus.avoid]: ap_styles.hint_avoid,
+    [API.HintStatus.priority]: ap_styles.hint_prioirty,
+    [API.HintStatus.found]: ap_styles.hint_found,
 };
 
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
     const services = useContext(ServiceContext);
-    let textColor = colors.textPrimary;
+    let textColor = null;
     let backgroundColor = undefined;
-    let underline = false;
-    let bold = false;
+    let className = "";
     if (part.type === "item") {
         if (part.item.progression) {
-            textColor = colors.progressionItem;
+            className = ap_styles.item_prog;
         } else if (part.item.useful) {
-            textColor = colors.usefulItem;
+            className = ap_styles.item_useful;
         } else if (part.item.trap) {
-            textColor = colors.trapItem;
+            className = ap_styles.item_trap;
         } else {
-            textColor = colors.normalItem;
+            className = ap_styles.item_normal;
         }
     } else if (part.type === "location") {
-        textColor = colors.textClient.green;
+        className = ap_styles.location;
     } else if (part.type === "player") {
         if (part.text === services.connector?.connection?.slotInfo.alias) {
-            textColor = colors.textClient.magenta;
+            className = ap_styles.player;
         } else {
-            textColor = colors.textClient.yellow;
+            className = ap_styles.player_other;
         }
     } else if (part.type === "entrance") {
-        textColor = colors.textClient.blue;
+        className = ap_styles.entrance;
     } else if (part.type === "color" || part.type === "echo") {
-        if (part.color === "underline") {
-            underline = true;
-        } else if (part.color === "bold") {
-            bold = true;
-        } else if (part.color && part.color.endsWith("_bg")) {
+        if (part.color && part.color.endsWith("_bg")) {
             backgroundColor =
                 colors.textClient[
                     part.color.substring(0, part.color.length - 3)
@@ -52,22 +47,22 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
             textColor = colors.textClient[part.color];
         }
     } else if (part.type === "hint_status") {
-        const color = hintStatusToColorMap[part.hint_status];
-        if (color) {
-            textColor = color;
-            bold = true;
-        }
+        className = hintStatusToClassMap[part.hint_status];
+    }
+    const styles: React.CSSProperties = {
+        whiteSpace: "pre-wrap",
+    };
+    if (textColor) {
+        styles.color = textColor;
+    }
+    if (backgroundColor) {
+        styles.backgroundColor = backgroundColor;
     }
 
     return (
         <span
-            style={{
-                color: textColor,
-                backgroundColor,
-                textDecoration: underline ? "underline" : undefined,
-                fontWeight: bold ? "bold" : "normal",
-                whiteSpace: "pre-wrap",
-            }}
+            style={styles}
+            className={className ? className + " " + ap_styles.ap_text : ""}
         >
             {part.text}
         </span>

@@ -1,10 +1,7 @@
 import styled from "styled-components";
 
-const CollectionContainer = styled.div<{
-    $color: string;
-}>`
+const CollectionContainer = styled.div`
     cursor: pointer;
-    color: ${(props) => props.$color};
     &:hover {
         text-decoration: underline;
     }

@@ -3,7 +3,6 @@ import MainHeader from "./components/MainHeader";
 import StartScreen from "./components/StartScreen";
 import { TrackerStateContext } from "./contexts/contexts";
 import { createConnector } from "./services/connector/connector";
-import styled from "styled-components";
 import { CONNECTION_STATUS } from "./services/connector/connector";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
 import { LocationManager } from "./services/locations/locationManager";
@@ -13,7 +12,6 @@ import { LocationTagger } from "./services/tags/LocationTagger";
 import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
-import { background, textPrimary } from "./constants/colors";
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
@@ -27,27 +25,6 @@ import { LocationTracker } from "./services/tracker/locationTrackers/locationTra
 import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
 import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
-
-const AppScreen = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    overflow: auto;
-    background-color: ${background};
-    justify-items: stretch;
-    align-items: stretch;
-    color: ${textPrimary};
-    transition:
-        background-color 0.25s ease-in-out,
-        color 0.25s ease-in-out;
-    grid-template-rows: 3em 1fr;
-    grid-template-columns: auto;
-`;
 
 const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
@@ -126,61 +103,61 @@ const App = (): React.ReactNode => {
         titleParts.unshift(connector.connection?.slotInfo.alias);
     }
     return (
-        <div className="App" data-theme={readThemeValue(themeValue)}>
+        <div
+            className={["app", "base", readThemeValue(themeValue)].join(" ")}
+            data-theme={readThemeValue(themeValue)}
+            style={{ colorScheme: readThemeValue(themeValue) }}
+        >
             <title>{titleParts.join(" | ")}</title>
-            <AppScreen data-theme={readThemeValue(themeValue)}>
-                <TrackerStateContext.Provider
+            <TrackerStateContext.Provider
+                value={{
+                    connectionStatus: trackerConnectionState,
+                    slotData: trackerSlotData,
+                }}
+            >
+                <ServiceContext.Provider
                     value={{
-                        connectionStatus: trackerConnectionState,
-                        slotData: trackerSlotData,
+                        locationManager,
+                        locationTracker,
+                        inventoryTracker: itemTracker,
+                        connector,
+                        tagManager,
+                        optionManager,
+                        inventoryManager,
+                        trackerManager,
+                        textClientManager,
+                        customTrackerRepository,
+                        genericTrackerRepository,
+                        locationTagger,
+                        hintTagger,
+                        hintManager,
                     }}
                 >
-                    <ServiceContext.Provider
-                        value={{
-                            locationManager,
-                            locationTracker,
-                            inventoryTracker: itemTracker,
-                            connector,
-                            tagManager,
-                            optionManager,
-                            inventoryManager,
-                            trackerManager,
-                            textClientManager,
-                            customTrackerRepository,
-                            genericTrackerRepository,
-                            locationTagger,
-                            hintTagger,
-                            hintManager,
+                    <NotificationContainer />
+                    <MainHeader
+                        optionsCallback={() => {
+                            setOptionWindowOpen(!optionWindowOpen);
                         }}
-                    >
-                        <NotificationContainer />
-                        <MainHeader
-                            optionsCallback={() => {
-                                setOptionWindowOpen(!optionWindowOpen);
+                    />
+                    {optionWindowOpen && <OptionsScreen />}
+                    {!optionWindowOpen && (
+                        <div
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                overflow: "auto",
                             }}
-                        />
-                        {optionWindowOpen && <OptionsScreen />}
-                        {!optionWindowOpen && (
-                            <div
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    overflow: "auto",
-                                }}
-                            >
-                                {new Set([
-                                    CONNECTION_STATUS.disconnected,
-                                    CONNECTION_STATUS.connecting,
-                                ]).has(trackerConnectionState) && (
-                                    <StartScreen />
-                                )}
-                                {CONNECTION_STATUS.connected ===
-                                    trackerConnectionState && <TrackerScreen />}
-                            </div>
-                        )}
-                    </ServiceContext.Provider>
-                </TrackerStateContext.Provider>
-            </AppScreen>
+                        >
+                            {new Set([
+                                CONNECTION_STATUS.disconnected,
+                                CONNECTION_STATUS.connecting,
+                            ]).has(trackerConnectionState) && <StartScreen />}
+                            {CONNECTION_STATUS.connected ===
+                                trackerConnectionState && <TrackerScreen />}
+                        </div>
+                    )}
+                </ServiceContext.Provider>
+            </TrackerStateContext.Provider>
         </div>
     );
 };

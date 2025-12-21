@@ -80,7 +80,6 @@ const Flex = ({
 
     const myStyle: React.CSSProperties = {
         display: "flex",
-        gap: "0.25em",
         flexDirection: direction,
         ...style,
     };

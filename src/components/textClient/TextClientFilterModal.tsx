@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../buttons";
+import { GhostButton } from "../shared/buttons";
 import OptionView from "../optionsComponents/OptionView";
 import { baseTrackerOptions } from "../../services/options/trackerOptions";
 

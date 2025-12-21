@@ -2,11 +2,10 @@
     box-sizing: border-box;
     width: 95%;
     justify-self: center;
-    color: var(--filled-text-primary);
-    background-color: var(--background-secondary);
+    background-color: var(--background-level-2);
     margin: 0.5rem 0.75rem;
     padding: 0.5rem;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    box-shadow: var(--box-shadow);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -18,4 +17,44 @@
     align-items: center;
     height: 100%;
     flex-shrink: 1;
+}
+
+.slots {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    justify-self: center;
+    align-self: center;
+    row-gap: 0.25em;
+    width: 80%;
+    margin: 1em 2em;
+    grid-template-rows: 3em 1fr 3em;
+    grid-template-columns: 1fr;
+    max-height: 75%;
+    height: fit-content;
+}
+
+.slot_list {
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 5em;
+    max-height: 100%;
+    width: 100%;
+    padding: 0 0.5em;
+    margin: 0 0.5em;
+    scrollbar-gutter: stable;
+    background-color: var(--background-level-0);
+    box-shadow: inset var(--box-shadow-small);
+}
+
+.new_slot_panel {
+    display: grid;
+    align-items: end;
+    justify-items: center;
+    justify-self: center;
+    margin: auto 0;
+    row-gap: 0.25em;
+    width: fit-content;
+    padding: 1em 2em;
+    grid-template-rows: repeat(5, 2.5em) 4em;
 }

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import { Input } from "../inputs";
 import { useTextClientHistory } from "../../hooks/textClientHook";
 import Spinner from "../icons/spinner";
@@ -52,7 +52,7 @@ const TextClientTextBox = () => {
         <div style={{ display: "flex", padding: "0 0.5em 0.25em 0" }}>
             <PrimaryButton
                 onClick={processInput}
-                $small
+                small
                 disabled={sendingMessage}
             >
                 {sendingMessage ? (

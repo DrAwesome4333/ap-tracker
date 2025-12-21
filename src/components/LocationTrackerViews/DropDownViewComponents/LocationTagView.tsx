@@ -5,7 +5,11 @@ import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
 import { LocationStatus } from "../../../services/locations/locationManager";
 import { Input } from "../../inputs";
-import { DangerButton, PrimaryButton, SecondaryButton } from "../../buttons";
+import {
+    DangerButton,
+    PrimaryButton,
+    SecondaryButton,
+} from "../../shared/buttons";
 import { TagId } from "../../../services/tags/tagManager";
 
 const LocationTagView = ({
@@ -87,7 +91,7 @@ const LocationTagView = ({
             {editMode ? (
                 <>
                     <PrimaryButton
-                        $tiny
+                        tiny
                         style={{
                             margin: "1em",
                         }}
@@ -100,7 +104,7 @@ const LocationTagView = ({
                         <Icon type="check_small" fontSize="14px" />{" "}
                     </PrimaryButton>
                     <SecondaryButton
-                        $tiny
+                        tiny
                         style={{
                             margin: "1em",
                         }}
@@ -118,7 +122,7 @@ const LocationTagView = ({
                     style={{
                         margin: "1em",
                     }}
-                    $tiny
+                    tiny
                     onClick={() => setEditMode(true)}
                 >
                     {" "}
@@ -133,7 +137,7 @@ const LocationTagView = ({
                         margin: "1em",
                     }}
                     onClick={() => onClear(tagId)}
-                    $tiny
+                    tiny
                 >
                     <Icon fontSize="14px" type="delete" />
                 </DangerButton>

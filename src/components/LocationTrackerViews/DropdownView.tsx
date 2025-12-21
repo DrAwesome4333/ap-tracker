@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PanelHeader from "../shared/PanelHeader";
 import SectionView from "./DropDownViewComponents/SectionView";
 import StickySpacer from "../shared/StickySpacer";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import DropdownFilterModal from "./DropDownViewComponents/DropdownFilterModal";
 import LocationDetails from "./LocationDetails";
@@ -16,7 +16,7 @@ const LocationTrackerDropdownView = () => {
             <div className={styles.dropdown_view}>
                 <PanelHeader title="Locations">
                     <PrimaryButton
-                        $tiny
+                        tiny
                         style={{ height: "20px" }}
                         onClick={() => setShowFilterModal(true)}
                     >

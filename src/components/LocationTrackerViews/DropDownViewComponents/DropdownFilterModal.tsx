@@ -3,7 +3,7 @@ import Modal from "../../shared/Modal";
 import ChecklistSettings from "../../optionsComponents/ChecklistSettings";
 import ServiceContext from "../../../contexts/serviceContext";
 import ButtonRow from "../../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../../buttons";
+import { GhostButton } from "../../shared/buttons";
 import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import HintSettings from "../../optionsComponents/HintTagSettings";

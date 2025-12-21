@@ -31,8 +31,13 @@ const ClientMessage = forwardRef(
                 ref={ref}
                 style={{
                     ...style,
-                    padding: "0.12em",
-                    width: "95%",
+                    padding: "0.25em",
+                    backgroundColor:
+                        index % 2 === 1
+                            ? "rgba(128, 128, 128, 0.2)"
+                            : "rgba(0, 0, 0, 0)",
+                    width: "100%",
+                    boxSizing: "border-box",
                 }}
                 onDoubleClick={async () => {
                     if (!copyOnDblClick) {

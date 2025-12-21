@@ -5,7 +5,7 @@ import Icon from "../../icons/icons";
 import useOption from "../../../hooks/optionHook";
 import { naturalSort } from "../../../utility/comparisons";
 import { useSection } from "../../../hooks/sectionHooks";
-import { TextButton } from "../../buttons";
+import { TextButton } from "../../shared/buttons";
 import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { useTagCounters } from "../../../hooks/tagHook";
@@ -297,8 +297,10 @@ const SectionView = ({
                                         width: "95%",
                                         margin: "1em",
                                         boxShadow:
-                                            "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                                            "inset var(--box-shadow-small)",
                                         maxHeight: "75vh",
+                                        backgroundColor:
+                                            "var(--background-level-0)",
                                     }}
                                     rowComponent={LocationView}
                                     rowHeight={rowHeight}

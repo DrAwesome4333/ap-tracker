@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { InventoryItem } from "../../services/inventory/inventoryManager";
 import CollectionContainer from "./CollectionContainer";
-import { TextButton } from "../buttons";
+import { TextButton } from "../shared/buttons";
 import InventoryItemListView from "./InventoryItemListView";
-import {
-    normalItem,
-    progressionItem,
-    textClient,
-    trapItem,
-    usefulItem,
-} from "../../constants/colors";
 import Icon from "../icons/icons";
+import ap_styles from "../sharedStyles/archipelago.module.css";
 
 const InventoryItemGroupView = ({
     name,
@@ -36,23 +30,23 @@ const InventoryItemGroupView = ({
         })
     );
 
-    let color = normalItem;
+    let itemClass = ap_styles.item_normal;
     if (flags.progression) {
-        color = progressionItem;
+        itemClass = ap_styles.item_prog;
     } else if (flags.useful) {
-        color = usefulItem;
+        itemClass = ap_styles.item_useful;
     } else if (flags.trap) {
-        color = trapItem;
+        itemClass = ap_styles.item_trap;
     } else if (flags.server) {
-        color = textClient.yellow;
+        itemClass = ap_styles.item_server;
     }
     return (
         <div>
-            <CollectionContainer
-                $color={color}
-                onClick={() => setDetailsOpen((x) => !x)}
-            >
-                <TextButton style={{ outlineColor: color, fontWeight: "bold" }}>
+            <CollectionContainer onClick={() => setDetailsOpen((x) => !x)}>
+                <TextButton
+                    className={ap_styles.ap_text_alt + " " + itemClass}
+                    style={{ fontWeight: "bold" }}
+                >
                     {count} - {name}{" "}
                     {
                         <Icon

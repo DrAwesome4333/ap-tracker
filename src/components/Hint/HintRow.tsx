@@ -1,15 +1,11 @@
 import { API, Hint, Item } from "archipelago.js";
 import React, { forwardRef, useCallback, useContext, useState } from "react";
 import ServiceContext from "../../contexts/serviceContext";
-import {
-    normalItem,
-    progressionItem,
-    textClient,
-    trapItem,
-    usefulItem,
-} from "../../constants/colors";
 import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
+import ap_styles from "../sharedStyles/archipelago.module.css";
+import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+
 const statusSelections = [
     API.HintStatus.priority,
     API.HintStatus.avoid,
@@ -24,18 +20,28 @@ const statusToText = {
     [API.HintStatus.found]: "Found",
 };
 
-const getPlayerColor = (ownSlot: number, player: number) => {
-    return ownSlot === player ? textClient.magenta : textClient.yellow;
+const getPlayerClass = (player: number) => {
+    if (player === MultiWorldContext.loadedSlot.slot_number)
+        return ap_styles.player + " " + ap_styles.ap_text;
+
+    if (
+        MultiWorldContext.loadedMultiWorld.slots.find(
+            (s) => s.slot_number === player
+        )
+    )
+        return ap_styles.player_alt + " " + ap_styles.ap_text;
+    return ap_styles.player_other + " " + ap_styles.ap_text;
 };
 
-const getItemColor = (item: Item) => {
-    return item.progression
-        ? progressionItem
+const getItemClass = (item: Item) => {
+    const special = item.progression
+        ? ap_styles.item_prog
         : item.useful
-          ? usefulItem
+          ? ap_styles.item_useful
           : item.trap
-            ? trapItem
-            : normalItem;
+            ? ap_styles.item_trap
+            : ap_styles.item_normal;
+    return special + " " + ap_styles.ap_text;
 };
 
 const HintRow = forwardRef(
@@ -61,48 +67,35 @@ const HintRow = forwardRef(
                 style={{
                     ...style,
                     display: "flex",
-                    width: "98%",
+                    width: "100%",
+                    boxSizing: "border-box",
                     gap: "0.25em",
-                    padding: "0.12em",
+                    padding: "0.5em",
                     background: odd ? "rgba(128, 128, 128, 0.12)" : "",
                 }}
             >
                 <div>
-                    <span
-                        style={{
-                            color: getPlayerColor(
-                                playerSlot,
-                                hint.item.receiver.slot
-                            ),
-                        }}
-                    >
+                    <span className={getPlayerClass(hint.item.receiver.slot)}>
                         {hint.item.receiver.alias}
                     </span>
                     {"'s"}{" "}
-                    <span
-                        style={{
-                            color: getItemColor(hint.item),
-                        }}
-                    >
+                    <span className={getItemClass(hint.item)}>
                         {hint.item.name}
                     </span>{" "}
                     is at{" "}
-                    <span style={{ color: textClient.green }}>
+                    <span
+                        className={ap_styles.location + " " + ap_styles.ap_text}
+                    >
                         {hint.item.locationName}
                     </span>{" "}
                     (
-                    <span style={{ color: textClient.blue }}>
+                    <span
+                        className={ap_styles.entrance + " " + ap_styles.ap_text}
+                    >
                         {hint.entrance}
                     </span>
                     ) in{" "}
-                    <span
-                        style={{
-                            color: getPlayerColor(
-                                playerSlot,
-                                hint.item.sender.slot
-                            ),
-                        }}
-                    >
+                    <span className={getPlayerClass(hint.item.sender.slot)}>
                         {hint.item.sender.alias}
                     </span>
                     {"'s"} world.

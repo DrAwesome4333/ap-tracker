@@ -1,6 +1,6 @@
 // @ts-check
 import React, { forwardRef, ComponentProps } from "react";
-import { background, danger, tertiary, textPrimary } from "../constants/colors";
+import { tertiary } from "../constants/colors";
 
 const Input = forwardRef(
     (
@@ -37,7 +37,9 @@ const Input = forwardRef(
                                         fontSize: "0.75em",
                                         marginLeft: "0.5em",
                                         marginBottom: "0px",
-                                        color: invalid ? danger : textPrimary,
+                                        color: invalid
+                                            ? "var(--danger-accent)"
+                                            : "var(--text-primary)",
                                     }}
                                 >
                                     {label} {invalid && "*"}
@@ -51,9 +53,9 @@ const Input = forwardRef(
                             {...props}
                             className="interactive"
                             style={{
-                                backgroundColor: background,
-                                color: textPrimary,
-                                border: `1px solid ${invalid ? danger : tertiary}`,
+                                backgroundColor: "var(--background-level-2)",
+                                color: "var(--text-primary)",
+                                border: `1px solid ${invalid ? "var(--danger-accent)" : tertiary}`,
                                 width: "100%",
                                 boxSizing: "border-box",
                             }}

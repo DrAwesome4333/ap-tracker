@@ -1,31 +1,12 @@
 import React, { useContext, useState } from "react";
-import styled from "styled-components";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
+import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
 import ServiceContext from "../../contexts/serviceContext";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
-
-const Container = styled.div`
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    justify-self: center;
-    margin: auto 0;
-    row-gap: 0.25em;
-    width: fit-content;
-    padding: 1em 2em;
-    grid-template-areas:
-        "title"
-        "host"
-        "port"
-        "slot"
-        "password"
-        "connect";
-    grid-template-rows: repeat(5, 2.5em) 4em;
-`;
 
 const NewConnection = ({ ...props }) => {
     const [connectionInfo, setConnectionInfo] = useState({
@@ -52,8 +33,8 @@ const NewConnection = ({ ...props }) => {
     }
 
     return (
-        <Container {...props}>
-            <h2>New Connection</h2>
+        <div className={styles.new_slot_panel} {...props}>
+            <h2>New Slot</h2>
             <Input
                 type="text"
                 name="host"
@@ -108,7 +89,7 @@ const NewConnection = ({ ...props }) => {
             >
                 Connect
             </PrimaryButton>
-        </Container>
+        </div>
     );
 };
 

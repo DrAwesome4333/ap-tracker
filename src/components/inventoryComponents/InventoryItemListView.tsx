@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import {
-    normalItem,
-    progressionItem,
-    tertiary,
-    trapItem,
-    usefulItem,
-    textClient,
-} from "../../constants/colors";
 import CollectionContainer from "./CollectionContainer";
 import InventoryItemView from "./InventoryItemView";
-import { TextButton } from "../buttons";
+import { TextButton } from "../shared/buttons";
 import { InventoryItem } from "../../services/inventory/inventoryManager";
 import Icon from "../icons/icons";
 import { List, useDynamicRowHeight } from "react-window";
-
+import ap_styles from "../sharedStyles/archipelago.module.css";
 const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const count = items.length;
@@ -34,25 +26,22 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
         }
     });
 
-    let color = normalItem;
+    let itemClass = ap_styles.item_normal;
     if (flags.progression) {
-        color = progressionItem;
+        itemClass = ap_styles.item_prog;
     } else if (flags.useful) {
-        color = usefulItem;
+        itemClass = ap_styles.item_useful;
     } else if (flags.trap) {
-        color = trapItem;
+        itemClass = ap_styles.item_trap;
     } else if (flags.server) {
-        color = textClient.yellow;
+        itemClass = ap_styles.item_server;
     }
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
 
     return (
         <div>
-            <CollectionContainer
-                $color={color}
-                onClick={() => setDetailsOpen((x) => !x)}
-            >
-                <TextButton style={{ outlineColor: color }}>
+            <CollectionContainer onClick={() => setDetailsOpen((x) => !x)}>
+                <TextButton className={ap_styles.ap_text_alt + " " + itemClass}>
                     {count} - {name}
                     {
                         <Icon
@@ -81,14 +70,13 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                         marginLeft: "1em",
                         fontStyle: "italic",
                         textDecoration: "none",
-                        color: tertiary,
                     }}
                 >
                     <List
                         style={{
                             overflow: "hidden",
                             maxHeight: "75vh",
-                            boxShadow: "2px 3px 5px rgba(0, 0, 0, 0.5)",
+                            boxShadow: "inset var(--box-shadow-small)",
                         }}
                         rowComponent={InventoryItemView}
                         rowCount={items.length}

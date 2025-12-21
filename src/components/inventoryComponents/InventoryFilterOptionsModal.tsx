@@ -2,7 +2,7 @@ import React, { useContext, useSyncExternalStore } from "react";
 import Modal from "../shared/Modal";
 import InventorySettings from "../optionsComponents/InventorySettings";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../buttons";
+import { GhostButton } from "../shared/buttons";
 import ServiceContext from "../../contexts/serviceContext";
 import OptionView from "../optionsComponents/OptionView";
 import { JSONValue } from "../../services/dataStores";

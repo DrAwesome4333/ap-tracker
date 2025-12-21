@@ -1,0 +1,14 @@
+.modal_grid {
+    display: grid;
+    column-gap: 2em;
+
+    grid:
+        "upload" 25vh
+        "build" 25vh / auto;
+}
+
+@media only screen and (orientation: landscape) {
+    .modal_grid {
+        grid: "upload build" 25vh / 1fr 1fr;
+    }
+}

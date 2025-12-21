@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-    background,
-    filledTextPrimary,
-    primary,
-    secondary,
-    tertiary,
-    textPrimary,
-} from "../../constants/colors";
+import { tertiary } from "../../constants/colors";
 import styled from "styled-components";
 import { randomUUID } from "../../utility/uuid";
+import { TextButton } from "../shared/buttons";
 
 class Tab {
     name: string;
@@ -21,12 +15,18 @@ class Tab {
     }
 }
 
-const TabContainer = styled.div<{ $selected: boolean }>`
+const TabContainer = styled(TextButton)<{ $selected: boolean }>`
     cursor: pointer;
     padding: 0.5em;
-    background-color: ${(props) => (props.$selected ? background : primary)};
-    color: ${(props) => (props.$selected ? textPrimary : filledTextPrimary)};
-    border: 2px solid ${secondary};
+    background-color: ${(props) =>
+        props.$selected
+            ? "var(--background-level-2)"
+            : "var(--primary-accent)"};
+    color: ${(props) =>
+        props.$selected ? "var(--text-primary)" : "var(--filled-text-primary)"};
+    border-left: 1px solid var(--secondary-accent);
+    border-right: 1px solid var(--secondary-accent);
+    box-shadow: ${(props) => (props.$selected ? "inset" : "")} var(--box-shadow);
     flex: 1 1 100%;
     text-align: center;
     line-height: 100%;
@@ -71,7 +71,6 @@ const Tabs = ({
         <div
             style={{
                 display: "grid",
-                paddingTop: "0.25em",
                 boxSizing: "border-box",
                 gridTemplateRows: "2em 1fr",
                 ...style,
@@ -84,6 +83,7 @@ const Tabs = ({
                     width: "100%",
                     height: "100%",
                     overflowX: "auto",
+                    zIndex: "2",
                 }}
             >
                 {tabs.map((tab) => (
