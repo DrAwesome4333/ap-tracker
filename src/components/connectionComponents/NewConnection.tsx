@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { PrimaryButton } from "../shared/buttons";
+import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
 import ServiceContext from "../../contexts/serviceContext";
@@ -7,8 +7,9 @@ import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
-const NewConnection = ({ ...props }) => {
+const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
@@ -67,28 +68,33 @@ const NewConnection = ({ ...props }) => {
                 label="Password"
                 disabled={disabled}
             />
-            <PrimaryButton
-                onClick={() => {
-                    connector?.connectToAP(connectionInfo).catch((result) => {
-                        if (result instanceof Error) {
-                            console.error(result);
-                            NotificationManager.createToast({
-                                type: MessageType.error,
-                                message: `An unexpected error occurred: ${result.name}`,
-                                details: `${result.message}\n${result.stack}`,
-                                duration: 30,
+            <ButtonRow>
+                <PrimaryButton
+                    onClick={() => {
+                        connector
+                            ?.connectToAP(connectionInfo)
+                            .catch((result) => {
+                                if (result instanceof Error) {
+                                    console.error(result);
+                                    NotificationManager.createToast({
+                                        type: MessageType.error,
+                                        message: `An unexpected error occurred: ${result.name}`,
+                                        details: `${result.message}\n${result.stack}`,
+                                        duration: 30,
+                                    });
+                                } else {
+                                    NotificationManager.createToast({
+                                        ...result,
+                                    });
+                                }
                             });
-                        } else {
-                            NotificationManager.createToast({
-                                ...result,
-                            });
-                        }
-                    });
-                }}
-                disabled={disabled}
-            >
-                Connect
-            </PrimaryButton>
+                    }}
+                    disabled={disabled}
+                >
+                    Connect
+                </PrimaryButton>
+                {onClose && <GhostButton onClick={onClose}>Close</GhostButton>}
+            </ButtonRow>
         </div>
     );
 };

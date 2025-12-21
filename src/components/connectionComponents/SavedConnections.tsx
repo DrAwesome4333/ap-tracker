@@ -145,7 +145,7 @@ const SavedConnections = ({ ...props }) => {
                             textAlign: "center",
                         }}
                     >
-                        <i>Create a new connection and it will appear here</i>
+                        <i>Add a slot and it will appear here</i>
                     </div>
                 )}
             </div>

@@ -85,11 +85,11 @@ const LocationView = forwardRef(
             <div
                 ref={ref}
                 style={{
-                    position: "relative",
                     backgroundColor: selected
                         ? "rgba(128, 128, 128, 0.25)"
                         : "",
                     paddingLeft: "1em",
+                    boxSizing: "border-box",
                     ...style,
                 }}
             >
