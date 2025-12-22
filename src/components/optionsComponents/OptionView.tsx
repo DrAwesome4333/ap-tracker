@@ -6,6 +6,7 @@ import { JSONValue } from "../../services/dataStores";
 import MultiselectOptionView from "./optionViewComponents/MultiSelectOptionView";
 import { TrackerOption } from "../../services/options/option";
 import { OptionType } from "../../services/options/optionEnums";
+import ColorOptionView from "./optionViewComponents/ColorOptionView";
 
 const OptionView = ({
     option,
@@ -37,6 +38,8 @@ const OptionView = ({
                     {...props}
                     hideTitle={hideTitle}
                 />
+            ) : option.type === OptionType.color ? (
+                <ColorOptionView option={option} {...props} />
             ) : (
                 <p style={{ color: "red" }}>
                     Not Implemented Option type {option.type} for {option.name}

@@ -1,10 +1,4 @@
 import { API } from "archipelago.js";
-import {
-    normalItem,
-    progressionItem,
-    trapItem,
-    usefulItem,
-} from "../../constants/colors";
 import { randomNumericId } from "../../utility/uuid";
 import {
     TagCounterV2,
@@ -38,7 +32,7 @@ const hintTagTypes: { [status: number]: TagTypeV2[] } = {
             ...baseHint,
             type_id: "hint_unspecified",
             icon_id: "bookmark_flag",
-            icon_color: usefulItem,
+            icon_color: "var(--ap-hint-unspecified)",
             display_name: "Hint (Unspecified)",
             counter_id: "hint_unspecified",
             icon_spec: {
@@ -51,7 +45,7 @@ const hintTagTypes: { [status: number]: TagTypeV2[] } = {
             ...baseHint,
             type_id: "hint_no_priority",
             icon_id: "bookmark_flag",
-            icon_color: normalItem,
+            icon_color: "var(--ap-hint-no-priority)",
             display_name: "Hint (No priority)",
             counter_id: "hint_no_priority",
             icon_spec: {
@@ -64,7 +58,7 @@ const hintTagTypes: { [status: number]: TagTypeV2[] } = {
             ...baseHint,
             type_id: "hint_avoid",
             icon_id: "bomb",
-            icon_color: trapItem,
+            icon_color: "var(--ap-hint-avoid)",
             display_name: "Hint (avoid)",
             counter_id: "hint_avoid",
         },
@@ -74,7 +68,7 @@ const hintTagTypes: { [status: number]: TagTypeV2[] } = {
             ...baseHint,
             type_id: "hint_priority",
             icon_id: "flag",
-            icon_color: progressionItem,
+            icon_color: "var(--ap-hint-priority)",
             display_name: "Hint (Priority)",
             counter_id: "hint_priority",
         },
@@ -84,7 +78,7 @@ const hintTagTypes: { [status: number]: TagTypeV2[] } = {
             ...baseHint,
             type_id: "hint_found",
             icon_id: "flag_check",
-            icon_color: "green",
+            icon_color: "var(--ap-hint-found)",
             display_name: "Hint (Found)",
             counter_id: "hint_found",
             variants: null,
@@ -108,7 +102,7 @@ Object.freeze(hintTagTypeArray);
 const hintCounter_unspecified: TagCounterV2 = {
     counter_id: "hint_unspecified",
     display_name: "Hint (Unspecified)",
-    color: usefulItem,
+    color: "var(--ap-hint-unspecified)",
     icon_id: "bookmark_flag",
     show_total: false,
 };
@@ -116,7 +110,7 @@ const hintCounter_unspecified: TagCounterV2 = {
 const hintCounter_no_priority: TagCounterV2 = {
     counter_id: "hint_no_priority",
     display_name: "Hint (No Priority)",
-    color: normalItem,
+    color: "var(--ap-hint-no-priority)",
     icon_id: "bookmark_flag",
     show_total: false,
 };
@@ -124,7 +118,7 @@ const hintCounter_no_priority: TagCounterV2 = {
 const hintCounter_avoid: TagCounterV2 = {
     counter_id: "hint_avoid",
     display_name: "Hint (Avoid)",
-    color: trapItem,
+    color: "var(--ap-hint-avoid)",
     icon_id: "bomb",
     show_total: false,
 };
@@ -132,7 +126,7 @@ const hintCounter_avoid: TagCounterV2 = {
 const hintCounter_priority: TagCounterV2 = {
     counter_id: "hint_priority",
     display_name: "Hint (Priority)",
-    color: progressionItem,
+    color: "var(--ap-hint-priority)",
     icon_id: "flag",
     show_total: false,
 };

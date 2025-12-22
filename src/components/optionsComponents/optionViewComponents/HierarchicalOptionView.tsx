@@ -47,7 +47,7 @@ const HierarchicalOptionView = ({
             <div
                 style={{
                     marginLeft: "0.5em",
-                    display: "flex",
+                    display: option.format === "column" ? "grid" : "flex",
                     columnGap: "2em",
                     overflowY: "auto",
                     flexWrap: "wrap",

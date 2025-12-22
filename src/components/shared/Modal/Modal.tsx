@@ -5,6 +5,8 @@ import { readThemeValue } from "../../../services/theme/theme";
 import useOption from "../../../hooks/optionHook";
 import ServiceContext from "../../../contexts/serviceContext";
 import { globalOptionManager } from "../../../services/options/optionManager";
+import apStyles from "../../sharedStyles/archipelago.module.css";
+import { useAPColorStyles } from "../../../services/theme/ColorManager";
 
 /**
  *
@@ -26,6 +28,7 @@ const Modal = ({
         | "dark"
         | "system"
         | null;
+    const apColors = useAPColorStyles(optionManger, "global");
     return (
         <>
             {open &&
@@ -39,6 +42,8 @@ const Modal = ({
                                 "base",
                                 readThemeValue(themeValue),
                                 styles.modal_container,
+                                apStyles.ap_color_wrapper,
+                                apColors,
                             ].join(" ")}
                         >
                             {children}

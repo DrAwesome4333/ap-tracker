@@ -4,6 +4,7 @@ import ServiceContext from "../../../contexts/serviceContext";
 import useOption from "../../../hooks/optionHook";
 import { Checkbox } from "../../inputs";
 import { JSONValue } from "../../../services/dataStores";
+import apStyles from "../../sharedStyles/archipelago.module.css";
 
 const CheckboxOptionView = ({
     option,
@@ -26,8 +27,10 @@ const CheckboxOptionView = ({
             ? parent[option.name]
             : useOption(optionManager, option.name, scope)
     ) as boolean;
+    const classes = option.apClasses?.map((c) => apStyles[c]) ?? [];
+
     return (
-        <div className={className} style={style}>
+        <div className={[className, ...classes].join(" ")} style={style}>
             <Checkbox
                 label={option.display ?? option.name}
                 checked={value}

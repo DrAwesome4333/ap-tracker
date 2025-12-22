@@ -5,6 +5,7 @@ import Icon from "../icons/icons";
 import ServiceContext from "../../contexts/serviceContext";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
+import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
 
 const InventoryItemView = forwardRef(
     (
@@ -27,6 +28,15 @@ const InventoryItemView = forwardRef(
         } else if (item.sender === "Archipelago") {
             itemClass = ap_styles.item_server;
         }
+
+        const playerClass =
+            item.sender_slot === MultiWorldContext.loadedSlot.slot_number
+                ? ap_styles.player
+                : MultiWorldContext.loadedMultiWorld.slots.find(
+                        (slot) => slot.slot_number === item.sender_slot
+                    )
+                  ? ap_styles.player_alt
+                  : ap_styles.player_other;
         return (
             <div
                 className={ap_styles.ap_text_alt + " " + itemClass}
@@ -40,7 +50,21 @@ const InventoryItemView = forwardRef(
                         marginLeft: "0.5em",
                     }}
                 >
-                    {item.location} ({item.sender})
+                    <span
+                        className={[
+                            ap_styles.ap_text_alt,
+                            ap_styles.location,
+                        ].join(" ")}
+                    >
+                        {item.location}
+                    </span>{" "}
+                    <span
+                        className={[ap_styles.ap_text_alt, playerClass].join(
+                            " "
+                        )}
+                    >
+                        {item.sender}
+                    </span>
                     {item.local && locationManager && tagManager && (
                         <GhostButton
                             onClick={(event) => {

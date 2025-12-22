@@ -32,6 +32,7 @@ type ColorOption = {
 type HierarchicalOption = {
     type: OptionType.hierarchical;
     children: TrackerOption[];
+    format?: "column";
 } & BaseOption;
 
 interface BaseOption {
@@ -42,6 +43,7 @@ interface BaseOption {
         values: (number | string | boolean)[];
     };
     scope?: string;
+    apClasses?: string[];
 }
 
 type TrackerOption =

@@ -9,6 +9,8 @@ import OptionView from "./OptionView";
 import InventorySettings from "./InventorySettings";
 import LayoutSettings from "./LayoutSettings";
 import HintSettings from "./HintTagSettings";
+import { colorOptionsDef } from "../../services/theme/ColorManager";
+import { SecondaryButton } from "../shared/buttons";
 
 const OptionsScreen = () => {
     const serviceContext = useContext(ServiceContext);
@@ -58,6 +60,21 @@ const OptionsScreen = () => {
             </OptionBlock>
             <OptionBlock title="Hint Tag Settings">
                 <HintSettings hideTitle />
+            </OptionBlock>
+            <OptionBlock title="Color Settings">
+                <p>Note: colors are muted in light mode</p>
+                <OptionView option={colorOptionsDef} />
+                <SecondaryButton
+                    onClick={() => {
+                        optionManager.setOptionValue(
+                            "APColors",
+                            "global",
+                            null
+                        );
+                    }}
+                >
+                    Reset Colors
+                </SecondaryButton>
             </OptionBlock>
 
             <OptionBlock title="Attributions">

@@ -25,6 +25,8 @@ import { LocationTracker } from "./services/tracker/locationTrackers/locationTra
 import { ItemTracker } from "./services/tracker/itemTrackers/itemTrackers";
 import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
+import ApStyles from "./components/sharedStyles/archipelago.module.css";
+import { useAPColorStyles } from "./services/theme/ColorManager";
 
 const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
@@ -102,11 +104,19 @@ const App = (): React.ReactNode => {
     if (connector.connection?.slotInfo.alias) {
         titleParts.unshift(connector.connection?.slotInfo.alias);
     }
+
+    const apColors = useAPColorStyles(optionManager, "global");
+
     return (
         <div
-            className={["app", "base", readThemeValue(themeValue)].join(" ")}
+            className={[
+                "app",
+                "base",
+                readThemeValue(themeValue),
+                ApStyles.ap_color_wrapper,
+            ].join(" ")}
             data-theme={readThemeValue(themeValue)}
-            style={{ colorScheme: readThemeValue(themeValue) }}
+            style={{ colorScheme: readThemeValue(themeValue), ...apColors }}
         >
             <title>{titleParts.join(" | ")}</title>
             <TrackerStateContext.Provider

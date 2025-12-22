@@ -17,6 +17,7 @@ const convertAPItem = (
         index,
         location: item.locationName,
         sender: item.sender.alias,
+        sender_slot: item.sender.slot,
         local: item.sender.slot === client.players.self.slot,
     };
 };

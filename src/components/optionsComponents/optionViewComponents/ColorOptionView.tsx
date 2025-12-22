@@ -1,18 +1,18 @@
 import React, { useContext, useId } from "react";
-import { SelectOption } from "../../../services/options/option";
+import { ColorOption } from "../../../services/options/option";
 import ServiceContext from "../../../contexts/serviceContext";
 import useOption from "../../../hooks/optionHook";
 import { JSONValue } from "../../../services/dataStores";
 import apStyles from "../../sharedStyles/archipelago.module.css";
 
-const SelectOptionView = ({
+const ColorOptionView = ({
     option,
     style,
     className,
     parent,
     onUpdate,
 }: {
-    option: SelectOption;
+    option: ColorOption;
     style?: React.CSSProperties;
     className?: string;
     parent?: { [propName: string]: JSONValue };
@@ -28,11 +28,10 @@ const SelectOptionView = ({
             : useOption(optionManager, option.name, scope)
     ) as string;
     const classes = option.apClasses?.map((c) => apStyles[c]) ?? [];
-
     return (
         <div className={[className, ...classes].join(" ")} style={style}>
-            <label htmlFor={elementId}>{option.display ?? option.name}: </label>
-            <select
+            <input
+                type="color"
                 className="interactive"
                 id={elementId}
                 value={value}
@@ -44,19 +43,12 @@ const SelectOptionView = ({
                         optionManager.setOptionValue(option.name, scope, value);
                     }
                 }}
-            >
-                {option.choices.map((choice, index) => (
-                    <option
-                        key={index}
-                        value={
-                            typeof choice === "string" ? choice : choice.name
-                        }
-                    >
-                        {typeof choice === "string" ? choice : choice.display}
-                    </option>
-                ))}
-            </select>
+            />
+            <label htmlFor={elementId}>
+                {" "}
+                - {option.display ?? option.name}
+            </label>
         </div>
     );
 };
-export default SelectOptionView;
+export default ColorOptionView;
