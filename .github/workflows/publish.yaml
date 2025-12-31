@@ -2,8 +2,9 @@
 name: publish-to-github-pages
 on:
     push:
-        branches:
-            - main
+        tags:
+            - "v[0-9]+.[0-9]+.[0-9]+" # Matches v1.0.0, v2.1.5, etc.
+            - "v[0-9]+.[0-9]+.[0-9]+-test.[0-9]+" # for forced test versions.
 
 permissions:
     contents: read
