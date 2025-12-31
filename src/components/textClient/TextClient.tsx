@@ -8,7 +8,7 @@ import React, {
 import { useTextClientMessages } from "../../hooks/textClientHook";
 import ServiceContext from "../../contexts/serviceContext";
 import ClientMessage from "./ClientMessage";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import { Checkbox } from "../inputs";
 import Icon from "../icons/icons";
 import TextClientTextBox from "./TextClientTextBox";
@@ -56,10 +56,9 @@ const TextClient = () => {
                     width: "100%",
                     height: "100%",
                     display: "grid",
-                    gap: "0.25em",
+                    gap: "0",
                     gridTemplateRows: "3em 1fr auto",
                     overflow: "hidden",
-                    padding: "0.25em",
                 }}
             >
                 <PanelHeader title={"Text Client"}>
@@ -71,7 +70,7 @@ const TextClient = () => {
                         checked={followMessages}
                     />
                     <PrimaryButton
-                        $tiny
+                        tiny
                         style={{ height: "20px" }}
                         onClick={() => setShowFilterModal(true)}
                     >
@@ -85,6 +84,11 @@ const TextClient = () => {
                     rowHeight={rowHeight}
                     rowProps={{ messages }}
                     overscanCount={5}
+                    style={{
+                        padding: "1em",
+                        backgroundColor: "var(--background-level-0",
+                        boxShadow: "inset var(--box-shadow)",
+                    }}
                 />
 
                 <TextClientTextBox />

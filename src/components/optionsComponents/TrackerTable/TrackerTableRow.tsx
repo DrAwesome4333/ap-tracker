@@ -7,7 +7,11 @@ import {
 } from "../../../services/tracker/resourceEnums";
 import ServiceContext from "../../../contexts/serviceContext";
 import { useCurrentGameTracker } from "../../../hooks/trackerHooks";
-import { DangerButton, PrimaryButton, SecondaryButton } from "../../buttons";
+import {
+    DangerButton,
+    PrimaryButton,
+    SecondaryButton,
+} from "../../shared/buttons";
 import Icon from "../../icons/icons";
 import { CustomTrackerRepository } from "../../../services/tracker/customTrackerRepository";
 import NotificationManager, {
@@ -45,7 +49,7 @@ const TrackerTableRow = ({
             <td>{tracker.version}</td>
             <td>
                 <PrimaryButton
-                    $tiny
+                    tiny
                     onClick={async () => {
                         const trackerData = (await customTrackerRepository
                             .loadResource(
@@ -110,7 +114,7 @@ const TrackerTableRow = ({
                     <Icon fontSize="14px" type="download" />
                 </PrimaryButton>
                 <DangerButton
-                    $tiny
+                    tiny
                     onClick={() => {
                         if (
                             window.confirm(
@@ -125,7 +129,7 @@ const TrackerTableRow = ({
                 </DangerButton>
                 {!inUse && (
                     <SecondaryButton
-                        $tiny
+                        tiny
                         onClick={() => {
                             trackerManager.setGameTracker(
                                 tracker.game,
@@ -139,7 +143,7 @@ const TrackerTableRow = ({
                 )}
                 {inUse && (
                     <SecondaryButton
-                        $tiny
+                        tiny
                         onClick={() => {
                             trackerManager.setGameTracker(tracker.game, {
                                 type: tracker.type,

@@ -1,45 +1,34 @@
 import React, { useContext, useEffect, useState } from "react";
-import Modal from "../shared/Modal";
-import styled from "styled-components";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton, PrimaryButton, SecondaryButton } from "../buttons";
-import Icon from "../icons/icons";
-import { LocationManager } from "../../services/locations/locationManager";
-import ServiceContext from "../../contexts/serviceContext";
-import { NameTokenizationOptions } from "../../services/tracker/generic/locationTrackerGenerators/locationName";
-import { Checkbox, Input } from "../inputs";
-import SectionView from "../LocationTrackerViews/DropDownViewComponents/SectionView";
-import { TagManager } from "../../services/tags/tagManager";
-import { GenericGameMethod } from "../../services/tracker/generic/genericGameEnums";
+import Modal from "../../shared/Modal";
+import styles from "./NameAnalysis.module.css";
+import ButtonRow from "../../LayoutUtilities/ButtonRow";
+import {
+    GhostButton,
+    PrimaryButton,
+    SecondaryButton,
+} from "../../shared/buttons";
+import Icon from "../../icons/icons";
+import { LocationManager } from "../../../services/locations/locationManager";
+import ServiceContext from "../../../contexts/serviceContext";
+import { NameTokenizationOptions } from "../../../services/tracker/generic/locationTrackerGenerators/locationName";
+import { Checkbox, Input } from "../../inputs";
+import SectionView from "../../LocationTrackerViews/DropDownViewComponents/SectionView";
+import { TagManager } from "../../../services/tags/tagManager";
+import { GenericGameMethod } from "../../../services/tracker/generic/genericGameEnums";
 import NotificationManager, {
     MessageType,
-} from "../../services/notifications/notifications";
-import { exportJSONFile } from "../../utility/jsonExport";
-import { InventoryManager } from "../../services/inventory/inventoryManager";
-import { ResourceType } from "../../services/tracker/resourceEnums";
-import TemplateLocationTracker from "../../services/tracker/generic/templateTracker";
-import { randomUUID } from "../../utility/uuid";
+} from "../../../services/notifications/notifications";
+import { exportJSONFile } from "../../../utility/jsonExport";
+import { InventoryManager } from "../../../services/inventory/inventoryManager";
+import { ResourceType } from "../../../services/tracker/resourceEnums";
+import TemplateLocationTracker from "../../../services/tracker/generic/templateTracker";
+import { randomUUID } from "../../../utility/uuid";
 
 interface AdditionalParams {
     minChecksPerGroup?: number;
     minTokenCount?: number;
     maxDepth?: number;
 }
-
-const AnalysisGrid = styled.div`
-    display: grid;
-    column-gap: 2em;
-    width: 80vw;
-
-    grid:
-        "preview" 25vh
-        "parameters" 25vh / auto;
-    @media only screen and (orientation: landscape) {
-        & {
-            grid: "preview parameters" 50vh / 1fr 1fr;
-        }
-    }
-`;
 
 const previewLocationManager = new LocationManager();
 const previewSourceId = "preview_source";
@@ -142,7 +131,7 @@ const NameAnalysisModal = ({
     return (
         <Modal open={open}>
             <h2>Name Analysis</h2>
-            <AnalysisGrid>
+            <div className={styles.analysis_grid}>
                 <div
                     style={{
                         gridArea: "preview",
@@ -332,7 +321,7 @@ const NameAnalysisModal = ({
                     />
                     <br />
                 </div>
-            </AnalysisGrid>
+            </div>
             <ButtonRow>
                 <PrimaryButton
                     onClick={() => {

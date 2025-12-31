@@ -1,0 +1,15 @@
+.tracker_table {
+    border: 2px solid var(--primary-accent);
+    border-spacing: 0;
+    th {
+        font-weight: bold;
+        border: 1px solid var(--secondary-accent);
+        text-align: center;
+        padding: 0.25em 1em;
+    }
+    td {
+        border: 1px dotted var(--secondary-accent);
+        text-align: center;
+        padding: 0.25em 1em;
+    }
+}

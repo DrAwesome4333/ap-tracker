@@ -7,7 +7,7 @@ import { naturalSort } from "../../utility/comparisons";
 import LocationTagView from "./DropDownViewComponents/LocationTagView";
 import TagBar from "../tags/TagBar";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../buttons";
+import { GhostButton } from "../shared/buttons";
 
 const LocationDetails = ({
     locationName,

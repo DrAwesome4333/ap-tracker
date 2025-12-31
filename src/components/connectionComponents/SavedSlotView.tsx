@@ -1,7 +1,7 @@
 import styles from "./SavedSlots.module.css";
 import React from "react";
 import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldContext";
-import { PrimaryButton, SecondaryButton } from "../buttons";
+import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 
 const SavedSlotView = ({
@@ -31,10 +31,10 @@ const SavedSlotView = ({
                 </div>
             </div>
             <div className={styles.slot_actions}>
-                <PrimaryButton $small disabled={disabled} onClick={connect}>
+                <PrimaryButton small disabled={disabled} onClick={connect}>
                     <Icon type="play_arrow" />
                 </PrimaryButton>
-                <SecondaryButton $small disabled={disabled} onClick={edit}>
+                <SecondaryButton small disabled={disabled} onClick={edit}>
                     <Icon type="edit" iconParams={{ fill: 0 }} />
                 </SecondaryButton>
             </div>

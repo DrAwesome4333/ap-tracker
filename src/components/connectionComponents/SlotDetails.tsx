@@ -5,7 +5,7 @@ import MultiWorldContext, {
 } from "../../services/MultiInfo/MultiWorldContext";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { DangerButton, GhostButton, PrimaryButton } from "../buttons";
+import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
 import SavedConnectionManager, {
     SavedConnection,
 } from "../../services/savedConnections/savedConnectionManager";

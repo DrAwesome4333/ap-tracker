@@ -3,7 +3,7 @@ import Modal from "../shared/Modal";
 import React from "react";
 import OptionView from "../optionsComponents/OptionView";
 import { globalOptionManager } from "../../services/options/optionManager";
-import { GhostButton } from "../buttons";
+import { GhostButton } from "../shared/buttons";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 const HintFilterModal = ({

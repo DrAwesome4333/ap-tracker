@@ -1,23 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { PrimaryButton, GhostButton, SecondaryButton } from "./buttons";
-import styled from "styled-components";
-import { background, danger, textPrimary } from "../constants/colors";
-import { saveNote, loadNote } from "../services/connector/remoteSync";
+import { PrimaryButton, GhostButton, SecondaryButton } from "../shared/buttons";
+import styles from "./NotePad.module.css";
+import { saveNote, loadNote } from "../../services/connector/remoteSync";
 import NotificationManager, {
     MessageType,
-} from "../services/notifications/notifications";
-import Spinner from "./icons/spinner";
-import Modal from "./shared/Modal";
-const NoteGrid = styled.div`
-    display: grid;
-    width: 80vw;
-    height: 80vh;
-    grid:
-        "title" 8em
-        "note" 1fr
-        "." 1em
-        "buttons" 3em / 100%;
-`;
+} from "../../services/notifications/notifications";
+import Spinner from "../icons/spinner";
+import Modal from "../shared/Modal";
 
 const MAX_NOTE_LENGTH = 1024;
 
@@ -122,15 +111,9 @@ const NotePad = ({
     }, [disabled, noteContent, retrieveNote, loading, initialLoad]);
     return (
         <Modal open={open}>
-            <NoteGrid>
+            <div className={styles.note_grid}>
                 <div style={{ gridArea: "title" }}>
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "baseline",
-                            gap: "1em",
-                        }}
-                    >
+                    <div className={styles.note_header}>
                         <h3>AP Notepad (experimental)</h3>
                         <span>
                             {loading ? (
@@ -150,13 +133,7 @@ const NotePad = ({
                 </div>
 
                 <textarea
-                    style={{
-                        gridArea: "note",
-                        backgroundColor: background,
-                        color: textPrimary,
-                        resize: "none",
-                    }}
-                    className="interactive"
+                    className={styles.note_text_area}
                     disabled={disabled || loading}
                     value={noteContent}
                     ref={textArea}
@@ -181,23 +158,14 @@ const NotePad = ({
                         setUnsavedChanges(true);
                         setNoteContent(e.target.value);
                     }}
-                ></textarea>
-                <div
-                    style={{
-                        display: "grid",
-                        gridArea: "buttons",
-                        width: "100%",
-                        gridTemplateColumns: "1fr 1fr",
-                    }}
-                >
+                />
+                <div className={styles.note_footer}>
                     <div
                         style={{
-                            gridColumn: "1",
-                            gridRow: "1",
                             color:
                                 noteContent.length > MAX_NOTE_LENGTH
-                                    ? danger
-                                    : textPrimary,
+                                    ? "var(--danger-accent)"
+                                    : "var(--text-primary)",
                         }}
                     >
                         {noteContent.length} / {MAX_NOTE_LENGTH}
@@ -206,12 +174,10 @@ const NotePad = ({
                         style={{
                             display: "flex",
                             justifyContent: "right",
-                            gridColumn: "2",
-                            gridRow: "1",
                         }}
                     >
                         <PrimaryButton
-                            $small
+                            small
                             onClick={storeNote}
                             disabled={
                                 disabled ||
@@ -222,18 +188,18 @@ const NotePad = ({
                             Save to Server
                         </PrimaryButton>
                         <SecondaryButton
-                            $small
+                            small
                             onClick={retrieveNote}
                             disabled={disabled || loading}
                         >
                             Load from Server
                         </SecondaryButton>
-                        <GhostButton $small onClick={onClose}>
+                        <GhostButton small onClick={onClose}>
                             Close
                         </GhostButton>
                     </div>
                 </div>
-            </NoteGrid>
+            </div>
         </Modal>
     );
 };

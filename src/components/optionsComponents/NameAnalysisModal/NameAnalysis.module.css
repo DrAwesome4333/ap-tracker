@@ -1,0 +1,19 @@
+.analysis_grid {
+    display: grid;
+    column-gap: 2em;
+    row-gap: 2em;
+    width: 80vw;
+    grid:
+        "preview" 25vh
+        "parameters" 25vh / auto;
+}
+
+@media only screen and (orientation: landscape) {
+    .analysis_grid {
+        grid: "preview parameters" 50vh / 1fr 1fr;
+    }
+}
+
+.analysis_grid > div {
+    box-shadow: inset var(--box-shadow-small);
+}

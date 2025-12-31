@@ -1,0 +1,117 @@
+.ap_color_wrapper {
+    --ap-cyan: #00ffff;
+    --ap-slate-blue: #0098ff;
+    --ap-magenta: #ff00c7;
+    --ap-plum: #cc57ff;
+    --ap-red: #ff0000;
+    --ap-green: #00db26;
+    --ap-light-yellow: #ede091;
+    --ap-yellow: #ffd400;
+    --ap-orange: #ff6400;
+    --ap-salmon: #ff8e72;
+
+    --ap-player: var(--ap-magenta);
+    --ap-player-alt: var(--ap-yellow);
+    --ap-player-other: var(--ap-light-yellow);
+
+    --ap-item-prog: var(--ap-plum);
+    --ap-item-normal: var(--ap-cyan);
+    --ap-item-trap: var(--ap-salmon);
+    --ap-item-useful: var(--ap-slate-blue);
+    --ap-item-prog-useful: var(--ap-yellow);
+    --ap-item-server: var(--ap-light-yellow);
+
+    --ap-location: var(--ap-green);
+    --ap-entrance: var(--ap-slate-blue);
+
+    --ap-hint-found: var(--ap-green);
+    --ap-hint-no-priority: var(--ap-cyan);
+    --ap-hint-priority: var(--ap-plum);
+    --ap-hint-unspecified: var(--ap-slate-blue);
+    --ap-hint-avoid: var(--ap-salmon);
+}
+
+.ap_text {
+    --color: var(white);
+    color: oklch(from var(--color) calc(l * 0.65) calc(c * 0.75) h);
+    font-weight: bolder;
+}
+
+:global(.dark) .ap_text {
+    color: var(--color);
+}
+
+.ap_text_alt {
+    --color: var(white);
+    color: oklch(from var(--color) calc(l * 0.5) calc(c * 0.5) h);
+}
+
+:global(.dark) .ap_text_alt {
+    color: var(--color);
+}
+
+.player {
+    --color: var(--ap-player);
+    text-decoration: wavy underline var(--color);
+}
+
+.player_alt {
+    --color: var(--ap-player-alt);
+    text-decoration: wavy underline var(--color);
+}
+
+.player_other {
+    --color: var(--ap-player-other);
+}
+
+.item_prog {
+    --color: var(--ap-item-prog);
+}
+
+.item_normal {
+    --color: var(--ap-item-normal);
+}
+
+.item_trap {
+    --color: var(--ap-item-trap);
+}
+
+.item_useful {
+    --color: var(--ap-item-useful);
+}
+
+.item_prog_useful {
+    --color: var(--ap-item-prog-useful);
+}
+
+.item_server {
+    --color: var(--ap-item-server);
+}
+
+.location {
+    --color: var(--ap-location);
+}
+
+.entrance {
+    --color: var(--ap-entrance);
+}
+
+.hint_no_priority {
+    --color: var(--ap-hint-no-priority);
+}
+
+.hint_priority {
+    --color: var(--ap-hint-priority);
+}
+
+.hint_found {
+    --color: var(--ap-hint-found);
+}
+
+.hint_unspecified {
+    --color: var(--ap-hint-unspecified);
+}
+
+.hint_avoid {
+    --color: var(--ap-hint-avoid);
+}

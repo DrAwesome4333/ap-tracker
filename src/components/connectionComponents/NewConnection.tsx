@@ -1,33 +1,15 @@
 import React, { useContext, useState } from "react";
-import styled from "styled-components";
-import { PrimaryButton } from "../buttons";
+import { GhostButton, PrimaryButton } from "../shared/buttons";
+import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
 import ServiceContext from "../../contexts/serviceContext";
 import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
-const Container = styled.div`
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    justify-self: center;
-    margin: auto 0;
-    row-gap: 0.25em;
-    width: fit-content;
-    padding: 1em 2em;
-    grid-template-areas:
-        "title"
-        "host"
-        "port"
-        "slot"
-        "password"
-        "connect";
-    grid-template-rows: repeat(5, 2.5em) 4em;
-`;
-
-const NewConnection = ({ ...props }) => {
+const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
@@ -52,8 +34,8 @@ const NewConnection = ({ ...props }) => {
     }
 
     return (
-        <Container {...props}>
-            <h2>New Connection</h2>
+        <div className={styles.new_slot_panel} {...props}>
+            <h2>New Slot</h2>
             <Input
                 type="text"
                 name="host"
@@ -86,29 +68,34 @@ const NewConnection = ({ ...props }) => {
                 label="Password"
                 disabled={disabled}
             />
-            <PrimaryButton
-                onClick={() => {
-                    connector?.connectToAP(connectionInfo).catch((result) => {
-                        if (result instanceof Error) {
-                            console.error(result);
-                            NotificationManager.createToast({
-                                type: MessageType.error,
-                                message: `An unexpected error occurred: ${result.name}`,
-                                details: `${result.message}\n${result.stack}`,
-                                duration: 30,
+            <ButtonRow>
+                <PrimaryButton
+                    onClick={() => {
+                        connector
+                            ?.connectToAP(connectionInfo)
+                            .catch((result) => {
+                                if (result instanceof Error) {
+                                    console.error(result);
+                                    NotificationManager.createToast({
+                                        type: MessageType.error,
+                                        message: `An unexpected error occurred: ${result.name}`,
+                                        details: `${result.message}\n${result.stack}`,
+                                        duration: 30,
+                                    });
+                                } else {
+                                    NotificationManager.createToast({
+                                        ...result,
+                                    });
+                                }
                             });
-                        } else {
-                            NotificationManager.createToast({
-                                ...result,
-                            });
-                        }
-                    });
-                }}
-                disabled={disabled}
-            >
-                Connect
-            </PrimaryButton>
-        </Container>
+                    }}
+                    disabled={disabled}
+                >
+                    Connect
+                </PrimaryButton>
+                {onClose && <GhostButton onClick={onClose}>Close</GhostButton>}
+            </ButtonRow>
+        </div>
     );
 };
 

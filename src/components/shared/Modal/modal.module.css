@@ -1,0 +1,30 @@
+.modal_back_drop {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+}
+
+.modal_container {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    margin: auto;
+    width: fit-content;
+    height: fit-content;
+    max-height: 95vh;
+    max-width: 95vw;
+    overflow: auto;
+    padding: 2rem;
+    background-color: var(--background-level-2);
+    color: var(--text-primary);
+    pointer-events: all;
+    box-shadow: var(--box-shadow);
+    z-index: 11;
+}

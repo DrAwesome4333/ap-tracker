@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
-import CreateCustomTrackerModal from "./CreateCustomTrackerModal";
+import CreateCustomTrackerModal from "./CreateCustomTrackerModal/CreateCustomTrackerModal";
 
 import { CustomTrackerRepository } from "../../services/tracker/customTrackerRepository";
 import TrackerTable from "./TrackerTable/TrackerTable";
@@ -19,7 +19,7 @@ const CustomTrackerOptions = ({
                 />
                 <br />
                 <PrimaryButton
-                    $tiny
+                    tiny
                     onClick={() => {
                         setModalOpen(true);
                     }}

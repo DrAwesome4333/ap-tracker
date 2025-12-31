@@ -1,4 +1,4 @@
-import { PrimaryButton, SecondaryButton } from "../buttons";
+import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import styles from "./SavedSlots.module.css";
 import React from "react";
@@ -41,10 +41,10 @@ const SavedConnectionView = ({
                     style={{ color: "orange" }}
                     iconParams={{ fill: 0 }}
                 />
-                <PrimaryButton $small disabled={disabled} onClick={connect}>
+                <PrimaryButton small disabled={disabled} onClick={connect}>
                     <Icon type="play_arrow" />
                 </PrimaryButton>
-                <SecondaryButton $small disabled={disabled} onClick={edit}>
+                <SecondaryButton small disabled={disabled} onClick={edit}>
                     <Icon type="edit" iconParams={{ fill: 0 }} />
                 </SecondaryButton>
             </div>

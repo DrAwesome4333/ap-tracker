@@ -4,7 +4,7 @@ import HintTable from "./HintTable";
 import ServiceContext from "../../contexts/serviceContext";
 import useOption from "../../hooks/optionHook";
 import HintFilterModal from "./HintFilterModal";
-import { PrimaryButton } from "../buttons";
+import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import { HintFilter, optionScope } from "./HintOptionDef";
 import { Input } from "../inputs";
@@ -31,7 +31,6 @@ const HintTab = () => {
                 gap: "0.25em",
                 gridTemplateRows: "3em 1fr",
                 overflow: "hidden",
-                padding: "0.25em",
             }}
         >
             <PanelHeader title="Hints">
@@ -53,7 +52,7 @@ const HintTab = () => {
                     <option value="item">Items</option>
                 </select>
                 <PrimaryButton
-                    $tiny
+                    tiny
                     style={{ height: "20px" }}
                     onClick={() => setShowFilterModal(true)}
                 >

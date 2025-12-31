@@ -3,7 +3,7 @@ import { TagEntityType } from "../../services/tags/tagManager";
 import ServiceContext from "../../contexts/serviceContext";
 import { useTagList } from "../../hooks/tagHook";
 import Icon, { IconParams } from "../icons/icons";
-import { TextButton } from "../buttons";
+import { TextButton } from "../shared/buttons";
 import { primary } from "../../constants/colors";
 
 const TagButton = ({

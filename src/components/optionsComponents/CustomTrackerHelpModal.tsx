@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "../shared/Modal";
-import { GhostButton } from "../buttons";
+import { GhostButton } from "../shared/buttons";
 
 const CustomTrackerHelpModal = ({
     open,

@@ -1,9 +1,8 @@
 import React, { useContext, useState } from "react";
 import { TrackerStateContext } from "../contexts/contexts";
-import { PrimaryButton, SecondaryButton } from "./buttons";
+import { PrimaryButton, SecondaryButton } from "./shared/buttons";
 import Icon from "./icons/icons";
-import { background } from "../constants/colors";
-import NotePad from "./NotePad";
+import NotePad from "./NotePad/NotePad";
 import { CONNECTION_STATUS } from "../services/connector/connector";
 import ConnectionIcon from "./icons/ConnectionIcon";
 
@@ -24,9 +23,9 @@ const MainHeader = ({
                 width: "100vw",
                 position: "sticky",
                 top: "0px",
-                boxShadow: "3px 4px 0px rgba(0, 0, 0, 0.5)",
+                boxShadow: "var(--box-shadow)",
                 zIndex: "2",
-                backgroundColor: background,
+                backgroundColor: "var(--background-level-2)",
             }}
         >
             <div
@@ -56,14 +55,14 @@ const MainHeader = ({
                         trackerState.connectionStatus !==
                         CONNECTION_STATUS.connected
                     }
-                    $small
+                    small
                     onClick={() => {
                         setNotePadOpen(true);
                     }}
                 >
                     <Icon type="sticky_note" />
                 </PrimaryButton>
-                <SecondaryButton $small onClick={optionsCallback}>
+                <SecondaryButton small onClick={optionsCallback}>
                     <Icon type="settings" />
                 </SecondaryButton>
             </div>

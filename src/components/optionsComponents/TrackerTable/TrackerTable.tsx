@@ -1,6 +1,5 @@
 import React, { useSyncExternalStore } from "react";
-import { primary, secondary } from "../../../constants/colors";
-import styled from "styled-components";
+import styles from "./TrackerTable.module.css";
 import { naturalSort } from "../../../utility/comparisons";
 import TrackerTableRow from "./TrackerTableRow";
 import { CustomTrackerRepository } from "../../../services/tracker/customTrackerRepository";
@@ -11,22 +10,6 @@ const trackerTypeToString = {
     [ResourceType.locationTracker]: "Location",
     [ResourceType.itemTracker]: "Item",
 };
-
-const Table = styled.table`
-    border: 2px solid ${primary};
-    border-spacing: 0;
-    th {
-        font-weight: bold;
-        border: 1px solid ${secondary};
-        text-align: center;
-        padding: 0.25em 1em;
-    }
-    td {
-        border: 1px dotted ${secondary};
-        text-align: center;
-        padding: 0.25em 1em;
-    }
-`;
 
 const TrackerTable = ({
     customTrackerRepository,
@@ -68,7 +51,7 @@ const TrackerTable = ({
         }
     });
     return (
-        <Table>
+        <table className={styles.tracker_table}>
             <thead>
                 <tr>
                     <th> Name </th>
@@ -114,7 +97,7 @@ const TrackerTable = ({
                     </tr>
                 )}
             </tbody>
-        </Table>
+        </table>
     );
 };
 

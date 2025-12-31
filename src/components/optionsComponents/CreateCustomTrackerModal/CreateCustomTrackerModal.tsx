@@ -1,40 +1,31 @@
 import React, { useContext, useState } from "react";
-import styled from "styled-components";
-import Modal from "../shared/Modal";
-import { GhostButton, PrimaryButton, SecondaryButton } from "../buttons";
-import { FileInput } from "../inputs";
-import CustomTrackerHelpModal from "./CustomTrackerHelpModal";
+import styles from "./CreateCustomTrackerModal.module.css";
+import Modal from "../../shared/Modal";
+import {
+    GhostButton,
+    PrimaryButton,
+    SecondaryButton,
+} from "../../shared/buttons";
+import { FileInput } from "../../inputs";
+import CustomTrackerHelpModal from "../CustomTrackerHelpModal";
 import NotificationManager, {
     MessageType,
-} from "../../services/notifications/notifications";
-import { tertiary } from "../../constants/colors";
-import ServiceContext from "../../contexts/serviceContext";
-import { exportJSONFile } from "../../utility/jsonExport";
-import Icon from "../icons/icons";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import NameAnalysisModal from "./NameAnalysisModal";
-import CustomLocationTracker from "../../services/tracker/locationTrackers/CustomLocationTracker";
-import LocationGroupCategoryGenerator from "../../services/tracker/generic/locationTrackerGenerators/locationGroup";
-import { CustomLocationTrackerDef_V2 } from "../../services/tracker/locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
-import { CustomItemTrackerDef_V1 } from "../../services/tracker/itemTrackers/formatDefinitions/CustomItemTrackerFormat_V1";
-import { ResourceType } from "../../services/tracker/resourceEnums";
-import CustomItemTracker from "../../services/tracker/itemTrackers/CustomItemTracker";
-import GenericItemTracker from "../../services/tracker/generic/GenericItemTracker";
-import { randomUUID } from "../../utility/uuid";
+} from "../../../services/notifications/notifications";
+import { tertiary } from "../../../constants/colors";
+import ServiceContext from "../../../contexts/serviceContext";
+import { exportJSONFile } from "../../../utility/jsonExport";
+import Icon from "../../icons/icons";
+import ButtonRow from "../../LayoutUtilities/ButtonRow";
+import NameAnalysisModal from "../NameAnalysisModal";
+import CustomLocationTracker from "../../../services/tracker/locationTrackers/CustomLocationTracker";
+import LocationGroupCategoryGenerator from "../../../services/tracker/generic/locationTrackerGenerators/locationGroup";
+import { CustomLocationTrackerDef_V2 } from "../../../services/tracker/locationTrackers/formatDefinitions/CustomLocationTrackerFormat_V2";
+import { CustomItemTrackerDef_V1 } from "../../../services/tracker/itemTrackers/formatDefinitions/CustomItemTrackerFormat_V1";
+import { ResourceType } from "../../../services/tracker/resourceEnums";
+import CustomItemTracker from "../../../services/tracker/itemTrackers/CustomItemTracker";
+import GenericItemTracker from "../../../services/tracker/generic/GenericItemTracker";
+import { randomUUID } from "../../../utility/uuid";
 
-const ModalGrid = styled.div`
-    display: grid;
-    column-gap: 2em;
-
-    grid:
-        "upload" 25vh
-        "build" 25vh / auto;
-    @media only screen and (orientation: landscape) {
-        & {
-            grid: "upload build" 25vh / 1fr 1fr;
-        }
-    }
-`;
 const CreateCustomTrackerModal = ({
     open,
     onClose,
@@ -161,7 +152,7 @@ const CreateCustomTrackerModal = ({
             <Modal open={open}>
                 <div>
                     <h2>Custom Trackers (experimental)</h2>
-                    <ModalGrid>
+                    <div className={styles.modal_grid}>
                         <div
                             style={{
                                 gridArea: "upload",
@@ -266,7 +257,7 @@ const CreateCustomTrackerModal = ({
                                 </div>
                             </div>
                         </div>
-                    </ModalGrid>
+                    </div>
                     <ButtonRow>
                         <SecondaryButton onClick={() => setHelpModalOpen(true)}>
                             Help

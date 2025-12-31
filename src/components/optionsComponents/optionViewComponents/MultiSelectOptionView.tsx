@@ -4,6 +4,7 @@ import ServiceContext from "../../../contexts/serviceContext";
 import useOption from "../../../hooks/optionHook";
 import { JSONValue } from "../../../services/dataStores";
 import { Checkbox } from "../../inputs";
+import apStyles from "../../sharedStyles/archipelago.module.css";
 
 const MultiselectOptionView = ({
     option,
@@ -41,8 +42,10 @@ const MultiselectOptionView = ({
             optionManager.setOptionValue(option.name, scope, [...newValues]);
         }
     };
+    const classes = option.apClasses?.map((c) => apStyles[c]) ?? [];
+
     return (
-        <div className={className} style={style}>
+        <div className={[className, ...classes].join(" ")} style={style}>
             {!hideTitle && <h4>{option.display ?? option.name}</h4>}
             {option.choices.map((choice) => {
                 const name = typeof choice === "string" ? choice : choice.name;

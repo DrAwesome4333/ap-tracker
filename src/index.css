@@ -20,6 +20,18 @@
     --salmon: #fa8072;
     --white: #ffffff;
     --orange: #ff7700;
+
+    --background-level-0: light-dark(oklch(0.9 0 0), oklch(0.2 0 0));
+    --background-level-1: light-dark(oklch(0.93 0 0), oklch(0.23 0 0));
+    --background-level-2: light-dark(oklch(0.95 0 0), oklch(0.25 0 0));
+    --background-level-3: light-dark(oklch(1 0 0), oklch(0.3 0 0));
+    --box-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    --box-shadow-small: 1px 1px 2px rgba(0, 0, 0, 1);
+
+    --primary-hue: 220deg;
+    --primary-accent: oklch(0.5 0.4 var(--primary-hue));
+    --secondary-accent: oklch(0.3 0.2 var(--primary-hue));
+    --danger-accent: oklch(0.5 0.4 0deg);
 }
 
 [data-theme="dark"] {
@@ -44,6 +56,10 @@
     --orange: #ff7700;
 }
 
+.dark {
+    color-scheme: dark;
+}
+
 body {
     font-family: "Roboto", sans-serif;
 }
@@ -56,11 +72,31 @@ a {
     margin-left: 1em;
 }
 
-.App {
-    background-color: var(--background);
+.base {
+    background-color: var(--background-level-1);
     scrollbar-width: thin;
-    scrollbar-color: var(--background-secondary) var(--background);
+    scrollbar-color: var(--background-secondary) var(--background-level-0);
     scrollbar-gutter: stable;
+}
+
+.app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    overflow: auto;
+    justify-items: stretch;
+    align-items: stretch;
+    color: light-dark(black, white);
+    transition:
+        background-color 0.25s ease-in-out,
+        color 0.25s ease-in-out;
+    grid-template-rows: 3em 1fr;
+    grid-template-columns: auto;
 }
 
 .material-symbols-rounded {
@@ -72,11 +108,11 @@ a {
 }
 
 .interactive {
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    box-shadow: var(--box-shadow-small);
 }
 
 .interactive:hover {
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 1);
+    box-shadow: inset var(--box-shadow-small);
 }
 
 .interactive:active,
@@ -119,7 +155,7 @@ a {
     font-style: normal;
     font-weight: 100 700;
     font-display: block;
-    src: url(https://fonts.gstatic.com/icon/font?kit=sykg-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190FjzarEsMNMUCI73OyfpCrG-7NwbH1G3kZdilQi81G668VAFmkXr1QjF_c13dGxffx-ktBQeZiEEns57Wr-O2E6iqoCp8S0L7XruGVxPTZduEYozqmXkA2vUkiohDIrMtYeiVt-tjaMB2VTEymii2HUgUkCombMgbbocW0Fk&skey=70ddea8fe54d532e&v=v302)
+    src: url(https://fonts.gstatic.com/icon/font?kit=sykg-zNym6YjUruM-QrEh7-nyTnjDwKNJ_190FjzarEsMNMUCI73OyfpCrG-7NwbH1G3kZdilQi81G668VAFmkXr1QjF-s13dGxffx-ktBQeZiEEns57Wr-O2E6iqoCp8S0L7XruGVxPzZduEYozqmXkA2vUkiohDIrMtYeiVt-tLQNnmfDOFD2n2OCwwhytBTa9ZL8ZeFG0NQ&skey=70ddea8fe54d532e&v=v305)
         format("woff2");
 }
 

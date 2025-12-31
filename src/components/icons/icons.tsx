@@ -38,6 +38,7 @@ const IconContainer = styled.span.attrs({
 //     "check_indeterminate_small",
 //     "check_small",
 //     "checklist",
+//     "content_copy",
 //     "counter_1",
 //     "counter_2",
 //     "counter_3",

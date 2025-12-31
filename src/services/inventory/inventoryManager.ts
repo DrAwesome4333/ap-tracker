@@ -9,6 +9,7 @@ interface InventoryItem {
     index: number;
     location: string;
     sender: string;
+    sender_slot: number;
     local: boolean;
 }
 

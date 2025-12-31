@@ -4,7 +4,6 @@ import React, {
     useState,
     useSyncExternalStore,
 } from "react";
-import styled from "styled-components";
 import SavedConnectionView from "./SavedConnectionView";
 import ServiceContext from "../../contexts/serviceContext";
 import { TrackerStateContext } from "../../contexts/contexts";
@@ -21,21 +20,7 @@ import MultiWorldContext, {
 } from "../../services/MultiInfo/MultiWorldContext";
 import SavedSlotView from "./SavedSlotView";
 import Icon from "../icons/icons";
-
-const Container = styled.div`
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    justify-self: center;
-    align-self: center;
-    row-gap: 0.25em;
-    width: 80%;
-    margin: 1em 2em;
-    grid-template-rows: 3em 1fr 3em;
-    grid-template-columns: 1fr;
-    max-height: 75%;
-    height: fit-content;
-`;
+import styles from "./SavedSlots.module.css";
 
 const SavedConnections = ({ ...props }) => {
     const trackerState = useContext(TrackerStateContext);
@@ -76,7 +61,10 @@ const SavedConnections = ({ ...props }) => {
         MultiWorldContext.getAllMultiWorldsWithSlots
     );
 
-    const slots = multiSlots.map((multi) => multi.slots).flat();
+    const slots = multiSlots
+        .map((multi) => multi.slots)
+        .flat()
+        .sort((a, b) => b.last_used_timestamp - a.last_used_timestamp);
 
     const onConnect = useCallback(
         ({
@@ -114,17 +102,9 @@ const SavedConnections = ({ ...props }) => {
     );
 
     return (
-        <Container {...props}>
+        <div className={styles.slots} {...props}>
             <h2>Saved Slots</h2>
-            <div
-                style={{
-                    overflowY: "auto",
-                    minHeight: "5em",
-                    maxHeight: "100%",
-                    width: "100%",
-                    scrollbarGutter: "stable",
-                }}
-            >
+            <div className={styles.slot_list}>
                 {slots.length > 0 &&
                     slots.map((slot) => (
                         <SavedSlotView
@@ -168,7 +148,7 @@ const SavedConnections = ({ ...props }) => {
                             textAlign: "center",
                         }}
                     >
-                        <i>Create a new connection and it will appear here</i>
+                        <i>Add a slot and it will appear here</i>
                     </div>
                 )}
             </div>
@@ -198,7 +178,7 @@ const SavedConnections = ({ ...props }) => {
                     setEditorConnection(null);
                 }}
             />
-        </Container>
+        </div>
     );
 };
 

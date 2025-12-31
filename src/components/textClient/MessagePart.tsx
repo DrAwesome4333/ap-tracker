@@ -1,49 +1,63 @@
-import React, { useContext } from "react";
-import { MessageNode } from "archipelago.js";
+import React from "react";
+import { API, MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
-import ServiceContext from "../../contexts/serviceContext";
 import { EchoMessageNode } from "../../services/textClientManager";
-
-const hintStatusToColorMap: { [status: number]: string } = {
-    0: null,
-    10: colors.tertiary,
-    20: colors.trapItem,
-    30: colors.progressionItem,
-    40: colors.textClient.green,
+import ap_styles from "../sharedStyles/archipelago.module.css";
+import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+const hintStatusToClassMap: { [status: number]: string } = {
+    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
+    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
+    [API.HintStatus.avoid]: ap_styles.hint_avoid,
+    [API.HintStatus.priority]: ap_styles.hint_priority,
+    [API.HintStatus.found]: ap_styles.hint_found,
 };
 
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
-    const services = useContext(ServiceContext);
-    let textColor = colors.textPrimary;
+    let textColor = null;
     let backgroundColor = undefined;
-    let underline = false;
-    let bold = false;
+    let className = "";
+    let additionalInfo: string = null;
     if (part.type === "item") {
+        className = ap_styles.item_normal;
+        const itemClasses = [];
+        if (part.item.trap) {
+            className = ap_styles.item_trap;
+            itemClasses.push("Trap");
+        }
+        if (part.item.useful) {
+            className = ap_styles.item_useful;
+            itemClasses.push("Useful");
+        }
         if (part.item.progression) {
-            textColor = colors.progressionItem;
-        } else if (part.item.useful) {
-            textColor = colors.usefulItem;
-        } else if (part.item.trap) {
-            textColor = colors.trapItem;
-        } else {
-            textColor = colors.normalItem;
+            className = ap_styles.item_prog;
+            itemClasses.push("Progression");
         }
+        if (part.item.progression && part.item.useful) {
+            className = ap_styles.item_prog_useful;
+        }
+        if (itemClasses.length === 0) {
+            itemClasses.push("Normal");
+        }
+        additionalInfo = `Game: ${part.item.game}, Class: ${itemClasses.join(", ")}`;
     } else if (part.type === "location") {
-        textColor = colors.textClient.green;
+        className = ap_styles.location;
     } else if (part.type === "player") {
-        if (part.text === services.connector?.connection?.slotInfo.alias) {
-            textColor = colors.textClient.magenta;
+        if (part.player.slot === MultiWorldContext.loadedSlot.slot_number) {
+            className = ap_styles.player;
+        } else if (
+            MultiWorldContext.loadedMultiWorld?.slots
+                .map((slot) => slot.slot_number)
+                .includes(part.player.slot)
+        ) {
+            className = ap_styles.player_alt;
         } else {
-            textColor = colors.textClient.yellow;
+            className = ap_styles.player_other;
         }
+        additionalInfo = `Game: ${part.player.game}`;
     } else if (part.type === "entrance") {
-        textColor = colors.textClient.blue;
+        className = ap_styles.entrance;
     } else if (part.type === "color" || part.type === "echo") {
-        if (part.color === "underline") {
-            underline = true;
-        } else if (part.color === "bold") {
-            bold = true;
-        } else if (part.color && part.color.endsWith("_bg")) {
+        if (part.color && part.color.endsWith("_bg")) {
             backgroundColor =
                 colors.textClient[
                     part.color.substring(0, part.color.length - 3)
@@ -52,22 +66,23 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
             textColor = colors.textClient[part.color];
         }
     } else if (part.type === "hint_status") {
-        const color = hintStatusToColorMap[part.hint_status];
-        if (color) {
-            textColor = color;
-            bold = true;
-        }
+        className = hintStatusToClassMap[part.hint_status];
+    }
+    const styles: React.CSSProperties = {
+        whiteSpace: "pre-wrap",
+    };
+    if (textColor) {
+        styles.color = textColor;
+    }
+    if (backgroundColor) {
+        styles.backgroundColor = backgroundColor;
     }
 
     return (
         <span
-            style={{
-                color: textColor,
-                backgroundColor,
-                textDecoration: underline ? "underline" : undefined,
-                fontWeight: bold ? "bold" : "normal",
-                whiteSpace: "pre-wrap",
-            }}
+            style={styles}
+            className={className ? className + " " + ap_styles.ap_text : ""}
+            title={additionalInfo}
         >
             {part.text}
         </span>

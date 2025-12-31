@@ -12,26 +12,13 @@ import NotificationManager, {
     ToastNotification,
 } from "../../services/notifications/notifications";
 import Toast from "./toastNotification";
-import styled from "styled-components";
-import { SecondaryButton } from "../buttons";
+import styles from "./notification.module.css";
+import { SecondaryButton } from "../shared/buttons";
 import Modal from "../shared/Modal";
 import ServiceContext from "../../contexts/serviceContext";
 import useOption from "../../hooks/optionHook";
 import { readThemeValue } from "../../services/theme/theme";
 import StatusNotificationView from "./statusNotification";
-
-const ContentContainer = styled.div`
-    width: fit-content;
-    max-width: 75vw;
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    row-gap: 0.25em;
-    grid-template-areas:
-        "message"
-        "details"
-        "close";
-`;
 
 interface ToastNotificationData {
     notification: ToastNotification;
@@ -254,24 +241,14 @@ const NotificationContainer = () => {
         <>
             {createPortal(
                 <div
-                    style={{
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        overflow: "hidden",
-                        display: "block",
-                        margin: 0,
-                        padding: 0,
-                        pointerEvents: "none",
-                        zIndex: 100,
-                    }}
+                    className={styles.notification_container}
                     data-theme={readThemeValue(themeValue)}
                 >
                     {detailModalOpen && toastNotifications[detailIndex] && (
                         <Modal open={detailModalOpen}>
-                            <ContentContainer>
+                            <div
+                                className={styles.notification_modal_container}
+                            >
                                 <h3 style={{ gridArea: "message" }}>
                                     {toastNotifications[detailIndex].message}
                                 </h3>
@@ -285,14 +262,14 @@ const NotificationContainer = () => {
                                 </div>
                                 <SecondaryButton
                                     style={{ gridArea: "close" }}
-                                    $small
+                                    small
                                     onClick={() => {
                                         setDetailModalOpen(false);
                                     }}
                                 >
                                     Close
                                 </SecondaryButton>
-                            </ContentContainer>
+                            </div>
                         </Modal>
                     )}
                     {toastNotifications.map((toast, index) => (

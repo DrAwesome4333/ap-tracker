@@ -3,6 +3,7 @@ import { SelectOption } from "../../../services/options/option";
 import ServiceContext from "../../../contexts/serviceContext";
 import useOption from "../../../hooks/optionHook";
 import { JSONValue } from "../../../services/dataStores";
+import apStyles from "../../sharedStyles/archipelago.module.css";
 
 const SelectOptionView = ({
     option,
@@ -26,8 +27,10 @@ const SelectOptionView = ({
             ? parent[option.name]
             : useOption(optionManager, option.name, scope)
     ) as string;
+    const classes = option.apClasses?.map((c) => apStyles[c]) ?? [];
+
     return (
-        <div className={className} style={style}>
+        <div className={[className, ...classes].join(" ")} style={style}>
             <label htmlFor={elementId}>{option.display ?? option.name}: </label>
             <select
                 className="interactive"

@@ -1,5 +1,4 @@
 import React from "react";
-import { background } from "../../constants/colors";
 
 const PanelHeader = ({
     title,
@@ -21,9 +20,9 @@ const PanelHeader = ({
                 width: "100%",
                 padding: "0.25em",
                 boxSizing: "border-box",
-                boxShadow: "3px 4px 0px rgba(0, 0, 0, 0.5)",
+                boxShadow: "var(--box-shadow)",
                 zIndex: "1",
-                backgroundColor: background,
+                backgroundColor: "var(--background-level-2)",
                 ...style,
             }}
         >
