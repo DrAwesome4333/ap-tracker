@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
-import { TrackerStateContext } from "../contexts/contexts";
-import { PrimaryButton, SecondaryButton } from "./shared/buttons";
-import Icon from "./icons/icons";
-import NotePad from "./NotePad/NotePad";
-import { CONNECTION_STATUS } from "../services/connector/connector";
-import ConnectionIcon from "./icons/ConnectionIcon";
+import { TrackerStateContext } from "../../contexts/contexts";
+import { PrimaryButton, SecondaryButton, TextButton } from "../shared/buttons";
+import Icon from "../icons/icons";
+import NotePad from "../NotePad/NotePad";
+import { CONNECTION_STATUS } from "../../services/connector/connector";
+import ConnectionOptions from "./ConnectionOptions";
+import { connected } from "process";
 
 const MainHeader = ({
     optionsCallback,
@@ -14,7 +15,16 @@ const MainHeader = ({
 }) => {
     const trackerState = useContext(TrackerStateContext);
     const [notePadOpen, setNotePadOpen] = useState(false);
+    const [connectionModalOpen, setConnectionModalOpen] = useState(false);
     const slot = trackerState.slotData;
+
+    if (
+        trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
+        connectionModalOpen
+    ) {
+        setConnectionModalOpen(false);
+    }
+
     return (
         <div
             style={{
@@ -32,22 +42,47 @@ const MainHeader = ({
                 style={{
                     width: "100%",
                     display: "flex",
-                    columnGap: "1rem",
+                    columnGap: "0.5rem",
                     alignItems: "center",
                     overflowX: "auto",
                     overflowY: "hidden",
+                    paddingLeft: "0.5em",
                 }}
                 {...props}
             >
-                {" "}
-                <div style={{ width: "2.5em", margin: "0.25em" }}>
-                    <ConnectionIcon status={trackerState.connectionStatus} />
-                </div>
+                <Icon
+                    type="circle"
+                    fontSize="0.5rem"
+                    style={{
+                        color:
+                            trackerState.connectionStatus ===
+                            CONNECTION_STATUS.connected
+                                ? "chartreuse"
+                                : trackerState.connectionStatus ===
+                                    CONNECTION_STATUS.connecting
+                                  ? "gold"
+                                  : trackerState.connectionStatus ===
+                                      CONNECTION_STATUS.disconnected
+                                    ? "gray"
+                                    : trackerState.connectionStatus ===
+                                        CONNECTION_STATUS.error
+                                      ? "red"
+                                      : "purple",
+                    }}
+                ></Icon>{" "}
                 {slot?.alias && (
-                    <div style={{ textOverflow: "ellipsis", flex: "auto" }}>
+                    <TextButton
+                        style={{
+                            textOverflow: "ellipsis",
+                            flex: "auto",
+                            textDecoration: "underline",
+                        }}
+                        onClick={() => setConnectionModalOpen(true)}
+                    >
                         {slot.alias}
-                    </div>
+                    </TextButton>
                 )}
+                <ConnectionOptions open={connectionModalOpen} />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <PrimaryButton

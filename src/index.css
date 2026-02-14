@@ -150,7 +150,7 @@ a {
 }
 
 /* Material Icon CSS */
-@font-face {
+/* @font-face {
     font-family: "Material Symbols Rounded";
     font-style: normal;
     font-weight: 100 700;
@@ -176,4 +176,4 @@ a {
     -webkit-font-smoothing: antialiased;
     -moz-font-feature-settings: "liga";
     -moz-osx-font-smoothing: grayscale;
-}
+} */

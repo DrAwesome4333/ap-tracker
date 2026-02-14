@@ -24,7 +24,6 @@ const defaultCheckStatus: LocationStatus = {
     id: 0,
 };
 Object.freeze(defaultCheckStatus);
-
 /**
  * Class for managing and broadcasting the state of locations
  */
@@ -159,10 +158,15 @@ class LocationManager {
 
     /**
      * Deletes the status of all locations
+     * Resumes update broadcast if paused.
      */
     deleteAllLocations = () => {
+        this.pauseUpdateBroadcast();
         const names = [...this.#locationStatsCache.keys()];
-        names.forEach((name) => this.deleteLocation(name));
+        this.#locationStatsCache.clear();
+        this.#locationStatsModifiers.clear();
+        names.forEach((name) => this.#broadcastUpdate(name));
+        this.resumeUpdateBroadcast();
     };
 
     /**
@@ -196,6 +200,7 @@ class LocationManager {
                 locationNames = locationName;
             }
             this.#locationSubscribers.set(locationNames, listener);
+
             // return a function to clean up the subscription
             return () => {
                 this.#locationSubscribers.delete(locationNames);

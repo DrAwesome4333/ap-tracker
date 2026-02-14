@@ -64,6 +64,7 @@ interface Connector {
         readonly client: Client;
         readonly slotInfo: SlotInfo;
     };
+    disconnect: () => void;
 }
 
 const createConnector = (
@@ -127,6 +128,12 @@ const createConnector = (
             },
         };
     })();
+
+    const disconnect = () => {
+        if (client.socket.connected) {
+            client.socket.disconnect();
+        }
+    };
 
     let apTags = ["Tracker", "Checklist"];
     let receiveText =
@@ -488,7 +495,7 @@ const createConnector = (
                 });
             });
     };
-    return { connectToAP, connection };
+    return { connectToAP, connection, disconnect };
 };
 
 export { CONNECTION_STATUS, createConnector };

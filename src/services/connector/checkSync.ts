@@ -8,6 +8,7 @@ const archipelagoJS_SourceId = "archipelago.js_source";
 const setAPLocations = (client: Client, locationManager: LocationManager) => {
     locationManager.registerSourcePriority(archipelagoJS_SourceId, 1);
     locationManager.deleteAllLocations();
+    locationManager.pauseUpdateBroadcast();
     client.room.allLocations.forEach((locationId) =>
         locationManager.updateLocationStatus(
             archipelagoJS_SourceId,
@@ -27,6 +28,7 @@ const setAPLocations = (client: Client, locationManager: LocationManager) => {
             }
         )
     );
+    locationManager.resumeUpdateBroadcast();
 
     const now = new Date();
     if (now.getMonth() === 3 && now.getDate() < 7) {
