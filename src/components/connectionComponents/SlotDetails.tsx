@@ -11,6 +11,7 @@ import SavedConnectionManager, {
 } from "../../services/savedConnections/savedConnectionManager";
 import { Input } from "../inputs";
 import Icon from "../icons/icons";
+import { DB_STORE_KEYS, SaveData } from "../../services/saveData";
 
 /** Shows information about the slot */
 const SlotDetails = ({
@@ -100,6 +101,10 @@ const SlotDetails = ({
             }
             if (slot) {
                 MultiWorldContext.deleteSlot(slot);
+                SaveData.deleteItem(DB_STORE_KEYS.groupCache, [
+                    slot.multi_save_id,
+                    slot.slot_number,
+                ]);
             }
         }
         onClose();
