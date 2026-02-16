@@ -282,6 +282,7 @@ const createConnector = (
                 tags: apTags,
                 password,
                 items: API.itemsHandlingFlags.all,
+                slotData: false,
             })
             .then((_packet) => {
                 statusMessageHandle.update({

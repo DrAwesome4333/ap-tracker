@@ -8,8 +8,10 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import { CONNECTION_STATUS } from "../../services/connector/connector";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
+import ActivityContext from "../../contexts/activityContext";
 
 const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
+    const activityContext = useContext(ActivityContext);
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
@@ -71,6 +73,7 @@ const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
             <ButtonRow>
                 <PrimaryButton
                     onClick={() => {
+                        activityContext.add('slot-tracker');
                         connector
                             ?.connectToAP(connectionInfo)
                             .catch((result) => {
@@ -82,6 +85,8 @@ const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
                                         details: `${result.message}\n${result.stack}`,
                                         duration: 30,
                                     });
+                                    activityContext.drop('slot-tracker');
+                                
                                 } else {
                                     NotificationManager.createToast({
                                         ...result,

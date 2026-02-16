@@ -21,9 +21,11 @@ import MultiWorldContext, {
 import SavedSlotView from "./SavedSlotView";
 import Icon from "../icons/icons";
 import styles from "./SavedSlots.module.css";
+import ActivityContext from "../../contexts/activityContext";
 
 const SavedConnections = ({ ...props }) => {
     const trackerState = useContext(TrackerStateContext);
+    const activityContext = useContext(ActivityContext);
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
     const [editorConnection, setEditorConnection] = useState<string>(null);
 
@@ -74,6 +76,7 @@ const SavedConnections = ({ ...props }) => {
             slot?: SavedSlotDetails;
             connectionId?: string;
         }) => {
+            activityContext.add("slot-tracker");
             connector
                 .connectToAP({
                     legacy_connection_id: connectionId,
@@ -91,6 +94,7 @@ const SavedConnections = ({ ...props }) => {
                             details: `${result.message}\n${result.stack}`,
                             duration: 30,
                         });
+                        activityContext.drop("slot-tracker");
                     } else {
                         NotificationManager.createToast({
                             ...result,

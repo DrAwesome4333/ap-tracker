@@ -67,13 +67,21 @@ const TrackerScreen = () => {
         return <Tabs tabs={tabs} style={{ width: "100%", height: "100%" }} />;
     }
     return (
-        <Flex
-            direction="row"
-            style={{ width: "100%", height: "100%" }}
-            startRatio={0.25}
-            child1={inventory}
-            child2={clientAndList}
-        />
+        <div
+            style={{
+                width: "100%",
+                height: "100%",
+                overflow: "auto",
+            }}
+        >
+            <Flex
+                direction="row"
+                style={{ width: "100%", height: "100%" }}
+                startRatio={0.25}
+                child1={inventory}
+                child2={clientAndList}
+            />
+        </div>
     );
 };
 

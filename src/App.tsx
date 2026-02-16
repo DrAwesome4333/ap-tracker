@@ -27,6 +27,8 @@ import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
 import ApStyles from "./components/sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "./services/theme/ColorManager";
+import { useActivityContext } from "./hooks/activityHook";
+import ActivityContext from "./contexts/activityContext";
 
 const locationManager = new LocationManager();
 const inventoryManager = new InventoryManager();
@@ -71,6 +73,7 @@ const connector = createConnector(
 const connection = connector.connection;
 
 const App = (): React.ReactNode => {
+    const activityContext = useActivityContext();
     const trackerConnectionState = useSyncExternalStore(
         connection.subscribe,
         () => connection.status,
@@ -81,7 +84,7 @@ const App = (): React.ReactNode => {
         () => connection.slotInfo,
         () => connection.slotInfo
     );
-    const [optionWindowOpen, setOptionWindowOpen] = useState(false);
+    const optionWindowOpen = activityContext.stack.includes('options');
     const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
@@ -119,55 +122,47 @@ const App = (): React.ReactNode => {
             style={{ colorScheme: readThemeValue(themeValue), ...apColors }}
         >
             <title>{titleParts.join(" | ")}</title>
-            <TrackerStateContext.Provider
-                value={{
-                    connectionStatus: trackerConnectionState,
-                    slotData: trackerSlotData,
-                }}
-            >
-                <ServiceContext.Provider
+            <ActivityContext.Provider value={activityContext}>
+                <TrackerStateContext.Provider
                     value={{
-                        locationManager,
-                        locationTracker,
-                        inventoryTracker: itemTracker,
-                        connector,
-                        tagManager,
-                        optionManager,
-                        inventoryManager,
-                        trackerManager,
-                        textClientManager,
-                        customTrackerRepository,
-                        genericTrackerRepository,
-                        locationTagger,
-                        hintTagger,
-                        hintManager,
+                        connectionStatus: trackerConnectionState,
+                        slotData: trackerSlotData,
                     }}
                 >
-                    <NotificationContainer />
-                    <MainHeader
-                        optionsCallback={() => {
-                            setOptionWindowOpen(!optionWindowOpen);
+                    <ServiceContext.Provider
+                        value={{
+                            locationManager,
+                            locationTracker,
+                            inventoryTracker: itemTracker,
+                            connector,
+                            tagManager,
+                            optionManager,
+                            inventoryManager,
+                            trackerManager,
+                            textClientManager,
+                            customTrackerRepository,
+                            genericTrackerRepository,
+                            locationTagger,
+                            hintTagger,
+                            hintManager,
                         }}
-                    />
-                    {optionWindowOpen && <OptionsScreen />}
-                    {!optionWindowOpen && (
-                        <div
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                overflow: "auto",
+                    >
+                        <NotificationContainer />
+                        <MainHeader
+                            optionsCallback={() => {
+                                if(optionWindowOpen){
+                                    activityContext.drop("options");
+                                } else {
+                                    activityContext.add("options");
+                                }
                             }}
-                        >
-                            {new Set([
-                                CONNECTION_STATUS.disconnected,
-                                CONNECTION_STATUS.connecting,
-                            ]).has(trackerConnectionState) && <StartScreen />}
-                            {CONNECTION_STATUS.connected ===
-                                trackerConnectionState && <TrackerScreen />}
-                        </div>
-                    )}
-                </ServiceContext.Provider>
-            </TrackerStateContext.Provider>
+                        />
+                        {optionWindowOpen && <OptionsScreen />}
+                        {activityContext.stack.length === 0 && <StartScreen/>}
+                        {activityContext.stack[activityContext.stack.length - 1] === 'slot-tracker' && <TrackerScreen/>}
+                    </ServiceContext.Provider>
+                </TrackerStateContext.Provider>
+            </ActivityContext.Provider>
         </div>
     );
 };
