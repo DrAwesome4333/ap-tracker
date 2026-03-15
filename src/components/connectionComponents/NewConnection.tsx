@@ -3,15 +3,18 @@ import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
 import ServiceContext from "../../contexts/serviceContext";
-import NotificationManager, {
-    MessageType,
-} from "../../services/notifications/notifications";
-import { CONNECTION_STATUS } from "../../services/connector/connector";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import ActivityContext from "../../contexts/activityContext";
 
-const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
-    const activityContext = useContext(ActivityContext);
+import ButtonRow from "../LayoutUtilities/ButtonRow";
+import { ConnectionConfiguration } from "../../services/connector/APConnector";
+
+const NewConnection = ({
+    onClose,
+    connectToServer,
+    ...props
+}: {
+    onClose: () => void;
+    connectToServer: (info: ConnectionConfiguration) => void;
+}) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
@@ -30,7 +33,8 @@ const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
     let disabled = false;
     if (
         !connector ||
-        connector.connection.status !== CONNECTION_STATUS.disconnected
+        false
+        //connector.connection.status !== CONNECTION_STATUS.disconnected
     ) {
         disabled = true;
     }
@@ -73,26 +77,7 @@ const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
             <ButtonRow>
                 <PrimaryButton
                     onClick={() => {
-                        activityContext.add('slot-tracker');
-                        connector
-                            ?.connectToAP(connectionInfo)
-                            .catch((result) => {
-                                if (result instanceof Error) {
-                                    console.error(result);
-                                    NotificationManager.createToast({
-                                        type: MessageType.error,
-                                        message: `An unexpected error occurred: ${result.name}`,
-                                        details: `${result.message}\n${result.stack}`,
-                                        duration: 30,
-                                    });
-                                    activityContext.drop('slot-tracker');
-                                
-                                } else {
-                                    NotificationManager.createToast({
-                                        ...result,
-                                    });
-                                }
-                            });
+                        connectToServer(connectionInfo);
                     }}
                     disabled={disabled}
                 >

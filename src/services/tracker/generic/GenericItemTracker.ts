@@ -1,3 +1,4 @@
+import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
 import { OptionManager } from "../../options/optionManager";
 import CustomItemTracker from "../itemTrackers/CustomItemTracker";
 import { CustomItemTrackerDef_V1 } from "../itemTrackers/formatDefinitions/CustomItemTrackerFormat_V1";
@@ -18,13 +19,10 @@ class GenericItemTracker extends CustomItemTracker {
         this.callListeners();
     };
 
-    configure = (
-        groups: { item: { [name: string]: string[] } },
-        gameName: string
-    ) => {
+    configure = (gamePackage: GamePackageWrapper) => {
         this.#reset();
-        this.discriminator = `-${gameName}`;
-        const groupsUpdated = { ...groups.item };
+        this.discriminator = `-${gamePackage.game}`;
+        const groupsUpdated = { ...gamePackage.getItemGroups() };
         delete groupsUpdated["Everything"];
         const itemGroupDef: CustomItemTrackerDef_V1 = {
             manifest: { ...this.manifest },

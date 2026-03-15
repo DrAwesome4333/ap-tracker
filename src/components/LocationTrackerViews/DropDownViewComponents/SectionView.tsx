@@ -10,6 +10,12 @@ import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { useTagCounters } from "../../../hooks/tagHook";
 import { List, useDynamicRowHeight } from "react-window";
+import SlotContext from "../../../contexts/slotContext";
+import { useSlotLocations } from "../../../hooks/locationHook";
+import {
+    LocationId,
+    LocationStatus,
+} from "../../../services/locations/locationSource";
 
 /**
  *
@@ -27,8 +33,8 @@ const SectionView = ({
 }: {
     name: string;
     startOpen?: boolean;
-    selectedLocation?: string;
-    onLocationSelect?: (locationName: string) => void;
+    selectedLocation?: LocationId;
+    onLocationSelect?: (locationId: LocationId) => void;
 }) => {
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
     const isClosable = name !== "root";
@@ -36,8 +42,9 @@ const SectionView = ({
         isClosable ? (startOpen ?? false) : true
     );
     const serviceContext = useContext(ServiceContext);
-    const locationTracker = serviceContext.locationTracker;
-    const locationManager = serviceContext.locationManager;
+    const slotContext = useContext(SlotContext);
+    const locationTracker = slotContext.locationTracker;
+
     const tagManager = serviceContext.tagManager;
     const optionManager = serviceContext.optionManager;
     if (!optionManager) {
@@ -53,10 +60,13 @@ const SectionView = ({
         minWidth: "10em",
     };
 
-    const clearedLocationCount =
-        (section?.locationReport.checked.size ?? 0) +
-        (section?.locationReport.ignored.size ?? 0);
-    const totalLocationCount = section?.locationReport.existing.size ?? 0;
+    const trackedLocations = useSlotLocations(section?.trackedLocations ?? []);
+    const clearedLocationCount = trackedLocations.reduce(
+        (count, status) =>
+            status.checked || status.ignored ? count + 1 : count,
+        0
+    );
+    const totalLocationCount = trackedLocations.length;
     const checkedLocationBehavior = useOption(
         optionManager,
         "LocationTracker:cleared_location_behavior",
@@ -92,26 +102,21 @@ const SectionView = ({
     /**
      * Compares two locations to determine their relative order
      * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @param a Location name a
-     * @param b Location name b
+     * @param a Location status a
+     * @param b Location status b
      * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
      */
-    const locationCompare = (a: string, b: string): number => {
-        const statusA = locationManager.getLocationStatus(a);
-        const statusB = locationManager.getLocationStatus(b);
-        if (
-            checkedLocationBehavior === "separate" &&
-            statusA.checked !== statusB.checked
-        ) {
-            return statusA.checked ? 1 : -1;
+    const locationCompare = (a: LocationStatus, b: LocationStatus): number => {
+        if (checkedLocationBehavior === "separate" && a.checked !== b.checked) {
+            return a.checked ? 1 : -1;
         }
 
         if (locationOrder === "natural") {
-            return naturalSort(a, b);
+            return naturalSort(a.name, b.name);
         } else if (locationOrder === "id") {
-            return statusA.id - statusB.id;
+            return a.locationId - b.locationId;
         } else if (locationOrder === "lexical") {
-            return a < b ? -1 : 1;
+            return a.name < b.name ? -1 : 1;
         }
         // leave ordering as listed
         return -1;
@@ -119,30 +124,19 @@ const SectionView = ({
 
     /**
      * Filter that removes any locations that do not exist or are hidden by settings.
-     * @param locationName
+     * @param locationStatus
      * @returns
      */
-    const locationFilter = (locationName: string): boolean => {
-        const locationStatus = locationManager.getLocationStatus(locationName);
-        return (
-            locationStatus.exists &&
-            (checkedLocationBehavior !== "hide" || !locationStatus.checked)
-        );
+    const locationFilter = (locationStatus: LocationStatus): boolean => {
+        return checkedLocationBehavior !== "hide" || !locationStatus.checked;
     };
 
-    const locations: string[] = useMemo(() => {
-        const locationNames = [...(section?.locations ?? [])].filter(
-            locationFilter
-        );
+    const localLocations = useSlotLocations(section?.locations ?? []);
+    const locations: LocationStatus[] = useMemo(() => {
+        const locationNames = localLocations.filter(locationFilter);
         locationNames.sort(locationCompare);
         return locationNames;
-    }, [
-        locationOrder,
-        checkedLocationBehavior,
-        section?.locations,
-        locationManager,
-        section?.locationReport,
-    ]);
+    }, [locationOrder, checkedLocationBehavior, localLocations]);
 
     /**
      * Compares two sections to determine their relative order
@@ -156,12 +150,12 @@ const SectionView = ({
         const sectionB = locationTracker.getSection(b);
         const indexA = section.children.indexOf(a);
         const indexB = section.children.indexOf(b);
-        const sectionAClear =
-            sectionA.locationReport.checked.size ===
-            sectionA.locationReport.existing.size;
-        const sectionBClear =
-            sectionB.locationReport.checked.size ===
-            sectionB.locationReport.existing.size;
+        const sectionAClear = false; // TODO fix
+        // sectionA.locationReport.checked.size ===
+        // sectionA.locationReport.existing.size;
+        const sectionBClear = false;
+        // sectionB.locationReport.checked.size ===
+        // sectionB.locationReport.existing.size;
 
         if (
             clearedSectionBehavior === "separate" &&
@@ -173,24 +167,15 @@ const SectionView = ({
         return indexA - indexB;
     };
 
-    const locationNames = section?.locationReport
-        ? [...section.locationReport.existing.values()]
-        : [];
-    const locationStatuses = locationNames.map((locationName) =>
-        locationManager.getLocationStatus(locationName)
-    );
-
-    const locationIds = locationStatuses.map((status) => status.id ?? 0);
-    const locationCounterStatuses = locationStatuses.map((status) => ({
+    const locationCounterStatuses = trackedLocations.map((status) => ({
         checked: status.checked,
         ignored: status.ignored,
-        exists: status.exists,
     }));
 
     const tagCounts = useTagCounters(
         tagManager,
         TagEntityType.location,
-        locationIds,
+        trackedLocations.map((l) => l.locationId) ?? [],
         locationCounterStatuses
     );
 
@@ -201,12 +186,11 @@ const SectionView = ({
      */
     const sectionFilter = (sectionName: string) => {
         const sectionInQuestion = locationTracker.getSection(sectionName);
-        return (
-            sectionInQuestion?.locationReport.existing.size > 0 &&
-            (clearedSectionBehavior !== "hide" ||
-                sectionInQuestion.locationReport.checked.size <
-                    sectionInQuestion.locationReport.existing.size)
-        );
+        return true; // todo FIX
+        // sectionInQuestion?.locationReport.existing.size > 0 &&
+        // (clearedSectionBehavior !== "hide" ||
+        //     sectionInQuestion.locationReport.checked.size <
+        //         sectionInQuestion.locationReport.existing.size)
     };
 
     const childSections = section?.children.filter(sectionFilter) ?? [];
@@ -214,8 +198,7 @@ const SectionView = ({
 
     return (
         <>
-            {section?.locationReport.existing.size === 0 &&
-            section?.id !== "root" ? (
+            {totalLocationCount === 0 && section?.id !== "root" ? (
                 <></> // Hide empty sections
             ) : (
                 <div style={style}>
@@ -233,8 +216,7 @@ const SectionView = ({
                                 marginBottom: "0.25em",
                             }}
                             className={`section_title ${
-                                section?.locationReport.checked.size ===
-                                section?.locationReport.existing.size
+                                clearedLocationCount === totalLocationCount
                                     ? "checked"
                                     : ""
                             }`}

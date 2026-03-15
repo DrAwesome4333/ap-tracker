@@ -3,9 +3,7 @@ import { TrackerStateContext } from "../../contexts/contexts";
 import { PrimaryButton, SecondaryButton, TextButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import NotePad from "../NotePad/NotePad";
-import { CONNECTION_STATUS } from "../../services/connector/connector";
 import ConnectionOptions from "./ConnectionOptions";
-import { connected } from "process";
 
 const MainHeader = ({
     optionsCallback,
@@ -13,17 +11,18 @@ const MainHeader = ({
 }: {
     optionsCallback: React.MouseEventHandler;
 }) => {
-    const trackerState = useContext(TrackerStateContext);
+    // const trackerState = useContext(TrackerStateContext);
+    const trackerState = {};
     const [notePadOpen, setNotePadOpen] = useState(false);
     const [connectionModalOpen, setConnectionModalOpen] = useState(false);
-    const slot = trackerState.slotData;
+    const slot = {};
 
-    if (
-        trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
-        connectionModalOpen
-    ) {
-        setConnectionModalOpen(false);
-    }
+    // if (
+    //     trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
+    //     connectionModalOpen
+    // ) {
+    //     setConnectionModalOpen(false);
+    // }
 
     return (
         <div
@@ -54,20 +53,20 @@ const MainHeader = ({
                     type="circle"
                     fontSize="0.5rem"
                     style={{
-                        color:
-                            trackerState.connectionStatus ===
-                            CONNECTION_STATUS.connected
-                                ? "chartreuse"
-                                : trackerState.connectionStatus ===
-                                    CONNECTION_STATUS.connecting
-                                  ? "gold"
-                                  : trackerState.connectionStatus ===
-                                      CONNECTION_STATUS.disconnected
-                                    ? "gray"
-                                    : trackerState.connectionStatus ===
-                                        CONNECTION_STATUS.error
-                                      ? "red"
-                                      : "purple",
+                        color: "chartreuse",
+                        // trackerState.connectionStatus ===
+                        // CONNECTION_STATUS.connected
+                        //     ? "chartreuse"
+                        //     : trackerState.connectionStatus ===
+                        //         CONNECTION_STATUS.connecting
+                        //       ? "gold"
+                        //       : trackerState.connectionStatus ===
+                        //           CONNECTION_STATUS.disconnected
+                        //         ? "gray"
+                        //         : trackerState.connectionStatus ===
+                        //             CONNECTION_STATUS.error
+                        //           ? "red"
+                        //           : "purple",
                     }}
                 ></Icon>{" "}
                 {slot?.alias && (
@@ -82,13 +81,17 @@ const MainHeader = ({
                         {slot.alias}
                     </TextButton>
                 )}
-                <ConnectionOptions open={connectionModalOpen} />
+                <ConnectionOptions
+                    open={connectionModalOpen}
+                    onClose={() => setConnectionModalOpen(false)}
+                />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <PrimaryButton
                     disabled={
-                        trackerState.connectionStatus !==
-                        CONNECTION_STATUS.connected
+                        // trackerState.connectionStatus !==
+                        // CONNECTION_STATUS.connected
+                        false
                     }
                     small
                     onClick={() => {
@@ -108,8 +111,9 @@ const MainHeader = ({
                         setNotePadOpen(false);
                     }}
                     disabled={
-                        trackerState.connectionStatus !==
-                        CONNECTION_STATUS.connected
+                        // trackerState.connectionStatus !==
+                        // CONNECTION_STATUS.connected
+                        true
                     }
                 />
             }

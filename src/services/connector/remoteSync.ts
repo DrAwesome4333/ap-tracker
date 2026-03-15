@@ -1,8 +1,6 @@
 import { Client } from "archipelago.js";
-import { TagManager } from "../tags/tagManager";
 
 let client: Client = null;
-let _tagManager: TagManager = null;
 
 const NOTE_KEY = "_tracker_note";
 
@@ -30,17 +28,8 @@ const loadNote = async () => {
     return (value[key] ?? { text: "" })["text"];
 };
 
-// const saveTags = async () => {
-//     if (!client || !client.authenticated) {
-//         throw new Error(
-//             "Failed to save tags, no connection to Archipelago Server."
-//         );
-//     }
-// };
-
-const enableDataSync = (client_: Client, tagManager_: TagManager) => {
+const enableDataSync = (client_: Client) => {
     client = client_;
-    _tagManager = tagManager_;
 };
 
 export { saveNote, loadNote, enableDataSync };

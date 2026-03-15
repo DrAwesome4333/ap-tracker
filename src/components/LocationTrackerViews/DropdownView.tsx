@@ -10,7 +10,7 @@ import styles from "./LocationTracker.module.css";
 
 const LocationTrackerDropdownView = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [focusedLocation, setFocusedLocation] = useState("");
+    const [focusedLocation, setFocusedLocation] = useState<number>(0);
     return (
         <>
             <div className={styles.dropdown_view}>
@@ -44,18 +44,18 @@ const LocationTrackerDropdownView = () => {
                     >
                         <SectionView
                             name="root"
-                            onLocationSelect={(locationName) => {
-                                setFocusedLocation(locationName);
+                            onLocationSelect={(locationId) => {
+                                setFocusedLocation(locationId);
                             }}
                             selectedLocation={focusedLocation}
                         />
                         <StickySpacer />
                     </div>
-                    {focusedLocation && (
+                    {focusedLocation > 0 && (
                         <div style={{ minWidth: 0, minHeight: 0 }}>
                             <LocationDetails
-                                locationName={focusedLocation}
-                                onClose={() => setFocusedLocation("")}
+                                locationId={focusedLocation}
+                                onClose={() => setFocusedLocation(0)}
                             />
                         </div>
                     )}

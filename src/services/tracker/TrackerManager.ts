@@ -12,6 +12,7 @@ import {
 } from "./locationTrackers/locationTrackers";
 import { ResourceType } from "./resourceEnums";
 import { ResourceManifest, ResourceRepository } from "./resource";
+import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
 const modified = Symbol("modified");
 
 type TrackerDirectory = {
@@ -68,6 +69,7 @@ class TrackerManager {
         [type: string]: LocationTracker | ItemTracker;
     } = {};
     #game: string = null;
+    #gamePackage: GamePackageWrapper = null;
     #defaults: TrackerResourceIds = {
         [ResourceType.locationTracker]: {
             uuid: GenericLocationTracker.uuid,
@@ -96,7 +98,7 @@ class TrackerManager {
                     tracker?.manifest.version !== newGameInfo[type]?.version
             );
             if (changes.length > 0) {
-                this.loadTrackers(this.#game);
+                this.loadTrackers(this.#game, this.#gamePackage);
             } else {
                 this.#callTrackerListeners();
             }
@@ -188,7 +190,7 @@ class TrackerManager {
             });
             this.#callDirectoryListeners();
             if (triggerReload) {
-                this.loadTrackers(this.#game);
+                this.loadTrackers(this.#game, this.#gamePackage);
             }
         };
         const subCall = repo.getUpdateSubscriber([
@@ -274,8 +276,12 @@ class TrackerManager {
     };
 
     /** Loads the appropriate trackers for a game */
-    loadTrackers = async (game: string): Promise<void> => {
+    loadTrackers = async (
+        game: string,
+        gamePackage: GamePackageWrapper
+    ): Promise<void> => {
         this.#game = game;
+        this.#gamePackage = gamePackage;
         const locationTrackerInfo = this.getCurrentGameTracker(
             game,
             ResourceType.locationTracker
@@ -296,7 +302,8 @@ class TrackerManager {
             ?.repo.loadResource(
                 locationTrackerInfo.uuid,
                 locationTrackerInfo.version,
-                locationTrackerInfo.type
+                locationTrackerInfo.type,
+                gamePackage
             )
             .then((tracker) => {
                 this.#trackers[ResourceType.locationTracker] =
@@ -321,7 +328,8 @@ class TrackerManager {
             ?.repo.loadResource(
                 itemTrackerInfo.uuid,
                 itemTrackerInfo.version,
-                itemTrackerInfo.type
+                itemTrackerInfo.type,
+                gamePackage
             )
             .then((tracker) => {
                 this.#trackers[ResourceType.itemTracker] = tracker;
@@ -342,7 +350,7 @@ class TrackerManager {
         return trackerId;
     };
 
-    /** Gest the currently in use tracker */
+    /** Gets the currently in use tracker */
     getCurrentTracker = (type: ResourceType) => {
         return this.#trackers[type];
     };

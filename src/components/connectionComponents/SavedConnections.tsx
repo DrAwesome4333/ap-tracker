@@ -7,7 +7,6 @@ import React, {
 import SavedConnectionView from "./SavedConnectionView";
 import ServiceContext from "../../contexts/serviceContext";
 import { TrackerStateContext } from "../../contexts/contexts";
-import { CONNECTION_STATUS } from "../../services/connector/connector";
 import SlotDetails from "./SlotDetails";
 import NotificationManager, {
     MessageType,
@@ -21,11 +20,15 @@ import MultiWorldContext, {
 import SavedSlotView from "./SavedSlotView";
 import Icon from "../icons/icons";
 import styles from "./SavedSlots.module.css";
-import ActivityContext from "../../contexts/activityContext";
+import { ConnectionConfiguration } from "../../services/connector/APConnector";
 
-const SavedConnections = ({ ...props }) => {
-    const trackerState = useContext(TrackerStateContext);
-    const activityContext = useContext(ActivityContext);
+const SavedConnections = ({
+    connectToServer,
+    ...props
+}: {
+    connectToServer: (info: ConnectionConfiguration) => void;
+}) => {
+    // const trackerState = useContext(TrackerStateContext);
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
     const [editorConnection, setEditorConnection] = useState<string>(null);
 
@@ -44,7 +47,8 @@ const SavedConnections = ({ ...props }) => {
     let disabled = false;
     if (
         !connector ||
-        trackerState.connectionStatus !== CONNECTION_STATUS.disconnected
+        false
+        // trackerState.connectionStatus !== CONNECTION_STATUS.disconnected
     ) {
         disabled = true;
     }
@@ -69,40 +73,15 @@ const SavedConnections = ({ ...props }) => {
         .sort((a, b) => b.last_used_timestamp - a.last_used_timestamp);
 
     const onConnect = useCallback(
-        ({
-            slot,
-            connectionId,
-        }: {
-            slot?: SavedSlotDetails;
-            connectionId?: string;
-        }) => {
-            activityContext.add("slot-tracker");
-            connector
-                .connectToAP({
-                    legacy_connection_id: connectionId,
-                    multi_slot: slot && {
-                        multi_save_id: slot.multi_save_id,
-                        slot_number: slot.slot_number,
-                    },
-                })
-                .catch((result) => {
-                    if (result instanceof Error) {
-                        console.error(result);
-                        NotificationManager.createToast({
-                            type: MessageType.error,
-                            message: `An unexpected error occurred: ${result.name}`,
-                            details: `${result.message}\n${result.stack}`,
-                            duration: 30,
-                        });
-                        activityContext.drop("slot-tracker");
-                    } else {
-                        NotificationManager.createToast({
-                            ...result,
-                        });
-                    }
-                });
+        ({ slot }: { slot?: SavedSlotDetails; connectionId?: string }) => {
+            connectToServer({
+                multi_slot: slot && {
+                    multi_save_id: slot.multi_save_id,
+                    slot_number: slot.slot_number,
+                },
+            });
         },
-        []
+        [connectToServer]
     );
 
     return (

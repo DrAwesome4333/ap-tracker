@@ -1,5 +1,3 @@
-import { InventoryManager } from "../inventory/inventoryManager";
-import { LocationManager } from "../locations/locationManager";
 import { OptionManager } from "../options/optionManager";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import CustomItemTracker from "./itemTrackers/CustomItemTracker";
@@ -10,6 +8,7 @@ import { convertLocationTrackerV1toV2 } from "./locationTrackers/upgradePathV1V2
 import { Resource, ResourceManifest, ResourceRepository } from "./resource";
 import { ResourceType } from "./resourceEnums";
 import { TrackerResourceId } from "./TrackerManager";
+import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
 
 const customTrackerRepositoryUUID = "c76c2420-d100-4093-8734-c52ddedd8917";
 type CustomTrackerDirectory = { [uuid: string]: ResourceManifest[] };
@@ -19,19 +18,11 @@ class CustomTrackerRepository implements ResourceRepository {
     resources: ResourceManifest[] = [];
     #directory: CustomTrackerDirectory = null;
     #resourceListeners: Set<() => void> = new Set();
-    #locationManager: LocationManager;
     #directoryQueueCallbacks: (() => void)[] = [];
     #optionManager: OptionManager;
-    // #inventoryManager: InventoryManager;
 
-    constructor(
-        optionManager: OptionManager,
-        locationManager: LocationManager,
-        _inventoryManager: InventoryManager
-    ) {
-        this.#locationManager = locationManager;
+    constructor(optionManager: OptionManager) {
         this.#optionManager = optionManager;
-        // this.#inventoryManager = inventoryManager;
         SaveData.getAllItems(DB_STORE_KEYS.customTrackersDirectory)
             .then((manifests: ResourceManifest[]) => {
                 if (manifests) {
@@ -74,8 +65,9 @@ class CustomTrackerRepository implements ResourceRepository {
     loadResource: (
         uuid: string,
         version: string,
-        type: ResourceType
-    ) => Promise<Resource> = async (uuid, version, type) => {
+        type: ResourceType,
+        gamePackage: GamePackageWrapper
+    ) => Promise<Resource> = async (uuid, version, type, gamePackage) => {
         if (!this.#directory[uuid]) {
             throw new Error(`Failed to locate resource ${uuid}`);
         }
@@ -88,7 +80,7 @@ class CustomTrackerRepository implements ResourceRepository {
         )?.["data"] as CustomLocationTrackerDef_V2 | CustomItemTrackerDef_V1;
         if (resource?.manifest?.type === ResourceType.locationTracker) {
             return new CustomLocationTracker(
-                this.#locationManager,
+                gamePackage,
                 resource as CustomLocationTrackerDef_V2
             );
         } else if (resource?.manifest?.type === ResourceType.itemTracker) {

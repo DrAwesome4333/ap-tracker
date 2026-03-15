@@ -7,6 +7,7 @@ import { GhostButton } from "../../shared/buttons";
 import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import HintSettings from "../../optionsComponents/HintTagSettings";
+import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 
 const DropdownFilterModal = ({
     open,
@@ -16,13 +17,14 @@ const DropdownFilterModal = ({
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
+    const slot = useCurrentMultiworldSlot();
 
     return (
         <Modal open={open}>
             <h2>Location Dropdown Settings</h2>
             Tracker: &nbsp;
             <TrackerDropdown
-                game={services.connector?.connection.slotInfo.game}
+                game={slot.game}
                 type={ResourceType.locationTracker}
             />
             <br />

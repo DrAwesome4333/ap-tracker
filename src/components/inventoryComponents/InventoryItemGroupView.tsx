@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { InventoryItem } from "../../services/inventory/inventoryManager";
+import { Item } from "../../services/items/itemSource";
 import CollectionContainer from "./CollectionContainer";
 import { TextButton } from "../shared/buttons";
 import InventoryItemListView from "./InventoryItemListView";
@@ -11,7 +11,7 @@ const InventoryItemGroupView = ({
     items,
 }: {
     name: string;
-    items: InventoryItem[][];
+    items: Item[][];
 }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const count = items.reduce((a, b) => a + b.length, 0);
@@ -23,9 +23,9 @@ const InventoryItemGroupView = ({
     };
     items.forEach((group) =>
         group.forEach((item) => {
-            flags.progression ||= item.progression;
-            flags.useful ||= item.useful;
-            flags.trap ||= item.trap;
+            flags.progression ||= item.flags.progression;
+            flags.useful ||= item.flags.useful;
+            flags.trap ||= item.flags.trap;
             flags.server ||= item.sender === "Archipelago";
         })
     );

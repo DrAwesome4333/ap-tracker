@@ -19,10 +19,13 @@ import NotificationManager, {
     MessageType,
 } from "../../../services/notifications/notifications";
 import { exportJSONFile } from "../../../utility/jsonExport";
-import { InventoryManager } from "../../../services/inventory/inventoryManager";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import TemplateLocationTracker from "../../../services/tracker/generic/templateTracker";
 import { randomUUID } from "../../../utility/uuid";
+import ItemRepository from "../../../services/items/itemRepository";
+import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
+import LocationRepository from "../../../services/locations/locationRepository";
+import SlotContext from "../../../contexts/slotContext";
 
 interface AdditionalParams {
     minChecksPerGroup?: number;
@@ -30,13 +33,9 @@ interface AdditionalParams {
     maxDepth?: number;
 }
 
-const previewLocationManager = new LocationManager();
-const previewSourceId = "preview_source";
-previewLocationManager.registerSourcePriority(previewSourceId, 1);
-const previewInventoryManager = new InventoryManager();
-const templateLocationTracker = new TemplateLocationTracker(
-    previewLocationManager
-);
+const previewLocationRepository = new LocationRepository();
+const previewItemRepository = new ItemRepository();
+const templateLocationTracker = new TemplateLocationTracker();
 const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
@@ -48,7 +47,8 @@ const NameAnalysisModal = ({
 }) => {
     const services = useContext(ServiceContext);
     const mainTrackerManager = services.trackerManager;
-    const connection = services.connector.connection;
+    // const connection = services.connector.connection;
+    const slot = useCurrentMultiworldSlot();
     const customTrackerRepository = services.customTrackerRepository;
 
     const [tokenOptions, setTokenOptions]: [
@@ -96,35 +96,35 @@ const NameAnalysisModal = ({
     };
 
     useEffect(() => {
-        if (connection.slotInfo.game && open) {
-            previewLocationManager.pauseUpdateBroadcast();
-            previewLocationManager.deleteAllLocations();
-            connection.slotInfo.groups.location["Everywhere"].forEach(
-                (location) => {
-                    previewLocationManager.updateLocationStatus(
-                        previewSourceId,
-                        location,
-                        {
-                            exists: true,
-                        }
-                    );
-                }
-            );
-            previewLocationManager.resumeUpdateBroadcast();
+        if (slot?.game && open) {
+            // previewLocationManager.pauseUpdateBroadcast();
+            // previewLocationManager.deleteAllLocations();
+            // connection.slotInfo.groups.location["Everywhere"].forEach(
+            //     (location) => {
+            //         previewLocationManager.updateLocationStatus(
+            //             previewSourceId,
+            //             location,
+            //             {
+            //                 exists: true,
+            //             }
+            //         );
+            //     }
+            // );
+            // previewLocationManager.resumeUpdateBroadcast();
         }
         if (open) {
-            templateLocationTracker.configure(
-                connection.slotInfo.groups,
-                GenericGameMethod.nameAnalysis,
-                {
-                    tokenOptions,
-                    groupRequirements: {
-                        minGroupSize: otherOptions.minChecksPerGroup,
-                        maxDepth: otherOptions.maxDepth,
-                        minTokenCount: otherOptions.minTokenCount,
-                    },
-                }
-            );
+            // templateLocationTracker.configure(
+            //     connection.slotInfo.groups,
+            //     GenericGameMethod.nameAnalysis,
+            //     {
+            //         tokenOptions,
+            //         groupRequirements: {
+            //             minGroupSize: otherOptions.minChecksPerGroup,
+            //             maxDepth: otherOptions.maxDepth,
+            //             minTokenCount: otherOptions.minTokenCount,
+            //         },
+            //     }
+            // );
         }
     }, [mainTrackerManager, tokenOptions, otherOptions, open]);
 
@@ -142,14 +142,22 @@ const NameAnalysisModal = ({
                     <h3>Preview</h3>
                     <ServiceContext.Provider
                         value={{
-                            locationManager: previewLocationManager,
-                            inventoryManager: previewInventoryManager,
-                            tagManager: previewTagManager,
+                            // locationManager: previewLocationManager,
+                            // inventoryManager: previewItemRepository,
                             optionManager: services.optionManager,
-                            locationTracker: templateLocationTracker,
+                            // locationTracker: templateLocationTracker,
                         }}
                     >
-                        <SectionView name="root" />
+                        <SlotContext.Provider
+                            value={{
+                                slotName: "Example Slot Name",
+                                slotAlias: "Example Slot Alias",
+                                tagManager: previewTagManager,
+                                locationTracker: templateLocationTracker,
+                            }}
+                        >
+                            <SectionView name="root" />
+                        </SlotContext.Provider>
                     </ServiceContext.Provider>
                 </div>
                 <div
@@ -328,9 +336,8 @@ const NameAnalysisModal = ({
                         const customTracker = templateLocationTracker;
                         const customTrackerExport =
                             customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game =
-                            connection.slotInfo.game;
-                        customTrackerExport.manifest.name = `Template for ${connection.slotInfo.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                        customTrackerExport.manifest.game = slot.game;
+                        customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
                         if (!customTracker || !customTrackerExport) {
                             NotificationManager.createToast({
                                 message: "Failed to export and save tracker",
@@ -340,14 +347,11 @@ const NameAnalysisModal = ({
                         }
 
                         customTrackerRepository.addTracker(customTrackerExport);
-                        mainTrackerManager.setGameTracker(
-                            connection.slotInfo.game,
-                            {
-                                type: ResourceType.locationTracker,
-                                uuid: customTrackerExport.manifest.uuid,
-                                version: customTrackerExport.manifest.version,
-                            }
-                        );
+                        mainTrackerManager.setGameTracker(slot.game, {
+                            type: ResourceType.locationTracker,
+                            uuid: customTrackerExport.manifest.uuid,
+                            version: customTrackerExport.manifest.version,
+                        });
                         NotificationManager.createStatus({
                             message: "Successfully added tracker",
                             type: MessageType.success,
@@ -363,9 +367,8 @@ const NameAnalysisModal = ({
                         const customTracker = templateLocationTracker;
                         const customTrackerExport =
                             customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game =
-                            connection.slotInfo.game;
-                        customTrackerExport.manifest.name = `Template for ${connection.slotInfo.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                        customTrackerExport.manifest.game = slot.game;
+                        customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
                         if (!customTracker) {
                             NotificationManager.createToast({
                                 message: "Failed to export tracker",

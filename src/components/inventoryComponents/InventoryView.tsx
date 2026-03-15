@@ -4,7 +4,6 @@ import React, {
     useState,
     useSyncExternalStore,
 } from "react";
-import { useInventoryItems } from "../../hooks/inventoryHook";
 import ServiceContext from "../../contexts/serviceContext";
 import InventoryItemListView from "./InventoryItemListView";
 import StickySpacer from "../shared/StickySpacer";
@@ -17,15 +16,17 @@ import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import InventoryFilterOptionsModal from "./InventoryFilterOptionsModal";
 import { ItemTrackerType } from "../../services/tracker/resourceEnums";
-import { InventoryItem } from "../../services/inventory/inventoryManager";
+import { Item } from "../../services/items/itemSource";
 import { ItemCollectionDef } from "../../services/tracker/itemTrackers/itemTrackers";
 import InventoryItemGroupView from "./InventoryItemGroupView";
+import SlotContext from "../../contexts/slotContext";
+import { useSlotItems } from "../../hooks/itemHook";
 const emptyList = [];
 const InventoryView = () => {
     const services = useContext(ServiceContext);
-    const inventoryManager = services.inventoryManager;
     const optionManager = services.optionManager ?? globalOptionManager;
-    const itemTracker = services.inventoryTracker;
+    const slotContext = useContext(SlotContext);
+    const itemTracker = slotContext.itemTracker;
     const groups: ItemCollectionDef[] = useSyncExternalStore(
         itemTracker?.manifest.itemTrackerType === ItemTrackerType.group
             ? itemTracker.getUpdateSubscriber()
@@ -39,12 +40,6 @@ const InventoryView = () => {
             ? () => itemTracker.getGroups()
             : () => emptyList
     );
-
-    if (!inventoryManager) {
-        throw new Error(
-            "Inventory manager was not provided for Inventory View"
-        );
-    }
 
     const [showFilterModal, setShowFilterModal] = useState(false);
     const showProgression = useOption(
@@ -83,19 +78,19 @@ const InventoryView = () => {
         "global"
     ) as boolean;
 
-    const items = useInventoryItems(inventoryManager);
+    const items = useSlotItems();
 
     const sortedItems = useMemo(() => {
         return items
             ?.filter(
                 (collection) =>
-                    (collection.progression && showProgression) ||
-                    (collection.useful && showUseful) ||
-                    (collection.trap && showTrap) ||
+                    (collection.flags.progression && showProgression) ||
+                    (collection.flags.useful && showUseful) ||
+                    (collection.flags.trap && showTrap) ||
                     (collection.sender === "Archipelago" && showServer) ||
-                    (!collection.progression &&
-                        !collection.useful &&
-                        !collection.trap &&
+                    (!collection.flags.progression &&
+                        !collection.flags.useful &&
+                        !collection.flags.trap &&
                         collection.sender !== "Archipelago" &&
                         (showNormal ?? true))
             )
@@ -128,7 +123,7 @@ const InventoryView = () => {
         items,
     ]);
 
-    const itemsGroupedByName: InventoryItem[][] = [];
+    const itemsGroupedByName: Item[][] = [];
     const itemsGroupedByNameIndex: { [itemName: string]: number } = {};
     sortedItems.forEach((item) => {
         if (itemsGroupedByNameIndex[item.name] === undefined) {
@@ -144,14 +139,14 @@ const InventoryView = () => {
         name: string;
         index: number;
         count: number;
-        items: InventoryItem[][];
+        items: Item[][];
     }[] = [];
     const pulledItems: Set<string> = new Set();
     groups.forEach((group) => {
         let index = -1;
         const groupItems = itemsGroupedByName.filter((items) => {
             const pullItem =
-                group.allowedItems.has(items[0].id) ||
+                group.allowedItems.has(items[0].locationId) ||
                 group.allowedItems.has(items[0].name);
             if (pullItem) {
                 pulledItems.add(items[0].name);

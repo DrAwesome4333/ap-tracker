@@ -8,6 +8,7 @@ import OptionView from "../optionsComponents/OptionView";
 import { JSONValue } from "../../services/dataStores";
 import TrackerDropdown from "../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../services/tracker/resourceEnums";
+import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 const InventoryFilterOptionsModal = ({
     open,
     onClose,
@@ -27,7 +28,7 @@ const InventoryFilterOptionsModal = ({
         () => itemTracker?.options,
         () => itemTracker?.options
     );
-
+    const slot = useCurrentMultiworldSlot();
     const optionUpdate = (optionName: string, value: JSONValue) => {
         optionManger.setOptionValue(optionName, "global", value);
     };
@@ -36,10 +37,7 @@ const InventoryFilterOptionsModal = ({
         <Modal open={open}>
             <h2>Inventory Settings</h2>
             Tracker: &nbsp;
-            <TrackerDropdown
-                game={services.connector?.connection.slotInfo.game}
-                type={ResourceType.itemTracker}
-            />
+            <TrackerDropdown game={slot.game} type={ResourceType.itemTracker} />
             <br />
             <br />
             <h3>Inventory Filters</h3>

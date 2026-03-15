@@ -17,7 +17,7 @@ const TextClientTextBox = () => {
         if (inputText && !sendingMessage) {
             setSendingMessage(true);
             textClientManager
-                .processInput(inputText, services.connector?.connection.client)
+                .processInput(inputText, services.connector.client)
                 .finally(() => setSendingMessage(false));
             setInputText("");
             setCachedInputText("");

@@ -3,7 +3,7 @@ import ServiceContext from "../../../contexts/serviceContext";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
-import { LocationStatus } from "../../../services/locations/locationManager";
+import { LocationStatus } from "../../../services/locations/locationSource";
 import { Input } from "../../inputs";
 import {
     DangerButton,
@@ -29,8 +29,8 @@ const LocationTagView = ({
     const tagManager = services.tagManager;
     const tag = useTag(tagManager, tagId);
     const tagType = tagManager.getTagType(tag.type_id, {
-        checked: locationStatus.checked,
-        ignored: locationStatus.ignored,
+        checked: locationStatus?.checked,
+        ignored: locationStatus?.ignored,
     });
     const inputRef = useRef<HTMLInputElement>(null);
 

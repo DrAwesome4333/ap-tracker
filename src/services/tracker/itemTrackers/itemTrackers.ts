@@ -1,5 +1,5 @@
 import { JSONValue } from "../../dataStores";
-import { InventoryItem } from "../../inventory/inventoryManager";
+import { Item } from "../../items/itemSource";
 import { TrackerOption } from "../../options/option";
 import { BaseResourceManifest } from "../resource";
 import { ResourceType, ItemTrackerType } from "../resourceEnums";
@@ -16,7 +16,7 @@ interface ItemTrackerUpdatePack {
     options?: { [optionName: string]: JSONValue };
     slotData?: unknown;
     itemGroups?: { [groupName: string]: string[] };
-    newItems?: InventoryItem[];
+    newItems?: Item[];
 }
 
 interface BaseItemTracker {

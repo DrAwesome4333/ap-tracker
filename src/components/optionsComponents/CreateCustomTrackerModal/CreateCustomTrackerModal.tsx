@@ -25,6 +25,8 @@ import { ResourceType } from "../../../services/tracker/resourceEnums";
 import CustomItemTracker from "../../../services/tracker/itemTrackers/CustomItemTracker";
 import GenericItemTracker from "../../../services/tracker/generic/GenericItemTracker";
 import { randomUUID } from "../../../utility/uuid";
+import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
+import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
 
 const CreateCustomTrackerModal = ({
     open,
@@ -36,8 +38,7 @@ const CreateCustomTrackerModal = ({
     const [helpModalOpen, setHelpModalOpen] = useState(false);
     const [nameModalOpen, setNameModalOpen] = useState(false);
     const services = useContext(ServiceContext);
-    const connector = services.connector.connection;
-    const locationManager = services.locationManager;
+    const slot = useCurrentMultiworldSlot();
     const customTrackerRepository = services.customTrackerRepository;
     const trackerManager = services.trackerManager;
     const optionManager = services.optionManager;
@@ -67,7 +68,16 @@ const CreateCustomTrackerModal = ({
                             data.manifest.type === ResourceType.locationTracker
                         ) {
                             testTracker = new CustomLocationTracker(
-                                locationManager,
+                                new GamePackageWrapper(
+                                    {
+                                        location_name_to_id: {},
+                                        item_name_to_id: {},
+                                        checksum: "",
+                                        location_groups: {},
+                                        item_groups: {},
+                                    },
+                                    ""
+                                ), //locationManager, TODO find proper replacement
                                 data as CustomLocationTrackerDef_V2
                             );
                         } else if (
@@ -80,7 +90,16 @@ const CreateCustomTrackerModal = ({
                         }
                     } else if ("customTrackerVersion" in data) {
                         testTracker = new CustomLocationTracker(
-                            locationManager,
+                            new GamePackageWrapper(
+                                {
+                                    location_name_to_id: {},
+                                    item_name_to_id: {},
+                                    checksum: "",
+                                    location_groups: {},
+                                    item_groups: {},
+                                },
+                                ""
+                            ), //locationManager, TODO find proper replacement
                             data as CustomLocationTrackerDef_V1
                         );
                     }
@@ -180,7 +199,7 @@ const CreateCustomTrackerModal = ({
                         >
                             <div>
                                 <h3>Generate a Template:</h3>
-                                {connector.slotInfo.game ? (
+                                {slot?.game ? (
                                     ""
                                 ) : (
                                     <i style={{ color: tertiary }}>
@@ -194,28 +213,28 @@ const CreateCustomTrackerModal = ({
                                     }}
                                 >
                                     <PrimaryButton
-                                        disabled={!connector.slotInfo.game}
+                                        disabled={!slot?.game}
                                         onClick={() => {
-                                            const trackerJSON =
-                                                LocationGroupCategoryGenerator.generateSectionDef(
-                                                    connector.slotInfo.groups
-                                                        .location
-                                                );
-                                            trackerJSON.manifest.game =
-                                                connector.slotInfo.game;
-                                            trackerJSON.manifest.name = `${connector.slotInfo.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
-                                            exportJSONFile(
-                                                `tracker-export-${connector.slotInfo.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
-                                                trackerJSON,
-                                                true
-                                            );
+                                            // const trackerJSON =
+                                            //     LocationGroupCategoryGenerator.generateSectionDef(
+                                            //         connector.slotInfo.groups
+                                            //             .location
+                                            //     );
+                                            // trackerJSON.manifest.game =
+                                            //     slot.game;
+                                            // trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
+                                            // exportJSONFile(
+                                            //     `tracker-export-${slot.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
+                                            //     trackerJSON,
+                                            //     true
+                                            // );
                                         }}
                                     >
                                         Location Group{" "}
                                         <Icon fontSize="14px" type="download" />
                                     </PrimaryButton>
                                     <PrimaryButton
-                                        disabled={!connector.slotInfo.game}
+                                        disabled={!slot?.game}
                                         onClick={async () => {
                                             const trackerId =
                                                 services.genericTrackerRepository.resources.filter(
@@ -236,10 +255,10 @@ const CreateCustomTrackerModal = ({
                                                 tracker as GenericItemTracker
                                             )?.exportGroups(randomUUID());
                                             trackerJSON.manifest.game =
-                                                connector.slotInfo.game;
-                                            trackerJSON.manifest.name = `${connector.slotInfo.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
+                                                slot?.game;
+                                            trackerJSON.manifest.name = `${slot?.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
                                             exportJSONFile(
-                                                `tracker-export-${connector.slotInfo.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
+                                                `tracker-export-${slot?.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
                                                 trackerJSON,
                                                 true
                                             );
@@ -249,7 +268,7 @@ const CreateCustomTrackerModal = ({
                                         <Icon fontSize="14px" type="download" />
                                     </PrimaryButton>
                                     <PrimaryButton
-                                        disabled={!connector.slotInfo.game}
+                                        disabled={!slot?.game}
                                         onClick={() => setNameModalOpen(true)}
                                     >
                                         Name Analysis

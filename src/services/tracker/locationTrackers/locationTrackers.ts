@@ -1,4 +1,5 @@
 import { JSONValue } from "../../dataStores";
+import { LocationId } from "../../locations/locationSource";
 import { TrackerOption } from "../../options/option";
 import { BaseResourceManifest } from "../resource";
 import { ResourceType, LocationTrackerType } from "../resourceEnums";
@@ -6,7 +7,6 @@ import {
     CustomLocationTrackerDef_V2,
     ThemeDef_V2,
 } from "./formatDefinitions/CustomLocationTrackerFormat_V2";
-import LocationReport from "./LocationReport";
 
 type LocationTrackerManifest = {
     type: ResourceType.locationTracker;
@@ -45,12 +45,11 @@ type ThemeDef = ThemeDef_V2;
 interface Section {
     id: string;
     title: string;
-    locationReport: LocationReport;
-    locations: string[];
+    locations: LocationId[];
+    trackedLocations: LocationId[];
     portals?: unknown;
     theme: ThemeDef;
     children: string[];
-    parents: string[];
 }
 
 type LocationTracker = DropdownLocationTracker;

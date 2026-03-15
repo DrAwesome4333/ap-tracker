@@ -6,6 +6,7 @@ import { naturalSort } from "../../utility/comparisons";
 import { HintFilter } from "./HintOptionDef";
 
 import { List, useDynamicRowHeight } from "react-window";
+import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 
 const HintTable = ({
     filters,
@@ -19,8 +20,7 @@ const HintTable = ({
     const services = useContext(ServiceContext);
     const hints = useHints(services.hintManager);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
-    const playerSlot =
-        services.connector?.connection.client.players.self.slot ?? -1;
+    const playerSlot = useCurrentMultiworldSlot();
     const lowerSearchKey = searchKey.toLowerCase().trim();
 
     const filteredHints = hints.filter((hint) => {
@@ -29,14 +29,14 @@ const HintTable = ({
         let passesSearchKeyFilter = false;
         if (
             filters.own.includes("items") &&
-            hint.item.receiver.slot === playerSlot
+            hint.item.receiver.slot === playerSlot.slot_number
         ) {
             passesPlayerFilter = true;
         }
 
         if (
             filters.own.includes("locations") &&
-            hint.item.sender.slot === playerSlot
+            hint.item.sender.slot === playerSlot.slot_number
         ) {
             passesPlayerFilter = true;
         }

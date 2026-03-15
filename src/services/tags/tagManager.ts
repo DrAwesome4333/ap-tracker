@@ -1,6 +1,10 @@
 import { IconParams } from "../../components/icons/icons";
 import { naturalSort } from "../../utility/comparisons";
-import { LocationManager } from "../locations/locationManager";
+import LocationRepository from "../locations/locationRepository";
+import {
+    LocationSource,
+    LocationUpdateCallback,
+} from "../locations/locationSource";
 
 /** A list of properties that must be true on the entities status for a tag */
 type TagCondition = string[];
@@ -114,9 +118,7 @@ const computeVariantName = (tagTypeId: string, variant: TagVariantDef) => {
     return `__${tagTypeId}_${variant[0].join("_")}`;
 };
 
-const TagManagerStatusSourceId = "tag_manager_source";
-
-class TagManager {
+class TagManager implements LocationSource {
     #tagSources: Map<string, TagSource> = new Map();
     #sourceCleanUpCalls: Map<string, () => void> = new Map();
     #tagTypes: Map<string, TagTypeV2> = new Map();
@@ -134,7 +136,8 @@ class TagManager {
     #typeListUpdateCallbacks: Set<() => void> = new Set();
     #tagCounters: Map<string, TagCounterV2> = new Map();
     #tagCounterResultCache: Map<string, TagCounterResult[]> = new Map();
-    #locationManager: LocationManager;
+    #locationRepository: LocationRepository;
+    #locationUpdateCallback: LocationUpdateCallback;
 
     constructor() {}
     #evaluateTagCondition = (
@@ -386,7 +389,7 @@ class TagManager {
 
     #updateTags = (tags: TagDataV2[]) => {
         let triggeredCallbacks: Set<() => void> = new Set();
-        this.#locationManager?.pauseUpdateBroadcast();
+        const affectedLocations: Set<number> = new Set();
         tags.forEach((tag) => {
             const tagType = this.#tagTypes.get(tag.type_id) ?? null;
             const tagsOnType = this.#tagsByType.get(tag.type_id) ?? new Set();
@@ -421,12 +424,12 @@ class TagManager {
                         triggeredCallbacks.union(updateCallbacks);
                 }
                 if (tagType.entity_type === TagEntityType.location) {
-                    this.#applyLocationEffects(tag.entity_id as number);
+                    affectedLocations.add(tag.entity_id as number);
                 }
             }
         });
         triggeredCallbacks.forEach((callback) => callback());
-        this.#locationManager?.resumeUpdateBroadcast();
+        this.#applyLocationEffects([...affectedLocations]);
     };
 
     #removeTags = (tagIds: TagId[]) => {
@@ -434,8 +437,7 @@ class TagManager {
         const tags = tagIds
             .map((tagId) => this.#tags.get(tagId))
             .filter((tag) => tag && true);
-        this.#locationManager?.pauseUpdateBroadcast();
-
+        const affectedLocations: Set<number> = new Set();
         tags.forEach((tag) => {
             const tagType = this.#tagTypes.get(tag.type_id) ?? null;
             const tagsOnType = this.#tagsByType.get(tag.type_id) ?? new Set();
@@ -471,12 +473,12 @@ class TagManager {
                         triggeredCallbacks.union(updateCallbacks);
                 }
                 if (tagType.entity_type === TagEntityType.location) {
-                    this.#applyLocationEffects(tag.entity_id as number);
+                    affectedLocations.add(tag.entity_id as number);
                 }
             }
         });
         triggeredCallbacks.forEach((callback) => callback());
-        this.#locationManager?.resumeUpdateBroadcast();
+        this.#applyLocationEffects([...affectedLocations]);
     };
 
     #readTagType = (tagTypeData: TagTypeV2Data, sourceId: string) => {
@@ -574,52 +576,63 @@ class TagManager {
         this.#typeListUpdateCallbacks.forEach((callback) => callback());
     };
 
-    enableLocationEffects = (locationManager: LocationManager) => {
-        if (this.#locationManager) {
-            this.#locationManager.removeSource(TagManagerStatusSourceId);
-        }
-        this.#locationManager = locationManager;
-        locationManager.registerSourcePriority(TagManagerStatusSourceId, 10);
-        locationManager
-            .getMatchingLocations(LocationManager.filters.exist)
-            .forEach((locationName) =>
-                this.#applyLocationEffects(
-                    locationManager.getLocationStatus(locationName).id
-                )
-            );
+    enableLocationEffects = (locationRepository: LocationRepository) => {
+        this.#locationRepository = locationRepository;
+        locationRepository.addSource(this);
+        this.#applyLocationEffects(
+            [...(this.#tagsByEntity.get(TagEntityType.location) ?? [])].map(
+                ([locationId, _tags]) => locationId as number
+            )
+        );
     };
 
-    #applyLocationEffects = (locationId: number) => {
-        if (!this.#locationManager) {
+    locationUpdateHook = (callback: LocationUpdateCallback) => {
+        this.#locationUpdateCallback = callback;
+        return () => {
+            if (this.#locationUpdateCallback === callback) {
+                this.#locationUpdateCallback = null;
+            }
+        };
+    };
+
+    #applyLocationEffects = (locationIds: number[]) => {
+        if (!this.#locationRepository) {
             return;
         }
-        const locationName =
-            [
-                ...this.#locationManager
-                    .getMatchingLocations((status) => status.id === locationId)
-                    .values(),
-            ][0] ?? null;
-        if (locationName) {
-            // debugger;
-            const effects: { checked?: boolean; ignored?: boolean } = [
-                ...(this.#tagsByEntity
-                    .get(TagEntityType.location)
-                    ?.get(locationId) ?? []),
-            ]
-                .map((tagId) =>
-                    this.#tagTypes.get(this.#tags.get(tagId).type_id)
-                )
-                .reduce(
-                    (prev, curr) => ({ ...prev, ...(curr.effects ?? {}) }),
-                    {}
-                );
-            this.#locationManager.updateLocationStatus(
-                TagManagerStatusSourceId,
-                locationName,
-                effects,
-                true
+
+        const effects: {
+            locationId: number;
+            checked?: boolean;
+            ignored?: boolean;
+        }[] = locationIds
+            .map((id) => ({
+                locationId: id,
+                tags: this.#tagsByEntity.get(TagEntityType.location)?.get(id),
+            })) // get tags on location
+            .filter((x) => x.tags && x.tags.size > 0) // only use locations with found tags
+            .map(
+                (
+                    location // map to relevant types
+                ) =>
+                    [...location.tags]
+                        .map((tagId) =>
+                            this.#tagTypes.get(this.#tags.get(tagId).type_id)
+                        )
+                        .reduce(
+                            (prev, curr) => ({
+                                ...prev,
+                                ...(curr.effects ?? {}),
+                            }),
+                            { locationId: location.locationId }
+                        )
+            )
+            .filter(
+                (location) =>
+                    Object.hasOwn(location, "checked") ||
+                    Object.hasOwn(location, "ignored")
             );
-        }
+
+        this.#locationUpdateCallback?.(effects);
     };
 }
 

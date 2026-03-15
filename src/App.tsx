@@ -1,15 +1,11 @@
-import React, { useState, useSyncExternalStore } from "react";
+import React, { useEffect, useSyncExternalStore } from "react";
 import MainHeader from "./components/header/MainHeader";
 import StartScreen from "./components/StartScreen/StartScreen";
 import { TrackerStateContext } from "./contexts/contexts";
-import { createConnector } from "./services/connector/connector";
-import { CONNECTION_STATUS } from "./services/connector/connector";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
-import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
 import { TagManager } from "./services/tags/tagManager";
 import { LocationTagger } from "./services/tags/LocationTagger";
-import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
 import useOption from "./hooks/optionHook";
@@ -29,13 +25,16 @@ import ApStyles from "./components/sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "./services/theme/ColorManager";
 import { useActivityContext } from "./hooks/activityHook";
 import ActivityContext from "./contexts/activityContext";
+import SlotContext from "./contexts/slotContext";
+import MultiWorldContext from "./services/MultiInfo/MultiWorldContext";
+import LocationRepository from "./services/locations/locationRepository";
+import ItemRepository from "./services/items/itemRepository";
+import APConnector from "./services/connector/APConnector";
 
-const locationManager = new LocationManager();
-const inventoryManager = new InventoryManager();
 const optionManager = globalOptionManager;
 
 const tagManager = new TagManager();
-tagManager.enableLocationEffects(locationManager);
+// tagManager.enableLocationEffects(locationManager);
 const locationTagger = new LocationTagger();
 const hintTagger = new HintTagger(optionManager);
 tagManager.addSource(locationTagger);
@@ -45,46 +44,28 @@ const mainTrackerManagerStore = new LocalStorageDataStore(
     "AP_ChecklistTracker_TrackerChoices"
 );
 const trackerManager = new TrackerManager(mainTrackerManagerStore);
-const customTrackerRepository = new CustomTrackerRepository(
-    optionManager,
-    locationManager,
-    inventoryManager
-);
-const genericTrackerRepository = new GenericTrackerRepository(
-    optionManager,
-    locationManager,
-    inventoryManager
-);
+const customTrackerRepository = new CustomTrackerRepository(optionManager);
+const genericTrackerRepository = new GenericTrackerRepository(optionManager);
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
 const textClientManager = new TextClientManager();
 
-const connector = createConnector(
-    locationManager,
-    inventoryManager,
-    tagManager,
-    hintManager,
-    trackerManager,
+const locationRepository = new LocationRepository();
+const itemRepository = new ItemRepository();
+const connector = new APConnector({
     textClientManager,
+    trackerManager,
     genericTrackerRepository,
-    locationTagger
-);
+    hintManager,
+    locationTagger,
+});
 
-const connection = connector.connection;
+locationRepository.addSource(connector);
+itemRepository.addSource(connector);
 
 const App = (): React.ReactNode => {
     const activityContext = useActivityContext();
-    const trackerConnectionState = useSyncExternalStore(
-        connection.subscribe,
-        () => connection.status,
-        () => connection.status
-    );
-    const trackerSlotData = useSyncExternalStore(
-        connection.subscribe,
-        () => connection.slotInfo,
-        () => connection.slotInfo
-    );
-    const optionWindowOpen = activityContext.stack.includes('options');
+    const optionWindowOpen = activityContext.stack.includes("options");
     const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
@@ -104,11 +85,17 @@ const App = (): React.ReactNode => {
         () => trackerManager.getCurrentTracker(ResourceType.itemTracker)
     ) as ItemTracker;
     const titleParts = ["AP Checklist Tracker"];
-    if (connector.connection?.slotInfo.alias) {
-        titleParts.unshift(connector.connection?.slotInfo.alias);
-    }
+    // if (connector.connection?.slotInfo.alias) {
+    //     titleParts.unshift(connector.connection?.slotInfo.alias);
+    // }
 
     const apColors = useAPColorStyles(optionManager, "global");
+
+    useEffect(() => {
+        return () => {
+            // cleanUp();
+        };
+    }, []);
 
     return (
         <div
@@ -123,21 +110,31 @@ const App = (): React.ReactNode => {
         >
             <title>{titleParts.join(" | ")}</title>
             <ActivityContext.Provider value={activityContext}>
-                <TrackerStateContext.Provider
+                {/* <TrackerStateContext.Provider
                     value={{
                         connectionStatus: trackerConnectionState,
                         slotData: trackerSlotData,
                     }}
+                > */}
+                <SlotContext.Provider
+                    value={{
+                        slotName: "[slot name]",
+                        slotAlias: "[slot alias]",
+                        locationRepository: locationRepository,
+                        itemRepository: itemRepository,
+                        locationTracker,
+                        itemTracker,
+                    }}
                 >
                     <ServiceContext.Provider
                         value={{
-                            locationManager,
+                            // locationManager,
                             locationTracker,
                             inventoryTracker: itemTracker,
                             connector,
                             tagManager,
                             optionManager,
-                            inventoryManager,
+                            // inventoryManager,
                             trackerManager,
                             textClientManager,
                             customTrackerRepository,
@@ -150,7 +147,7 @@ const App = (): React.ReactNode => {
                         <NotificationContainer />
                         <MainHeader
                             optionsCallback={() => {
-                                if(optionWindowOpen){
+                                if (optionWindowOpen) {
                                     activityContext.drop("options");
                                 } else {
                                     activityContext.add("options");
@@ -158,10 +155,13 @@ const App = (): React.ReactNode => {
                             }}
                         />
                         {optionWindowOpen && <OptionsScreen />}
-                        {activityContext.stack.length === 0 && <StartScreen/>}
-                        {activityContext.stack[activityContext.stack.length - 1] === 'slot-tracker' && <TrackerScreen/>}
+                        {activityContext.stack.length === 0 && <StartScreen />}
+                        {activityContext.stack[
+                            activityContext.stack.length - 1
+                        ] === "slot-tracker" && <TrackerScreen />}
                     </ServiceContext.Provider>
-                </TrackerStateContext.Provider>
+                    {/* </TrackerStateContext.Provider> */}
+                </SlotContext.Provider>
             </ActivityContext.Provider>
         </div>
     );

@@ -8,25 +8,24 @@ import LocationTagView from "./DropDownViewComponents/LocationTagView";
 import TagBar from "../tags/TagBar";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../shared/buttons";
+import { LocationId } from "../../services/locations/locationSource";
 
 const LocationDetails = ({
-    locationName,
+    locationId,
     onClose,
 }: {
-    locationName: string;
+    locationId: LocationId;
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
     const lastTagAdded = useRef<TagId>(null);
     const locationTagger = services.locationTagger;
     const tagManager = services.tagManager;
-    const locationManager = services.locationManager;
-    const locationStatus = useLocationStatus(locationManager, locationName);
-    const locationId = locationStatus.id;
+    const locationStatus = useLocationStatus(locationId);
     const tags = useTagList(tagManager, TagEntityType.location, locationId);
     const tagStatus = {
-        checked: locationStatus.checked,
-        ignored: locationStatus.ignored,
+        checked: locationStatus?.checked,
+        ignored: locationStatus?.ignored,
     };
 
     const sortedTags = [...(tags ?? [])];
@@ -46,7 +45,7 @@ const LocationDetails = ({
         return comparisonValue;
     });
 
-    const title = locationStatus.displayName ?? locationName;
+    const title = locationStatus?.name;
 
     return (
         <div
@@ -61,7 +60,6 @@ const LocationDetails = ({
         >
             {title}
             <br />
-            {locationStatus.displayName ? `(${locationName})` : ""}
             <TagBar
                 entityType={TagEntityType.location}
                 entityId={locationId}

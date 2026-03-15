@@ -1,13 +1,12 @@
 import { LocationManager } from "../../locations/locationManager";
 import { ResourceType } from "../resourceEnums";
-import { InventoryManager } from "../../inventory/inventoryManager";
 import GenericLocationTracker from "./GenericLocationTracker";
 import GenericItemTracker from "./GenericItemTracker";
 import { OptionManager } from "../../options/optionManager";
 import { ResourceManifest, ResourceRepository } from "../resource";
+import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
 
 const genericGameRepositoryUuid = "22b6c601-6f35-4264-b90e-1c83389c4a86";
-// const genericGameItemTrackerUuid = '46995402-c311-4992-9c35-8bf9a9c8427e';
 
 class GenericTrackerRepository implements ResourceRepository {
     static readonly uuid = genericGameRepositoryUuid;
@@ -17,17 +16,9 @@ class GenericTrackerRepository implements ResourceRepository {
         new Set();
     #locationTracker: GenericLocationTracker;
     #itemTracker: GenericItemTracker;
-    // #locationManager: LocationManager;
-    // #inventoryManager: InventoryManager;
 
-    constructor(
-        optionManager: OptionManager,
-        locationManager: LocationManager,
-        _inventoryManager: InventoryManager
-    ) {
-        // this.#locationManager = locationManager;
-        // this.#inventoryManager = inventoryManager;
-        this.#locationTracker = new GenericLocationTracker(locationManager);
+    constructor(optionManager: OptionManager) {
+        this.#locationTracker = new GenericLocationTracker();
         this.#itemTracker = new GenericItemTracker(optionManager);
         this.resources = [
             this.#locationTracker.manifest,
@@ -58,15 +49,9 @@ class GenericTrackerRepository implements ResourceRepository {
         });
     };
 
-    configureGenericTrackers = (
-        gameName: string,
-        groups: {
-            location: { [name: string]: string[] };
-            item: { [name: string]: string[] };
-        }
-    ) => {
-        this.#locationTracker.configure(groups);
-        this.#itemTracker.configure(groups, gameName);
+    configureGenericTrackers = (gamePackage: GamePackageWrapper) => {
+        this.#locationTracker.configure(gamePackage);
+        this.#itemTracker.configure(gamePackage);
         this.#callListeners([ResourceType.locationTracker]);
         return {
             [ResourceType.locationTracker]: {

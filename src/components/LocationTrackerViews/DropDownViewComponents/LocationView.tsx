@@ -3,11 +3,14 @@ import ServiceContext from "../../../contexts/serviceContext";
 import Icon from "../../icons/icons";
 import { textPrimary } from "../../../constants/colors";
 import { TextButton } from "../../shared/buttons";
-import { useLocationStatus } from "../../../hooks/sectionHooks";
 import { useTagList } from "../../../hooks/tagHook";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { naturalSort } from "../../../utility/comparisons";
 import { RowComponentProps } from "react-window";
+import {
+    LocationId,
+    LocationStatus,
+} from "../../../services/locations/locationSource";
 
 const LocationView = forwardRef(
     (
@@ -18,24 +21,26 @@ const LocationView = forwardRef(
             onLocationSelect,
             selectedLocation,
         }: RowComponentProps<{
-            locations: string[];
-            onLocationSelect?: (locationName: string) => void;
-            selectedLocation?: string;
+            locations: LocationStatus[];
+            onLocationSelect?: (locationId: LocationId) => void;
+            selectedLocation?: LocationId;
         }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const serviceContext = useContext(ServiceContext);
-        const locationManager = serviceContext.locationManager;
-        if (!locationManager) {
-            throw new Error("No location manager provided");
-        }
         const tagManager = serviceContext.tagManager;
         const location = locations[index];
-        const status = useLocationStatus(locationManager, location);
 
-        const tagStatus = { checked: status.checked, ignored: status.ignored };
-        const tags = useTagList(tagManager, TagEntityType.location, status.id);
-        const selected = selectedLocation === location;
+        const tagStatus = {
+            checked: location.checked,
+            ignored: location.ignored,
+        };
+        const tags = useTagList(
+            tagManager,
+            TagEntityType.location,
+            location.locationId
+        );
+        const selected = selectedLocation === location.locationId;
 
         const sortedTags = [...(tags ?? [])];
         sortedTags.sort((a, b) => {
@@ -62,14 +67,14 @@ const LocationView = forwardRef(
             : null;
 
         const classes = new Set(["section_check"]);
-        if (status.checked || status.ignored) {
+        if (location.checked || location.ignored) {
             classes.add("checked");
-            if (status.ignored) {
+            if (location.ignored) {
                 classes.add("ignored");
             }
         }
 
-        let iconType = status.checked
+        let iconType = location.checked
             ? "check_small"
             : "check_indeterminate_small";
         let iconColor = textPrimary;
@@ -101,7 +106,7 @@ const LocationView = forwardRef(
                                     ? "line-through"
                                     : "",
                         }}
-                        onClick={() => onLocationSelect?.(location)}
+                        onClick={() => onLocationSelect?.(location.locationId)}
                     >
                         <Icon
                             fontSize="14px"
@@ -109,7 +114,7 @@ const LocationView = forwardRef(
                             style={{ color: iconColor }}
                             iconParams={iconSpec}
                         />{" "}
-                        {status.displayName ?? location}
+                        {location.name}
                     </TextButton>
                 </span>
             </div>

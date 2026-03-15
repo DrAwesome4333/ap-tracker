@@ -1,5 +1,5 @@
 import React, { forwardRef, useContext } from "react";
-import { InventoryItem } from "../../services/inventory/inventoryManager";
+import { Item } from "../../services/items/itemSource";
 import { GhostButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import ServiceContext from "../../contexts/serviceContext";
@@ -9,31 +9,30 @@ import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
 
 const InventoryItemView = forwardRef(
     (
-        { items, index, style }: RowComponentProps<{ items: InventoryItem[] }>,
+        { items, index, style }: RowComponentProps<{ items: Item[] }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const item = items[index];
         const services = useContext(ServiceContext);
-        const locationManager = services.locationManager;
         const tagManager = services.tagManager;
         const locationTagger = services.locationTagger;
 
         let itemClass = ap_styles.item_normal;
-        if (item.progression) {
+        if (item.flags.progression) {
             itemClass = ap_styles.item_prog;
-        } else if (item.useful) {
+        } else if (item.flags.useful) {
             itemClass = ap_styles.item_useful;
-        } else if (item.trap) {
+        } else if (item.flags.trap) {
             itemClass = ap_styles.item_trap;
         } else if (item.sender === "Archipelago") {
             itemClass = ap_styles.item_server;
         }
 
         const playerClass =
-            item.sender_slot === MultiWorldContext.loadedSlot.slot_number
+            item.senderSlot === MultiWorldContext.loadedSlot.slot_number
                 ? ap_styles.player
                 : MultiWorldContext.loadedMultiWorld.slots.find(
-                        (slot) => slot.slot_number === item.sender_slot
+                        (slot) => slot.slot_number === item.senderSlot
                     )
                   ? ap_styles.player_alt
                   : ap_styles.player_other;
@@ -65,13 +64,10 @@ const InventoryItemView = forwardRef(
                     >
                         {item.sender}
                     </span>
-                    {item.local && locationManager && tagManager && (
+                    {item.flags.local && tagManager && (
                         <GhostButton
                             onClick={(event) => {
-                                const locationId =
-                                    locationManager.getLocationStatus(
-                                        item.location
-                                    )?.id ?? -1;
+                                const locationId = item.locationId;
                                 const existingTags = locationTagger
                                     .queryTags("star", locationId)
                                     .filter((tag) => tag.type_id === "star");

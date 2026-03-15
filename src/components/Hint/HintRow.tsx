@@ -7,6 +7,7 @@ import ap_styles from "../sharedStyles/archipelago.module.css";
 import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
 import Icon from "../icons/icons";
 import { TextButton } from "../shared/buttons";
+import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 
 const statusSelections = [
     API.HintStatus.priority,
@@ -63,10 +64,9 @@ const HintRow = forwardRef(
         const hint = hints[index];
         const odd = index % 2 === 1;
         const services = useContext(ServiceContext);
-        const playerSlot =
-            services.connector?.connection.client.players.self.slot;
+        const playerSlot = useCurrentMultiworldSlot();
         const canChangeStatus =
-            hint.item.receiver.slot === playerSlot &&
+            hint.item.receiver.slot === playerSlot.slot_number &&
             hint.status !== API.HintStatus.found;
         const [updateInProgress, setUpdateInProgress] = useState(false);
         const finishUpdate = useCallback(() => {
