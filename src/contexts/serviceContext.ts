@@ -1,6 +1,4 @@
 import { createContext } from "react";
-import { InventoryManager } from "../services/inventory/inventoryManager";
-import { LocationManager } from "../services/locations/locationManager";
 import { TagManager } from "../services/tags/tagManager";
 import { OptionManager } from "../services/options/optionManager";
 import TextClientManager from "../services/textClientManager";
@@ -13,8 +11,6 @@ import HintManager from "../services/HintManager";
 import APConnector from "../services/connector/APConnector";
 
 const ServiceContext: React.Context<{
-    locationManager?: LocationManager;
-    inventoryManager?: InventoryManager;
     connector?: APConnector;
     tagManager?: TagManager;
     optionManager?: OptionManager;

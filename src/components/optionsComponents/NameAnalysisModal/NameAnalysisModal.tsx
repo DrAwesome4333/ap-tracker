@@ -8,7 +8,6 @@ import {
     SecondaryButton,
 } from "../../shared/buttons";
 import Icon from "../../icons/icons";
-import { LocationManager } from "../../../services/locations/locationManager";
 import ServiceContext from "../../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../../inputs";
@@ -142,10 +141,7 @@ const NameAnalysisModal = ({
                     <h3>Preview</h3>
                     <ServiceContext.Provider
                         value={{
-                            // locationManager: previewLocationManager,
-                            // inventoryManager: previewItemRepository,
                             optionManager: services.optionManager,
-                            // locationTracker: templateLocationTracker,
                         }}
                     >
                         <SlotContext.Provider

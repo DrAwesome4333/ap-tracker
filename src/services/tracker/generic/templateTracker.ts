@@ -1,5 +1,4 @@
 import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
-import { LocationManager } from "../../locations/locationManager";
 import CustomLocationTracker from "../locationTrackers/CustomLocationTracker";
 import { GenericGameMethod } from "./genericGameEnums";
 import LocationGroupCategoryGenerator from "./locationTrackerGenerators/locationGroup";

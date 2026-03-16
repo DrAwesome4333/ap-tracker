@@ -1,4 +1,3 @@
-import { LocationManager } from "../../locations/locationManager";
 import { ResourceType } from "../resourceEnums";
 import GenericLocationTracker from "./GenericLocationTracker";
 import GenericItemTracker from "./GenericItemTracker";
