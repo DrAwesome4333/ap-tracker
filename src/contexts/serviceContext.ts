@@ -6,8 +6,6 @@ import { OptionManager } from "../services/options/optionManager";
 import TextClientManager from "../services/textClientManager";
 import { TrackerManager } from "../services/tracker/TrackerManager";
 import { CustomTrackerRepository } from "../services/tracker/customTrackerRepository";
-import { LocationTracker } from "../services/tracker/locationTrackers/locationTrackers";
-import { ItemTracker } from "../services/tracker/itemTrackers/itemTrackers";
 import GenericTrackerRepository from "../services/tracker/generic/genericTrackerRepository";
 import { LocationTagger } from "../services/tags/LocationTagger";
 import HintTagger from "../services/tags/HintTagger";
@@ -22,8 +20,6 @@ const ServiceContext: React.Context<{
     optionManager?: OptionManager;
     trackerManager?: TrackerManager;
     textClientManager?: TextClientManager;
-    locationTracker?: LocationTracker;
-    inventoryTracker?: ItemTracker;
     customTrackerRepository?: CustomTrackerRepository;
     genericTrackerRepository?: GenericTrackerRepository;
     locationTagger?: LocationTagger;

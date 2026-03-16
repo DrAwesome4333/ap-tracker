@@ -13,7 +13,6 @@ import MultiWorldContext, {
 } from "../MultiInfo/MultiWorldContext";
 import { LocalStorageDataStore } from "../dataStores";
 import { randomUUID } from "../../utility/uuid";
-import { DB_STORE_KEYS, SaveData } from "../saveData";
 import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
 import { enableDataSync } from "./remoteSync";
 import DataPackageHelper from "../MultiInfo/DatapackageHelper";
@@ -123,6 +122,13 @@ class APConnector implements LocationSource, ItemSource {
         }
         this.#status = newStatus;
         this.#statusChangeCallbacks.forEach((callback) => callback());
+    };
+
+    statusUpdateHook = (callback: () => void) => {
+        this.#statusChangeCallbacks.add(callback);
+        return () => {
+            this.#statusChangeCallbacks.delete(callback);
+        };
     };
 
     connect = async (config: ConnectionConfiguration) => {
@@ -323,27 +329,6 @@ class APConnector implements LocationSource, ItemSource {
                     })
                     .catch((e) => console.error(e));
 
-                // Load groups from save data or request them from AP
-                // getGroups()
-                //     .then(
-                //         async (groups: {
-                //             item: Record<string, string[]>;
-                //             location: Record<string, string[]>;
-                //         }) => {
-                //             DataPackageHelper.cachePackage(dataPackage, groups, this.client.game);
-
-                //             const gamePackage = new GamePackageWrapper(cachedPackage, game);
-                //             // genericTrackerRepository.configureGenericTrackers(
-                //             //     MultiWorldContext.loadedSlot.game,
-                //             //     groups,
-                //             //     gamePackage
-                //             // );
-                //             // trackerManager.loadTrackers(
-                //             //     MultiWorldContext.loadedSlot.game,
-                //             //     gamePackage
-                //             // );
-                //         }
-                //     );
                 this.#locationTagger?.loadTags(
                     MultiWorldContext.loadedMultiWorld.multi_save_id,
                     MultiWorldContext.loadedSlot.slot_number

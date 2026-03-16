@@ -1,7 +1,6 @@
 import React, { useEffect, useSyncExternalStore } from "react";
 import MainHeader from "./components/header/MainHeader";
 import StartScreen from "./components/StartScreen/StartScreen";
-import { TrackerStateContext } from "./contexts/contexts";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
 import ServiceContext from "./contexts/serviceContext";
 import { TagManager } from "./services/tags/tagManager";
@@ -129,8 +128,6 @@ const App = (): React.ReactNode => {
                     <ServiceContext.Provider
                         value={{
                             // locationManager,
-                            locationTracker,
-                            inventoryTracker: itemTracker,
                             connector,
                             tagManager,
                             optionManager,

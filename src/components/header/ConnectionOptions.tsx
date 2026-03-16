@@ -6,7 +6,6 @@ import {
 } from "../shared/buttons";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import useAPConnection from "../../hooks/useAPConnection";
 import { useActionState, useContext } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
@@ -15,6 +14,7 @@ import {
     useCurrentActivity,
 } from "../../hooks/activityHook";
 import ActivityContext from "../../contexts/activityContext";
+import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
 
 const ConnectionOptions = ({
     open,
@@ -25,9 +25,10 @@ const ConnectionOptions = ({
 }) => {
     const services = useContext(ServiceContext);
     const connector = services.connector;
-    const connection = {};
+    const connectionStatus = useAPConnectionStatus();
+
     const loadedSlot = useCurrentMultiworldSlot();
-    const canConnect = true; //connection.disconnected && loadedSlot;
+    const canConnect = connectionStatus.disconnected && loadedSlot;
     const currentPage = useCurrentActivity();
     const activityContext = useContext(ActivityContext);
     return (
@@ -35,12 +36,14 @@ const ConnectionOptions = ({
             <div
                 style={{ display: "flex", flexDirection: "column", gap: "1em" }}
             >
-                <div>{connection.status}</div>
-                <div>{loadedSlot?.title}</div>
-                <div>{loadedSlot?.slot_alias ?? loadedSlot?.slot_name}</div>
-                <div>{loadedSlot?.game}</div>
+                <div>Status: {connectionStatus.status}</div>
+                <div>Title: {loadedSlot?.title}</div>
+                <div>
+                    Slot: {loadedSlot?.slot_alias ?? loadedSlot?.slot_name}
+                </div>
+                <div>Game: {loadedSlot?.game}</div>
                 <ButtonRow>
-                    {connection.connected && (
+                    {connectionStatus.connected && (
                         <DangerButton onClick={connector.disconnect}>
                             Disconnect
                         </DangerButton>
@@ -55,7 +58,7 @@ const ConnectionOptions = ({
                         </PrimaryButton>
                     )}
                     {currentPage === "slot-tracker" &&
-                        connection.disconnected && (
+                        connectionStatus.disconnected && (
                             <SecondaryButton
                                 onClick={() => activityContext.drop()}
                             >

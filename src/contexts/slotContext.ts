@@ -4,15 +4,23 @@ import { LocationTracker } from "../services/tracker/locationTrackers/locationTr
 import { TagManager } from "../services/tags/tagManager";
 import LocationRepository from "../services/locations/locationRepository";
 import ItemRepository from "../services/items/itemRepository";
+import HintManager from "../services/HintManager";
+import { LocationTagger } from "../services/tags/LocationTagger";
+import { GamePackageWrapper } from "../services/gamepackage/GamePackageWrapper";
 
 const SlotContext: React.Context<{
     slotName?: string;
     slotAlias?: string;
+    slotNumber?: string;
+    multiWorldId?: string;
     locationRepository?: LocationRepository;
     itemRepository?: ItemRepository;
     itemTracker?: ItemTracker;
     locationTracker?: LocationTracker;
     tagManager?: TagManager;
+    hintManager?: HintManager;
+    locationTagger?: LocationTagger;
+    gamePackage?: GamePackageWrapper;
 }> = createContext({});
 
 export default SlotContext;

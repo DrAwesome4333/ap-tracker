@@ -57,7 +57,9 @@ See the help section in the settings.`;
 
             let message = "Failed to connect to server";
             let details = additionalHelp;
+            // @ts-ignore-error ap error is listed as unknown for now
             if (apError.errors) {
+                // @ts-ignore-error
                 const e = apError.errors[0];
                 switch (e) {
                     case "InvalidSlot": {

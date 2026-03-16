@@ -1,9 +1,10 @@
-import React, { useContext, useState } from "react";
-import { TrackerStateContext } from "../../contexts/contexts";
+import React, { useState } from "react";
 import { PrimaryButton, SecondaryButton, TextButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import NotePad from "../NotePad/NotePad";
 import ConnectionOptions from "./ConnectionOptions";
+import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
+import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
 
 const MainHeader = ({
     optionsCallback,
@@ -11,11 +12,10 @@ const MainHeader = ({
 }: {
     optionsCallback: React.MouseEventHandler;
 }) => {
-    // const trackerState = useContext(TrackerStateContext);
-    const trackerState = {};
+    const connectionStatus = useAPConnectionStatus();
     const [notePadOpen, setNotePadOpen] = useState(false);
     const [connectionModalOpen, setConnectionModalOpen] = useState(false);
-    const slot = {};
+    const slot = useCurrentMultiworldSlot();
 
     // if (
     //     trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
@@ -53,23 +53,16 @@ const MainHeader = ({
                     type="circle"
                     fontSize="0.5rem"
                     style={{
-                        color: "chartreuse",
-                        // trackerState.connectionStatus ===
-                        // CONNECTION_STATUS.connected
-                        //     ? "chartreuse"
-                        //     : trackerState.connectionStatus ===
-                        //         CONNECTION_STATUS.connecting
-                        //       ? "gold"
-                        //       : trackerState.connectionStatus ===
-                        //           CONNECTION_STATUS.disconnected
-                        //         ? "gray"
-                        //         : trackerState.connectionStatus ===
-                        //             CONNECTION_STATUS.error
-                        //           ? "red"
-                        //           : "purple",
+                        color: connectionStatus.connected
+                            ? "chartreuse"
+                            : connectionStatus.connecting
+                              ? "gold"
+                              : connectionStatus.disconnected
+                                ? "gray"
+                                : "purple",
                     }}
                 ></Icon>{" "}
-                {slot?.alias && (
+                {slot?.slot_alias && (
                     <TextButton
                         style={{
                             textOverflow: "ellipsis",
@@ -78,7 +71,7 @@ const MainHeader = ({
                         }}
                         onClick={() => setConnectionModalOpen(true)}
                     >
-                        {slot.alias}
+                        {slot.slot_alias}
                     </TextButton>
                 )}
                 <ConnectionOptions
@@ -88,11 +81,7 @@ const MainHeader = ({
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <PrimaryButton
-                    disabled={
-                        // trackerState.connectionStatus !==
-                        // CONNECTION_STATUS.connected
-                        false
-                    }
+                    disabled={!connectionStatus.connected}
                     small
                     onClick={() => {
                         setNotePadOpen(true);
@@ -110,11 +99,7 @@ const MainHeader = ({
                     onClose={() => {
                         setNotePadOpen(false);
                     }}
-                    disabled={
-                        // trackerState.connectionStatus !==
-                        // CONNECTION_STATUS.connected
-                        true
-                    }
+                    disabled={!connectionStatus.connected}
                 />
             }
         </div>
