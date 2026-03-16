@@ -33,7 +33,6 @@ import APConnector from "./services/connector/APConnector";
 const optionManager = globalOptionManager;
 
 const tagManager = new TagManager();
-// tagManager.enableLocationEffects(locationManager);
 const locationTagger = new LocationTagger();
 const hintTagger = new HintTagger(optionManager);
 tagManager.addSource(locationTagger);
@@ -51,6 +50,7 @@ const textClientManager = new TextClientManager();
 
 const locationRepository = new LocationRepository();
 const itemRepository = new ItemRepository();
+tagManager.enableLocationEffects(locationRepository);
 const connector = new APConnector({
     textClientManager,
     trackerManager,
@@ -109,12 +109,6 @@ const App = (): React.ReactNode => {
         >
             <title>{titleParts.join(" | ")}</title>
             <ActivityContext.Provider value={activityContext}>
-                {/* <TrackerStateContext.Provider
-                    value={{
-                        connectionStatus: trackerConnectionState,
-                        slotData: trackerSlotData,
-                    }}
-                > */}
                 <SlotContext.Provider
                     value={{
                         slotName: "[slot name]",
@@ -127,11 +121,9 @@ const App = (): React.ReactNode => {
                 >
                     <ServiceContext.Provider
                         value={{
-                            // locationManager,
                             connector,
                             tagManager,
                             optionManager,
-                            // inventoryManager,
                             trackerManager,
                             textClientManager,
                             customTrackerRepository,
@@ -157,7 +149,6 @@ const App = (): React.ReactNode => {
                             activityContext.stack.length - 1
                         ] === "slot-tracker" && <TrackerScreen />}
                     </ServiceContext.Provider>
-                    {/* </TrackerStateContext.Provider> */}
                 </SlotContext.Provider>
             </ActivityContext.Provider>
         </div>

@@ -609,12 +609,11 @@ class TagManager implements LocationSource {
                 locationId: id,
                 tags: this.#tagsByEntity.get(TagEntityType.location)?.get(id),
             })) // get tags on location
-            .filter((x) => x.tags && x.tags.size > 0) // only use locations with found tags
             .map(
                 (
                     location // map to relevant types
                 ) =>
-                    [...location.tags]
+                    [...(location?.tags ?? [])]
                         .map((tagId) =>
                             this.#tagTypes.get(this.#tags.get(tagId).type_id)
                         )
@@ -623,13 +622,8 @@ class TagManager implements LocationSource {
                                 ...prev,
                                 ...(curr.effects ?? {}),
                             }),
-                            { locationId: location.locationId }
+                            { locationId: location.locationId, ignored: false }
                         )
-            )
-            .filter(
-                (location) =>
-                    Object.hasOwn(location, "checked") ||
-                    Object.hasOwn(location, "ignored")
             );
 
         this.#locationUpdateCallback?.(effects);
