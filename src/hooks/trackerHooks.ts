@@ -41,6 +41,13 @@ const useCurrentGameTracker = (
     const [trackerId, setTrackerId] = useState<TrackerResourceId>(
         trackerManager?.getCurrentGameTracker(game, type) ?? null
     );
+    const [trackedGame, setTrackedGame] = useState(game);
+
+    if (trackedGame !== game) {
+        setTrackedGame(game);
+        setTrackerId(trackerManager?.getCurrentGameTracker(game, type) ?? null);
+    }
+
     useEffect(() => {
         const callback = () => {
             setTrackerId(trackerManager.getCurrentGameTracker(game, type));
