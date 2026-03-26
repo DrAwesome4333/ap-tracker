@@ -109,7 +109,8 @@ class TrackerManager {
 
             const changedGames: Set<GameId> = new Set();
             Object.entries(newOptions).forEach(([game, trackers]) => {
-                Object.entries(trackers).forEach(
+                const newTrackerEntries = Object.entries(trackers);
+                newTrackerEntries.forEach(
                     ([trackerType, trackerResourceId]) => {
                         const currentTracker =
                             this.#trackerChoiceOptions[game]?.[trackerType];
@@ -122,6 +123,16 @@ class TrackerManager {
                         }
                     }
                 );
+                // check for removed entries as well
+                const removedTrackers = Object.entries(
+                    this.#trackerChoiceOptions[game] ?? {}
+                ).filter(
+                    ([trackerType, _trackerResourceId]) =>
+                        !newTrackerEntries[trackerType]
+                );
+                if (removedTrackers.length > 0) {
+                    changedGames.add(game);
+                }
             });
             this.#trackerChoiceOptions = newOptions;
             this.#callTrackerCallbacks(changedGames);
@@ -349,7 +360,6 @@ class TrackerManager {
         game: string,
         tracker: TrackerResourceId | { type: string }
     ) => {
-        // console.log(`Updating ${game} to:`, tracker);
         if (game) {
             const currentValue =
                 (this.#optionsStore.read(game) as TrackerResourceIds) ?? {};
@@ -366,7 +376,6 @@ class TrackerManager {
         } else {
             if ("uuid" in tracker) {
                 this.#defaults[tracker.type] = tracker;
-                // todo reload tracker when default is changed
             } else {
                 throw new Error(
                     "Default tracker must be set, cannot be deleted"
@@ -379,7 +388,6 @@ class TrackerManager {
         games: Iterable<GameId>,
         includeGameFreeCallbacks = true
     ) => {
-        console.log("GAME TRACKER CALLBACK", games);
         if (includeGameFreeCallbacks) {
             this.#gameTrackerCallbacks
                 .get(null)
