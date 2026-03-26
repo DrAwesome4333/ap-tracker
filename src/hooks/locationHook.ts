@@ -15,7 +15,7 @@ const useSlotLocations = (trackedLocations: number[]) => {
             callback
         );
         return cleanUp;
-    }, []);
+    }, [trackedLocations]);
 
     return locations;
 };

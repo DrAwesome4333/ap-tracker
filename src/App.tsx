@@ -128,14 +128,11 @@ const App = (): React.ReactNode => {
     );
 
     useEffect(() => {
-        console.log(locationTrackerId, gamePackage);
         if (locationTrackerId && gamePackage) {
-            console.log("Loading racker");
             trackerManager
                 ?.loadTracker(locationTrackerId, gamePackage)
                 .then((tracker: LocationTracker) => {
                     setLocationTracker(tracker);
-                    console.log("tracker loaded");
                 });
         } else {
             setLocationTracker(null);

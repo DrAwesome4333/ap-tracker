@@ -1,7 +1,8 @@
-import { useContext, useEffect, useState, useSyncExternalStore } from "react";
-import { LocationTrackerType } from "../services/tracker/resourceEnums";
-import { DropdownLocationTracker } from "../services/tracker/locationTrackers/locationTrackers";
-import emptySyncCallback from "./emptyCallback";
+import { useContext, useEffect, useState } from "react";
+import {
+    DropdownLocationTracker,
+    Section,
+} from "../services/tracker/locationTrackers/locationTrackers";
 import SlotContext from "../contexts/slotContext";
 import {
     LocationId,
@@ -10,16 +11,27 @@ import {
 } from "../services/locations/locationSource";
 
 const useSection = (tracker: DropdownLocationTracker, name: string) => {
-    const callback =
-        tracker &&
-        tracker.manifest.locationTrackerType === LocationTrackerType.dropdown
-            ? tracker.getUpdateSubscriber(name)
-            : emptySyncCallback;
-    return useSyncExternalStore(
-        callback,
-        () => tracker?.getSection(name),
-        () => tracker?.getSection(name)
+    const [section, setSection] = useState<Section>(
+        tracker?.getSection?.(name) ?? null
     );
+    const [trackedTracker, setTrackedTracker] =
+        useState<DropdownLocationTracker>(null);
+    if (trackedTracker !== tracker) {
+        setTrackedTracker(tracker);
+        setSection(tracker?.getSection?.(name) ?? null);
+    }
+
+    useEffect(() => {
+        const callback = () => {
+            setSection(tracker.getSection(name));
+        };
+        const cleanUp = tracker?.addSectionUpdateCallBack(name, callback);
+        return () => {
+            cleanUp?.();
+        };
+    }, [tracker, name]);
+
+    return section;
 };
 
 const useLocationStatus = (locationId: LocationId) => {

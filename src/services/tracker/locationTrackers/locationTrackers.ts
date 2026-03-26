@@ -28,7 +28,6 @@ interface BaseLocationTracker {
     readonly optionOverrides?: {
         locationOrder?: "natural" | "id" | "lexical" | "listed";
     };
-    getUpdateSubscriber: () => (listener: () => void) => () => void;
     update?: (updates: LocationTrackerUpdatePack) => void;
     reset?: () => void;
 }
@@ -37,7 +36,10 @@ type DropdownLocationTracker = {
     readonly type: LocationTrackerType.dropdown;
     getSection: (name: string) => Section;
     exportDropdowns: (newUuid?: string) => CustomLocationTrackerDef_V2;
-    getUpdateSubscriber: (name?) => (listener: () => void) => () => void;
+    addSectionUpdateCallBack: (
+        name: string,
+        callback: () => void
+    ) => () => void;
 } & BaseLocationTracker;
 
 type ThemeDef = ThemeDef_V2;

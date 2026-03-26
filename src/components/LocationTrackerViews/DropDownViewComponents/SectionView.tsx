@@ -17,6 +17,7 @@ import {
     LocationStatus,
 } from "../../../services/locations/locationSource";
 
+const staticEmptyArray = [];
 /**
  *
  * @param options
@@ -44,7 +45,6 @@ const SectionView = ({
     const serviceContext = useContext(ServiceContext);
     const slotContext = useContext(SlotContext);
     const locationTracker = slotContext.locationTracker;
-    console.log(locationTracker);
 
     const tagManager = slotContext.tagManager;
     const optionManager = serviceContext.optionManager;
@@ -61,7 +61,9 @@ const SectionView = ({
         minWidth: "10em",
     };
 
-    const trackedLocations = useSlotLocations(section?.trackedLocations ?? []);
+    const trackedLocations = useSlotLocations(
+        section?.trackedLocations ?? staticEmptyArray
+    );
     const clearedLocationCount = trackedLocations.reduce(
         (count, status) =>
             status.checked || status.ignored ? count + 1 : count,
