@@ -9,6 +9,7 @@ import { LocationTagger } from "../services/tags/LocationTagger";
 import { GamePackageWrapper } from "../services/gamepackage/GamePackageWrapper";
 
 const SlotContext: React.Context<{
+    game?: string;
     slotName?: string;
     slotAlias?: string;
     slotNumber?: string;

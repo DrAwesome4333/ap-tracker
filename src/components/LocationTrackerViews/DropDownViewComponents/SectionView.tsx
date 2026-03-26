@@ -44,8 +44,9 @@ const SectionView = ({
     const serviceContext = useContext(ServiceContext);
     const slotContext = useContext(SlotContext);
     const locationTracker = slotContext.locationTracker;
+    console.log(locationTracker);
 
-    const tagManager = serviceContext.tagManager;
+    const tagManager = slotContext.tagManager;
     const optionManager = serviceContext.optionManager;
     if (!optionManager) {
         throw new Error("No option manager provided");

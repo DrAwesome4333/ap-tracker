@@ -216,7 +216,7 @@ Manages messages sent from archipelago.js and processes user input for the Text 
 
 Related hooks: [useTextClientMessages, useTextClientHistory](../../src/hooks/textClientHook.ts)
 
-#### [TrackerManager](../../src/games/TrackerManager.ts):
+#### [TrackerManager\_](../../src/games/TrackerManager_.ts):
 
 Manages the loading and creation of trackers.
 

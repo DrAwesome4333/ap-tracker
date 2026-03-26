@@ -3,6 +3,7 @@ import { TagEntityType, TagId, TagManager } from "../services/tags/tagManager";
 import emptySyncCallback from "./emptyCallback";
 import { randomShortId } from "../utility/uuid";
 
+// TODO fix if tag manager is null
 const useTagCounters = (
     tagManager: TagManager,
     entityType: TagEntityType,

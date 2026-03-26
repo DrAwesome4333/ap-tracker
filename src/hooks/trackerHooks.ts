@@ -1,18 +1,26 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { CustomTrackerRepository } from "../services/tracker/customTrackerRepository";
-import { TrackerManager } from "../services/tracker/TrackerManager";
+import {
+    TrackerDirectory,
+    TrackerManager,
+    TrackerResourceId,
+} from "../services/tracker/TrackerManager";
 import { ResourceType } from "../services/tracker/resourceEnums";
-import emptySyncCallback from "./emptyCallback";
 
 const useTrackerDirectory = (trackerManager: TrackerManager) => {
-    const callback = trackerManager
-        ? trackerManager.getDirectorySubscriberCallback()
-        : emptySyncCallback;
-    return useSyncExternalStore(
-        callback,
-        () => trackerManager?.getDirectory(),
-        () => trackerManager?.getDirectory()
+    const [directory, setDirectory] = useState<TrackerDirectory>(
+        trackerManager?.getDirectory() ?? { games: [], trackers: {} }
     );
+    useEffect(() => {
+        const callback = () => {
+            setDirectory(trackerManager.getDirectory());
+        };
+        const cleanUp = trackerManager?.addDirectoryUpdateCallback(callback);
+        return () => {
+            cleanUp?.();
+        };
+    }, [trackerManager]);
+    return directory;
 };
 
 const useCustomTrackerDirectory = (
@@ -30,14 +38,19 @@ const useCurrentGameTracker = (
     trackerManager: TrackerManager,
     type: ResourceType
 ) => {
-    const callback = trackerManager
-        ? trackerManager.getTrackerSubscriberCallback()
-        : emptySyncCallback;
-    return useSyncExternalStore(
-        callback,
-        () => trackerManager?.getCurrentGameTracker(game, type),
-        () => trackerManager?.getCurrentGameTracker(game, type)
+    const [trackerId, setTrackerId] = useState<TrackerResourceId>(
+        trackerManager?.getCurrentGameTracker(game, type) ?? null
     );
+    useEffect(() => {
+        const callback = () => {
+            setTrackerId(trackerManager.getCurrentGameTracker(game, type));
+        };
+        const cleanUp = trackerManager?.addGameTrackerCallback(game, callback);
+        return () => {
+            cleanUp?.();
+        };
+    }, [game, trackerManager, type]);
+    return trackerId;
 };
 
 export {

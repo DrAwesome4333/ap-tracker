@@ -18,8 +18,6 @@ import { enableDataSync } from "./remoteSync";
 import DataPackageHelper from "../MultiInfo/DatapackageHelper";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
-import GenericTrackerRepository from "../tracker/generic/genericTrackerRepository";
-import { TrackerManager } from "../tracker/TrackerManager";
 import HintManager from "../HintManager";
 import { LocationTagger } from "../tags/LocationTagger";
 
@@ -39,10 +37,15 @@ enum ConnectionStatus {
 
 type APConnectorParams = {
     textClientManager: TextClientManager;
-    genericTrackerRepository: GenericTrackerRepository;
-    trackerManager: TrackerManager;
     hintManager: HintManager;
     locationTagger: LocationTagger;
+};
+type ConnectedEventParams = {
+    gamePackage: GamePackageWrapper;
+    slotName: string;
+    slotAlias: string;
+    slotNumber: number;
+    multiWorldId: string;
 };
 
 const clientUuidStore = new LocalStorageDataStore("ap-checklist-client-uuid");
@@ -53,19 +56,17 @@ class APConnector implements LocationSource, ItemSource {
     #status: ConnectionStatus = ConnectionStatus.disconnected;
     #clientUuid: string = null;
     #statusChangeCallbacks: Set<() => void> = new Set();
+    #connectedCallbacks: Set<(params: ConnectedEventParams) => void> =
+        new Set();
     #locationCallbacks: Set<LocationUpdateCallback> = new Set();
     #itemCallbacks: Set<ItemUpdateCallback> = new Set();
     #locations: Map<LocationId, LocationStatus> = new Map();
     #items: Map<number, Item> = new Map();
-    #genericTrackerRepository: GenericTrackerRepository;
     #hintManager: HintManager;
     #locationTagger: LocationTagger;
-    #trackerManager: TrackerManager;
 
     constructor({
         textClientManager,
-        genericTrackerRepository,
-        trackerManager,
         hintManager,
         locationTagger,
     }: APConnectorParams) {
@@ -110,8 +111,6 @@ class APConnector implements LocationSource, ItemSource {
 
         setupAPTextSync(this.client, textClientManager);
         hintManager.initializeListeners(this.client);
-        this.#genericTrackerRepository = genericTrackerRepository;
-        this.#trackerManager = trackerManager;
         this.#hintManager = hintManager;
         this.#locationTagger = locationTagger;
     }
@@ -128,6 +127,13 @@ class APConnector implements LocationSource, ItemSource {
         this.#statusChangeCallbacks.add(callback);
         return () => {
             this.#statusChangeCallbacks.delete(callback);
+        };
+    };
+
+    connectedHook = (callback: (params: ConnectedEventParams) => void) => {
+        this.#connectedCallbacks.add(callback);
+        return () => {
+            this.#connectedCallbacks.delete(callback);
         };
     };
 
@@ -185,7 +191,7 @@ class APConnector implements LocationSource, ItemSource {
 
         this.#setStatus(ConnectionStatus.connecting);
 
-        await this.client
+        return this.client
             .login(`${host}:${port}`, slotName, undefined, {
                 tags: ["Tracker", "Checklist"],
                 password,
@@ -289,7 +295,7 @@ class APConnector implements LocationSource, ItemSource {
                     );
                 }
                 enableDataSync(this.client);
-
+                let wrappedGamePackage: GamePackageWrapper = null;
                 await DataPackageHelper.getCachedPackage(
                     game,
                     dataPackage.games[game].checksum
@@ -318,14 +324,10 @@ class APConnector implements LocationSource, ItemSource {
                         return gamePackage;
                     })
                     .then((gamePackage) => {
-                        const wrappedPackage = new GamePackageWrapper(
+                        wrappedGamePackage = new GamePackageWrapper(
                             gamePackage,
                             game
                         );
-                        this.#genericTrackerRepository.configureGenericTrackers(
-                            wrappedPackage
-                        );
-                        this.#trackerManager.loadTrackers(game, wrappedPackage);
                     })
                     .catch((e) => console.error(e));
 
@@ -333,6 +335,17 @@ class APConnector implements LocationSource, ItemSource {
                     MultiWorldContext.loadedMultiWorld.multi_save_id,
                     MultiWorldContext.loadedSlot.slot_number
                 );
+                const result: ConnectedEventParams = {
+                    gamePackage: wrappedGamePackage,
+                    slotName,
+                    slotAlias: this.client.players.self.alias,
+                    slotNumber: this.client.players.self.slot,
+                    multiWorldId: multiSlot.multi_save_id,
+                };
+                this.#connectedCallbacks.forEach((callback) =>
+                    callback(result)
+                );
+                return result;
             })
             .catch((error) => {
                 this.client.socket.disconnect();
@@ -411,4 +424,4 @@ class APConnector implements LocationSource, ItemSource {
 
 export default APConnector;
 export { ConnectionStatus };
-export type { ConnectionConfiguration };
+export type { ConnectionConfiguration, ConnectedEventParams };

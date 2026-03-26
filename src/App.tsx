@@ -1,4 +1,9 @@
-import React, { useEffect, useSyncExternalStore } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useState,
+    useSyncExternalStore,
+} from "react";
 import MainHeader from "./components/header/MainHeader";
 import StartScreen from "./components/StartScreen/StartScreen";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
@@ -10,7 +15,6 @@ import NotificationContainer from "./components/notifications/notificationContai
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
-import { TrackerManager } from "./services/tracker/TrackerManager";
 import { CustomTrackerRepository } from "./services/tracker/customTrackerRepository";
 import TextClientManager from "./services/textClientManager";
 import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
@@ -28,16 +32,14 @@ import SlotContext from "./contexts/slotContext";
 import MultiWorldContext from "./services/MultiInfo/MultiWorldContext";
 import LocationRepository from "./services/locations/locationRepository";
 import ItemRepository from "./services/items/itemRepository";
-import APConnector from "./services/connector/APConnector";
+import APConnector, {
+    ConnectedEventParams,
+} from "./services/connector/APConnector";
+import { TrackerManager } from "./services/tracker/TrackerManager";
+import { useCurrentGameTracker } from "./hooks/trackerHooks";
+import { GamePackageWrapper } from "./services/gamepackage/GamePackageWrapper";
 
 const optionManager = globalOptionManager;
-
-const tagManager = new TagManager();
-const locationTagger = new LocationTagger();
-const hintTagger = new HintTagger(optionManager);
-tagManager.addSource(locationTagger);
-tagManager.addSource(hintTagger);
-const hintManager = new HintManager(hintTagger);
 const mainTrackerManagerStore = new LocalStorageDataStore(
     "AP_ChecklistTracker_TrackerChoices"
 );
@@ -48,19 +50,19 @@ trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
 const textClientManager = new TextClientManager();
 
-const locationRepository = new LocationRepository();
-const itemRepository = new ItemRepository();
-tagManager.enableLocationEffects(locationRepository);
+// const tagManager = new TagManager();
+//tagManager.enableLocationEffects(locationRepository);
+//tagManager.addSource(locationTagger);
+//tagManager.addSource(hintTagger);
+const locationTagger = new LocationTagger();
+const hintTagger = new HintTagger(optionManager);
+const hintManager = new HintManager(hintTagger);
+
 const connector = new APConnector({
     textClientManager,
-    trackerManager,
-    genericTrackerRepository,
     hintManager,
     locationTagger,
 });
-
-locationRepository.addSource(connector);
-itemRepository.addSource(connector);
 
 const App = (): React.ReactNode => {
     const activityContext = useActivityContext();
@@ -71,30 +73,93 @@ const App = (): React.ReactNode => {
         | "system"
         | null;
 
-    const locationTracker = useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(
-            ResourceType.locationTracker
-        ),
-        () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.locationTracker)
-    ) as LocationTracker;
-    const itemTracker = useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(ResourceType.itemTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.itemTracker)
-    ) as ItemTracker;
-    const titleParts = ["AP Checklist Tracker"];
-    // if (connector.connection?.slotInfo.alias) {
-    //     titleParts.unshift(connector.connection?.slotInfo.alias);
-    // }
-
     const apColors = useAPColorStyles(optionManager, "global");
+    const [game, setGame] = useState<string>("");
+    const locationTrackerId = useCurrentGameTracker(
+        game,
+        trackerManager,
+        ResourceType.locationTracker
+    );
+    const itemTrackerId = useCurrentGameTracker(
+        game,
+        trackerManager,
+        ResourceType.itemTracker
+    );
+
+    const [locationTracker, setLocationTracker] =
+        useState<LocationTracker>(null);
+    const [itemTracker, setItemTracker] = useState<ItemTracker>(null);
+    const [slotName, setSlotName] = useState<string>("");
+    const [slotAlias, setSlotAlias] = useState<string>("");
+    const [multiWorldId, setMultiWorldId] = useState<string>("");
+    const [locationRepository, setLocationRepository] =
+        useState<LocationRepository>(null);
+    const [itemRepository, setItemRepository] = useState<ItemRepository>(null);
+    const [tagManager, setTagManager] = useState<TagManager>(null);
+    const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
+
+    const titleParts = ["Checklist Tracker"];
+    if (slotAlias) {
+        titleParts.unshift(slotAlias);
+    }
+
+    const processSlotConnection = useCallback(
+        async ({
+            slotName: slot_name,
+            slotAlias: slot_alias,
+            multiWorldId: multi_id,
+            gamePackage,
+        }: ConnectedEventParams) => {
+            setSlotName(slot_name);
+            setSlotAlias(slot_alias);
+            setMultiWorldId(multi_id);
+            const newItemRepository = new ItemRepository();
+            const newLocationRepository = new LocationRepository();
+            const newTagManager = new TagManager();
+            newItemRepository.addSource(connector);
+            newLocationRepository.addSource(connector);
+            setItemRepository(newItemRepository);
+            setLocationRepository(newLocationRepository);
+            setGame(gamePackage.game);
+            setGamePackage(gamePackage);
+            setTagManager(newTagManager);
+        },
+        []
+    );
 
     useEffect(() => {
+        console.log(locationTrackerId, gamePackage);
+        if (locationTrackerId && gamePackage) {
+            console.log("Loading racker");
+            trackerManager
+                ?.loadTracker(locationTrackerId, gamePackage)
+                .then((tracker: LocationTracker) => {
+                    setLocationTracker(tracker);
+                    console.log("tracker loaded");
+                });
+        } else {
+            setLocationTracker(null);
+        }
+    }, [locationTrackerId, gamePackage]);
+
+    useEffect(() => {
+        if (itemTrackerId && gamePackage) {
+            trackerManager
+                ?.loadTracker(itemTrackerId, gamePackage)
+                .then((tracker: ItemTracker) => {
+                    setItemTracker(tracker);
+                });
+        } else {
+            setItemTracker(null);
+        }
+    }, [itemTrackerId, gamePackage]);
+
+    useEffect(() => {
+        const cleanUp = connector.connectedHook(processSlotConnection);
         return () => {
-            // cleanUp();
+            cleanUp();
         };
-    }, []);
+    }, [processSlotConnection]);
 
     return (
         <div
@@ -111,10 +176,15 @@ const App = (): React.ReactNode => {
             <ActivityContext.Provider value={activityContext}>
                 <SlotContext.Provider
                     value={{
-                        slotName: "[slot name]",
-                        slotAlias: "[slot alias]",
-                        locationRepository: locationRepository,
-                        itemRepository: itemRepository,
+                        game,
+                        slotName,
+                        slotAlias,
+                        multiWorldId,
+                        locationRepository,
+                        itemRepository,
+                        hintManager,
+                        tagManager,
+                        locationTagger,
                         locationTracker,
                         itemTracker,
                     }}
@@ -122,15 +192,10 @@ const App = (): React.ReactNode => {
                     <ServiceContext.Provider
                         value={{
                             connector,
-                            tagManager,
                             optionManager,
                             trackerManager,
                             textClientManager,
                             customTrackerRepository,
-                            genericTrackerRepository,
-                            locationTagger,
-                            hintTagger,
-                            hintManager,
                         }}
                     >
                         <NotificationContainer />
