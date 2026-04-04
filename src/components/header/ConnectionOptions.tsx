@@ -6,7 +6,7 @@ import {
 } from "../shared/buttons";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { useActionState, useContext } from "react";
+import { useContext } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 import {
@@ -31,6 +31,12 @@ const ConnectionOptions = ({
     const canConnect = connectionStatus.disconnected && loadedSlot;
     const currentPage = useCurrentActivity();
     const activityContext = useContext(ActivityContext);
+
+    const disconnect = () => {
+        activityContext.drop();
+        connector.disconnect();
+    };
+
     return (
         <Modal open={open}>
             <div
@@ -44,15 +50,16 @@ const ConnectionOptions = ({
                 <div>Game: {loadedSlot?.game}</div>
                 <ButtonRow>
                     {connectionStatus.connected && (
-                        <DangerButton onClick={connector.disconnect}>
+                        <DangerButton onClick={disconnect}>
                             Disconnect
                         </DangerButton>
                     )}
                     {canConnect && (
                         <PrimaryButton
-                            onClick={() =>
-                                connector.connect({ multi_slot: loadedSlot })
-                            }
+                            onClick={() => {
+                                activityContext.add("slot-tracker");
+                                connector.connect({ multi_slot: loadedSlot });
+                            }}
                         >
                             Reconnect
                         </PrimaryButton>

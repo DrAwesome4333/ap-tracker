@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useState } from "react";
 import NewConnection from "../connectionComponents/NewConnection";
-import SavedConnections from "../connectionComponents/SavedConnections";
+import SavedSlotsView from "../connectionComponents/SavedSlotsView";
 import Modal from "../shared/Modal";
 import styles from "./StartScreen.module.css";
 import { PrimaryButton } from "../shared/buttons";
@@ -52,7 +52,7 @@ const StartScreen = () => {
             }}
         >
             <div className={styles.start_screen}>
-                <SavedConnections connectToServer={connectToServer} />
+                <SavedSlotsView connectToServer={connectToServer} />
                 <ButtonRow>
                     <PrimaryButton
                         style={{ fontWeight: "bold" }}

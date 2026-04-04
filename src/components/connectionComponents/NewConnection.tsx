@@ -1,11 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
-import ServiceContext from "../../contexts/serviceContext";
-
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
+import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
 
 const NewConnection = ({
     onClose,
@@ -28,16 +27,9 @@ const NewConnection = ({
             [event.target.name]: event.target.value,
         });
     };
-    const serviceContext = useContext(ServiceContext);
-    const connector = serviceContext.connector;
-    let disabled = false;
-    if (
-        !connector ||
-        false
-        //connector.connection.status !== CONNECTION_STATUS.disconnected
-    ) {
-        disabled = true;
-    }
+
+    const connectionStatus = useAPConnectionStatus();
+    const disabled = !connectionStatus.disconnected;
 
     return (
         <div className={styles.new_slot_panel} {...props}>
