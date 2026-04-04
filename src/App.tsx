@@ -54,15 +54,15 @@ const textClientManager = new TextClientManager();
 //tagManager.enableLocationEffects(locationRepository);
 //tagManager.addSource(locationTagger);
 //tagManager.addSource(hintTagger);
-const locationTagger = new LocationTagger();
+// const locationTagger = new LocationTagger();
 const hintTagger = new HintTagger(optionManager);
 const hintManager = new HintManager(hintTagger);
 
 const connector = new APConnector({
     textClientManager,
     hintManager,
-    locationTagger,
 });
+hintManager.initializeListeners(connector.client);
 
 const App = (): React.ReactNode => {
     const activityContext = useActivityContext();
@@ -90,12 +90,14 @@ const App = (): React.ReactNode => {
         useState<LocationTracker>(null);
     const [itemTracker, setItemTracker] = useState<ItemTracker>(null);
     const [slotName, setSlotName] = useState<string>("");
+    const [slotNumber, setSlotNumber] = useState(0);
     const [slotAlias, setSlotAlias] = useState<string>("");
     const [multiWorldId, setMultiWorldId] = useState<string>("");
     const [locationRepository, setLocationRepository] =
         useState<LocationRepository>(null);
     const [itemRepository, setItemRepository] = useState<ItemRepository>(null);
     const [tagManager, setTagManager] = useState<TagManager>(null);
+    const [locationTagger, setLocationTagger] = useState<LocationTagger>(null);
     const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
 
     const titleParts = ["Checklist Tracker"];
@@ -108,14 +110,20 @@ const App = (): React.ReactNode => {
             slotName: slot_name,
             slotAlias: slot_alias,
             multiWorldId: multi_id,
+            slotNumber: slot_number,
             gamePackage,
         }: ConnectedEventParams) => {
             setSlotName(slot_name);
             setSlotAlias(slot_alias);
+            setSlotNumber(slot_number);
             setMultiWorldId(multi_id);
             const newItemRepository = new ItemRepository();
             const newLocationRepository = new LocationRepository();
             const newTagManager = new TagManager();
+            const newLocationTagger = new LocationTagger(multi_id, slot_number);
+
+            newTagManager.addSource(newLocationTagger);
+            newTagManager.addSource(hintTagger);
             newItemRepository.addSource(connector);
             newLocationRepository.addSource(connector);
             setItemRepository(newItemRepository);
@@ -123,6 +131,7 @@ const App = (): React.ReactNode => {
             setGame(gamePackage.game);
             setGamePackage(gamePackage);
             setTagManager(newTagManager);
+            setLocationTagger(newLocationTagger);
         },
         []
     );
@@ -175,6 +184,7 @@ const App = (): React.ReactNode => {
                     value={{
                         game,
                         slotName,
+                        slotNumber,
                         slotAlias,
                         multiWorldId,
                         locationRepository,

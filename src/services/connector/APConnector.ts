@@ -38,7 +38,6 @@ enum ConnectionStatus {
 type APConnectorParams = {
     textClientManager: TextClientManager;
     hintManager: HintManager;
-    locationTagger: LocationTagger;
 };
 type ConnectedEventParams = {
     gamePackage: GamePackageWrapper;
@@ -63,13 +62,8 @@ class APConnector implements LocationSource, ItemSource {
     #locations: Map<LocationId, LocationStatus> = new Map();
     #items: Map<number, Item> = new Map();
     #hintManager: HintManager;
-    #locationTagger: LocationTagger;
 
-    constructor({
-        textClientManager,
-        hintManager,
-        locationTagger,
-    }: APConnectorParams) {
+    constructor({ textClientManager, hintManager }: APConnectorParams) {
         this.client = new Client({ debugLogVersions: false });
         let uuid: string = clientUuidStore.read("uuid") as string;
         if (!uuid) {
@@ -112,7 +106,7 @@ class APConnector implements LocationSource, ItemSource {
         setupAPTextSync(this.client, textClientManager);
         hintManager.initializeListeners(this.client);
         this.#hintManager = hintManager;
-        this.#locationTagger = locationTagger;
+        ``;
     }
 
     #setStatus = (newStatus: ConnectionStatus) => {
@@ -331,10 +325,6 @@ class APConnector implements LocationSource, ItemSource {
                     })
                     .catch((e) => console.error(e));
 
-                this.#locationTagger?.loadTags(
-                    MultiWorldContext.loadedMultiWorld.multi_save_id,
-                    MultiWorldContext.loadedSlot.slot_number
-                );
                 const result: ConnectedEventParams = {
                     gamePackage: wrappedGamePackage,
                     slotName,

@@ -12,7 +12,7 @@ const SlotContext: React.Context<{
     game?: string;
     slotName?: string;
     slotAlias?: string;
-    slotNumber?: string;
+    slotNumber?: number;
     multiWorldId?: string;
     locationRepository?: LocationRepository;
     itemRepository?: ItemRepository;

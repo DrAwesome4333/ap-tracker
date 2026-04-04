@@ -2,10 +2,10 @@ import React, { forwardRef, useContext } from "react";
 import { Item } from "../../services/items/itemSource";
 import { GhostButton } from "../shared/buttons";
 import Icon from "../icons/icons";
-import ServiceContext from "../../contexts/serviceContext";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
 import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+import SlotContext from "../../contexts/slotContext";
 
 const InventoryItemView = forwardRef(
     (
@@ -13,9 +13,9 @@ const InventoryItemView = forwardRef(
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
         const item = items[index];
-        const services = useContext(ServiceContext);
-        const tagManager = services.tagManager;
-        const locationTagger = services.locationTagger;
+        const slotContext = useContext(SlotContext);
+        const tagManager = slotContext.tagManager;
+        const locationTagger = slotContext.locationTagger;
 
         let itemClass = ap_styles.item_normal;
         if (item.flags.progression) {
@@ -29,7 +29,7 @@ const InventoryItemView = forwardRef(
         }
 
         const playerClass =
-            item.senderSlot === MultiWorldContext.loadedSlot.slot_number
+            item.senderSlot === slotContext.slotNumber
                 ? ap_styles.player
                 : MultiWorldContext.loadedMultiWorld.slots.find(
                         (slot) => slot.slot_number === item.senderSlot

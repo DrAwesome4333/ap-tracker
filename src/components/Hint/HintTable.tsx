@@ -7,6 +7,7 @@ import { HintFilter } from "./HintOptionDef";
 
 import { List, useDynamicRowHeight } from "react-window";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
+import SlotContext from "../../contexts/slotContext";
 
 const HintTable = ({
     filters,
@@ -17,48 +18,52 @@ const HintTable = ({
     searchKey: string;
     searchFilterMode: string;
 }) => {
-    const services = useContext(ServiceContext);
-    const hints = useHints(services.hintManager);
+    const slotContext = useContext(SlotContext);
+    const hints = useHints(slotContext.hintManager);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
-    const playerSlot = useCurrentMultiworldSlot();
     const lowerSearchKey = searchKey.toLowerCase().trim();
 
-    const filteredHints = hints.filter((hint) => {
-        let passesPlayerFilter = false;
-        let passesStatusFilter = false;
-        let passesSearchKeyFilter = false;
-        if (
-            filters.own.includes("items") &&
-            hint.item.receiver.slot === playerSlot.slot_number
-        ) {
-            passesPlayerFilter = true;
-        }
+    const filteredHints =
+        hints?.filter((hint) => {
+            let passesPlayerFilter = false;
+            let passesStatusFilter = false;
+            let passesSearchKeyFilter = false;
+            if (
+                filters.own.includes("items") &&
+                hint.item.receiver.slot === slotContext.slotNumber
+            ) {
+                passesPlayerFilter = true;
+            }
 
-        if (
-            filters.own.includes("locations") &&
-            hint.item.sender.slot === playerSlot.slot_number
-        ) {
-            passesPlayerFilter = true;
-        }
+            if (
+                filters.own.includes("locations") &&
+                hint.item.sender.slot === slotContext.slotNumber
+            ) {
+                passesPlayerFilter = true;
+            }
 
-        if (filters.status.includes(hint.status.toString())) {
-            passesStatusFilter = true;
-        }
+            if (filters.status.includes(hint.status.toString())) {
+                passesStatusFilter = true;
+            }
 
-        if (
-            !lowerSearchKey ||
-            (searchFilterMode === "item" &&
-                hint.item.name.toLowerCase().includes(lowerSearchKey)) ||
-            (searchFilterMode === "location" &&
-                hint.item.locationName.toLowerCase().includes(lowerSearchKey))
-        ) {
-            passesSearchKeyFilter = true;
-        }
+            if (
+                !lowerSearchKey ||
+                (searchFilterMode === "item" &&
+                    hint.item.name.toLowerCase().includes(lowerSearchKey)) ||
+                (searchFilterMode === "location" &&
+                    hint.item.locationName
+                        .toLowerCase()
+                        .includes(lowerSearchKey))
+            ) {
+                passesSearchKeyFilter = true;
+            }
 
-        return (
-            passesPlayerFilter && passesStatusFilter && passesSearchKeyFilter
-        );
-    });
+            return (
+                passesPlayerFilter &&
+                passesStatusFilter &&
+                passesSearchKeyFilter
+            );
+        }) ?? [];
 
     filteredHints.sort((a, b) => {
         let sortValue = 0;
