@@ -80,7 +80,7 @@ const LocationTagView = ({
                             setEditMode(false);
                         }
                         if (e.key === "Escape") {
-                            setText(tag.data ?? tagType?.display_name ?? "");
+                            setText(tag?.data ?? tagType?.display_name ?? "");
                             setEditMode(false);
                         }
                     }}
@@ -110,7 +110,7 @@ const LocationTagView = ({
                         }}
                         onClick={() => {
                             setEditMode(false);
-                            setText(tag.data ?? tagType?.display_name ?? "");
+                            setText(tag?.data ?? tagType?.display_name ?? "");
                         }}
                     >
                         {" "}

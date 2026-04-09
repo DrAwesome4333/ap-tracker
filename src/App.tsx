@@ -124,6 +124,7 @@ const App = (): React.ReactNode => {
 
             newTagManager.addSource(newLocationTagger);
             newTagManager.addSource(hintTagger);
+            newTagManager.enableLocationEffects(newLocationRepository);
             newItemRepository.addSource(connector);
             newLocationRepository.addSource(connector);
             setItemRepository(newItemRepository);

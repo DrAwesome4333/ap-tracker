@@ -1,5 +1,4 @@
 import React, { forwardRef, useContext } from "react";
-import ServiceContext from "../../../contexts/serviceContext";
 import Icon from "../../icons/icons";
 import { textPrimary } from "../../../constants/colors";
 import { TextButton } from "../../shared/buttons";
@@ -11,6 +10,7 @@ import {
     LocationId,
     LocationStatus,
 } from "../../../services/locations/locationSource";
+import SlotContext from "../../../contexts/slotContext";
 
 const LocationView = forwardRef(
     (
@@ -27,8 +27,8 @@ const LocationView = forwardRef(
         }>,
         ref: React.ForwardedRef<HTMLDivElement>
     ) => {
-        const serviceContext = useContext(ServiceContext);
-        const tagManager = serviceContext.tagManager;
+        const slotContext = useContext(SlotContext);
+        const tagManager = slotContext.tagManager;
         const location = locations[index];
 
         const tagStatus = {

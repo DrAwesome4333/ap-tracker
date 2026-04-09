@@ -137,7 +137,6 @@ class TagManager implements LocationSource {
     #tagCounters: Map<string, TagCounterV2> = new Map();
     #locationRepository: LocationRepository;
     #locationUpdateCallback: LocationUpdateCallback;
-    #versionSymbol = Symbol("tag_version");
 
     constructor() {}
     #evaluateTagCondition = (
@@ -152,7 +151,7 @@ class TagManager implements LocationSource {
         return false;
     };
 
-    #evaluateCounter = (
+    evaluateCounter = (
         counterId: string,
         status: { [statusName: string]: boolean },
         counters: Map<string, TagCounterResult>
@@ -185,53 +184,6 @@ class TagManager implements LocationSource {
         }
         counters.set(counter.counter_id, result);
         return counters;
-    };
-
-    getCounterResults = (
-        entityType: TagEntityType,
-        entityIds: TagEntityId[],
-        entityStatuses: { [statusName: string]: boolean }[]
-    ): TagCounterResult[] => {
-        const counters: Map<string, TagCounterResult> = new Map();
-        const tagsForType: Map<
-            TagEntityId,
-            Set<TagId>
-        > = this.#tagsByEntity.get(entityType) ?? new Map();
-        entityIds.forEach((entityId, index) => {
-            const tagsOnEntity = tagsForType.get(entityId) ?? new Set();
-            tagsOnEntity.forEach((tagId) => {
-                const tag = this.getTagById(tagId);
-                const tagType = this.getTagType(
-                    tag?.type_id,
-                    entityStatuses[index]
-                );
-                if (
-                    tagType.counter_id &&
-                    typeof tagType.counter_id === "string"
-                ) {
-                    this.#evaluateCounter(
-                        tagType.counter_id,
-                        entityStatuses[index],
-                        counters
-                    );
-                } else if (
-                    tagType.counter_id &&
-                    Array.isArray(tagType.counter_id)
-                ) {
-                    tagType.counter_id.forEach((counter_id) =>
-                        this.#evaluateCounter(
-                            counter_id,
-                            entityStatuses[index],
-                            counters
-                        )
-                    );
-                }
-            });
-        });
-        const results = [...counters.values()];
-        results.sort((a, b) => naturalSort(a.counter_id, b.counter_id));
-        Object.freeze(results);
-        return results;
     };
 
     getTypeList = () => {
@@ -331,23 +283,9 @@ class TagManager implements LocationSource {
         };
     };
 
-    addCounterUpdateCallback = (
-        entityType: TagEntityType,
-        entityIds: TagEntityId[],
-        callback: () => void
-    ) => {
-        const cleanUpCalls = entityIds.map((entityId) =>
-            this.addTagListUpdateCallback(entityType, entityId, callback)
-        );
-        return () => {
-            cleanUpCalls.forEach((callback) => callback());
-        };
-    };
-
     #updateTags = (tags: TagDataV2[]) => {
         let triggeredCallbacks: Set<() => void> = new Set();
         const affectedLocations: Set<number> = new Set();
-        this.#versionSymbol = Symbol("tag_version");
         tags.forEach((tag) => {
             const tagType = this.#tagTypes.get(tag.type_id) ?? null;
             const tagsOnType = this.#tagsByType.get(tag.type_id) ?? new Set();
@@ -396,7 +334,6 @@ class TagManager implements LocationSource {
             .map((tagId) => this.#tags.get(tagId))
             .filter((tag) => tag && true);
         const affectedLocations: Set<number> = new Set();
-        this.#versionSymbol = Symbol("tag_version");
         tags.forEach((tag) => {
             const tagType = this.#tagTypes.get(tag.type_id) ?? null;
             const tagsOnType = this.#tagsByType.get(tag.type_id) ?? new Set();
@@ -587,10 +524,6 @@ class TagManager implements LocationSource {
 
         this.#locationUpdateCallback?.(effects);
     };
-
-    get cacheVersion() {
-        return this.#versionSymbol;
-    }
 }
 
 export { TagManager, TagEntityType };

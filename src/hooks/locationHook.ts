@@ -8,14 +8,16 @@ const useSlotLocations = (trackedLocations: number[]) => {
     const [locations, setLocations] = useState<LocationStatus[]>([]);
     useEffect(() => {
         const callback = () => {
-            setLocations(locationRepository.getLocations(trackedLocations));
+            if (trackedLocations) {
+                setLocations(locationRepository.getLocations(trackedLocations));
+            }
         };
         const cleanUp = locationRepository?.locationUpdateHook(
             trackedLocations,
             callback
         );
         return cleanUp;
-    }, [trackedLocations]);
+    }, [trackedLocations, locationRepository]);
 
     return locations;
 };

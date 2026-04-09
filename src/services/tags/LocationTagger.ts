@@ -6,8 +6,8 @@ import {
     TagDataV2,
     TagEntityType,
     TagSource,
-    TagTypeV2,
     TagId,
+    TagTypeV2Data,
 } from "./tagManager";
 
 const uniqueTagInfo = [
@@ -56,7 +56,7 @@ const counters: TagCounterV2[] = uniqueTagInfo.map((info) => ({
     count_filter: [["checked"]],
 }));
 
-const types: TagTypeV2[] = [
+const types: TagTypeV2Data[] = [
     ...uniqueTagInfo.map((info) => ({
         ...info,
         priority: 100,

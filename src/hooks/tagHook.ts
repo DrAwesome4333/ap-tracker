@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     TagCounterResult,
     TagDataV2,
@@ -14,39 +14,88 @@ const useTagCounters = (
     entityIds: (string | number)[],
     entityStatuses: { [statusName: string]: boolean }[]
 ) => {
-    // TODO, check if effect is needed, as entity statuses will
-    // also update, potentially triggering a double update
-    const [counters, setCounters] = useState<TagCounterResult[]>([]);
-    const cacheVersionRef = useRef<Symbol>(null);
-    const cacheRef = useRef<TagCounterResult[]>(null);
-    // TODO fix
+    const tags = useTagLists(tagManager, entityType, entityIds);
+    const tagTypes = useTagTypeList(tagManager);
+    const counters = useMemo(() => {
+        if (!tagManager) {
+            return [];
+        }
 
-    useEffect(() => {
-        const callback = () => {
-            if (cacheVersionRef.current !== tagManager?.cacheVersion) {
-                cacheRef.current = tagManager?.getCounterResults(
-                    entityType,
-                    entityIds,
-                    entityStatuses
+        const _counters: Map<string, TagCounterResult> = new Map();
+        entityIds.forEach((entityId, index) => {
+            const tagsOnEntity = tags[entityId];
+            tagsOnEntity?.forEach((tagId) => {
+                const tag = tagManager.getTagById(tagId);
+                const tagType = tagManager.getTagType(
+                    tag?.type_id,
+                    entityStatuses[index]
                 );
-                cacheVersionRef.current = tagManager?.cacheVersion;
-                console.log("Cache update");
-            }
-            setCounters(cacheRef.current ?? []);
-        };
-        console.log("Effect update");
-        callback();
+                if (
+                    tagType.counter_id &&
+                    typeof tagType.counter_id === "string"
+                ) {
+                    tagManager.evaluateCounter(
+                        tagType.counter_id,
+                        entityStatuses[index],
+                        _counters
+                    );
+                } else if (
+                    tagType.counter_id &&
+                    Array.isArray(tagType.counter_id)
+                ) {
+                    tagType.counter_id.forEach((counter_id) =>
+                        tagManager.evaluateCounter(
+                            counter_id,
+                            entityStatuses[index],
+                            _counters
+                        )
+                    );
+                }
+            });
+        });
+        return [..._counters.values()];
+    }, [tagManager, entityType, entityIds, tags, tagTypes, entityStatuses]);
 
-        const cleanup = tagManager?.addCounterUpdateCallback(
-            entityType,
-            entityIds,
-            callback
+    return counters;
+};
+
+const useTagLists = (
+    tagManager: TagManager,
+    entityType: TagEntityType,
+    entityIds: (string | number)[]
+) => {
+    const [tags, setTags] = useState<Record<number | string, TagId[]>>({});
+    entityIds.forEach((id) => {
+        if (!tags[id]) {
+            setTags((old) => ({
+                ...old,
+                [id]: tagManager?.getTagIdsOnEntity(entityType, id) ?? [],
+            }));
+        }
+    });
+    useEffect(() => {
+        const callbacks = entityIds.map((entityId) => ({
+            entityId,
+            callback: () =>
+                setTags((old) => ({
+                    ...old,
+                    [entityId]:
+                        tagManager?.getTagIdsOnEntity(entityType, entityId) ??
+                        [],
+                })),
+        }));
+        const cleanupCalls = callbacks.map((x) =>
+            tagManager?.addTagListUpdateCallback(
+                entityType,
+                x.entityId,
+                x.callback
+            )
         );
         return () => {
-            cleanup?.();
+            cleanupCalls.forEach((cleanup) => cleanup?.());
         };
     }, [tagManager, entityType, entityIds]);
-    return counters;
+    return tags;
 };
 
 const useTagList = (
@@ -86,8 +135,6 @@ const useTagTypeList = (tagManager: TagManager) => {
         };
 
         const cleanup = tagManager?.addTypeListUpdateCallback(callback);
-        console.log("tag list effect");
-        console.log(tagManager);
         return () => {
             cleanup?.();
         };

@@ -17,7 +17,6 @@ import {
     LocationStatus,
 } from "../../../services/locations/locationSource";
 
-const staticEmptyArray = [];
 /**
  *
  * @param options
@@ -61,9 +60,7 @@ const SectionView = ({
         minWidth: "10em",
     };
 
-    const trackedLocations = useSlotLocations(
-        section?.trackedLocations ?? staticEmptyArray
-    );
+    const trackedLocations = useSlotLocations(section?.trackedLocations);
     const clearedLocationCount = trackedLocations.reduce(
         (count, status) =>
             status.checked || status.ignored ? count + 1 : count,
@@ -175,10 +172,12 @@ const SectionView = ({
         ignored: status.ignored,
     }));
 
+    const test = trackedLocations.map((l) => l.locationId);
+
     const tagCounts = useTagCounters(
         tagManager,
         TagEntityType.location,
-        trackedLocations.map((l) => l.locationId) ?? [],
+        test,
         locationCounterStatuses
     );
 
@@ -208,7 +207,7 @@ const SectionView = ({
                     <TextButton
                         onClick={() => {
                             if (isClosable) {
-                                setIsOpen(!isOpen);
+                                setIsOpen((x) => !x);
                             }
                         }}
                     >
