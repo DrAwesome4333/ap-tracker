@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import ServiceContext from "../../../contexts/serviceContext";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
@@ -11,6 +10,7 @@ import {
     SecondaryButton,
 } from "../../shared/buttons";
 import { TagId } from "../../../services/tags/tagManager";
+import SlotContext from "../../../contexts/slotContext";
 
 const LocationTagView = ({
     tagId,
@@ -25,23 +25,23 @@ const LocationTagView = ({
     onText: (tagId: TagId, text: string) => void;
     shouldFocus: (tagId: TagId) => boolean;
 }) => {
-    const services = useContext(ServiceContext);
-    const tagManager = services.tagManager;
+    const slot = useContext(SlotContext);
+    const tagManager = slot.tagManager;
     const tag = useTag(tagManager, tagId);
-    const tagType = tagManager.getTagType(tag.type_id, {
+    const tagType = tagManager?.getTagType(tag?.type_id, {
         checked: locationStatus?.checked,
         ignored: locationStatus?.ignored,
     });
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const [text, setText] = useState(tag.data ?? tagType.display_name);
+    const [text, setText] = useState(tag?.data ?? tagType?.display_name ?? "");
     const [editMode, setEditMode] = useState(false);
-    const canClear = tagType.user_managed && true;
-    const canEdit = tagType.allows_text && true;
+    const canClear = tagType?.user_managed && true;
+    const canEdit = tagType?.allows_text && true;
 
     useEffect(() => {
         if (editMode) {
-            setText(tag.data ?? "");
+            setText(tag?.data ?? "");
             inputRef.current?.focus();
         }
     }, [editMode]);
@@ -55,18 +55,18 @@ const LocationTagView = ({
         <div
             style={{
                 marginLeft: "1rem",
-                color: tagType.text_color ?? textPrimary,
+                color: tagType?.text_color ?? textPrimary,
                 textDecoration: "none",
                 // display: "inline-block",
             }}
         >
             <Icon
                 fontSize="14px"
-                type={tagType.icon_id}
+                type={tagType?.icon_id ?? "fmd_bad"}
                 style={{
-                    color: tagType.icon_color ?? textPrimary,
+                    color: tagType?.icon_color ?? textPrimary,
                 }}
-                iconParams={tagType.icon_spec}
+                iconParams={tagType?.icon_spec}
             />{" "}
             {editMode ? (
                 <Input
@@ -80,7 +80,7 @@ const LocationTagView = ({
                             setEditMode(false);
                         }
                         if (e.key === "Escape") {
-                            setText(tag.data ?? tagType.display_name);
+                            setText(tag.data ?? tagType?.display_name ?? "");
                             setEditMode(false);
                         }
                     }}
@@ -110,7 +110,7 @@ const LocationTagView = ({
                         }}
                         onClick={() => {
                             setEditMode(false);
-                            setText(tag.data ?? tagType.display_name);
+                            setText(tag.data ?? tagType?.display_name ?? "");
                         }}
                     >
                         {" "}

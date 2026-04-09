@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { TagEntityType } from "../../services/tags/tagManager";
 import { useTagTypeList } from "../../hooks/tagHook";
-import ServiceContext from "../../contexts/serviceContext";
 import TagButton from "./TagButton";
 import { background } from "../../constants/colors";
+import SlotContext from "../../contexts/slotContext";
 
 const TagBar = ({
     entityType,
@@ -14,8 +14,8 @@ const TagBar = ({
     entityId: string | number;
     tagClick: (typeId: string) => void;
 }) => {
-    const services = useContext(ServiceContext);
-    const tagManager = services.tagManager;
+    const slotContext = useContext(SlotContext);
+    const tagManager = slotContext.tagManager;
     const allTagTypes = useTagTypeList(tagManager);
     const tagOptions = allTagTypes.filter(
         (tagType) => tagType.entity_type === entityType && tagType.user_managed

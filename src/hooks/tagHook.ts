@@ -1,37 +1,52 @@
-import { useSyncExternalStore } from "react";
-import { TagEntityType, TagId, TagManager } from "../services/tags/tagManager";
-import emptySyncCallback from "./emptyCallback";
-import { randomShortId } from "../utility/uuid";
+import { useEffect, useRef, useState } from "react";
+import {
+    TagCounterResult,
+    TagDataV2,
+    TagEntityType,
+    TagId,
+    TagManager,
+    TagTypeV2,
+} from "../services/tags/tagManager";
 
-// TODO fix if tag manager is null
 const useTagCounters = (
     tagManager: TagManager,
     entityType: TagEntityType,
     entityIds: (string | number)[],
     entityStatuses: { [statusName: string]: boolean }[]
 ) => {
-    const cacheKey = randomShortId();
-    return useSyncExternalStore(
-        tagManager?.getCounterUpdateCallbackHook(
+    // TODO, check if effect is needed, as entity statuses will
+    // also update, potentially triggering a double update
+    const [counters, setCounters] = useState<TagCounterResult[]>([]);
+    const cacheVersionRef = useRef<Symbol>(null);
+    const cacheRef = useRef<TagCounterResult[]>(null);
+    // TODO fix
+
+    useEffect(() => {
+        const callback = () => {
+            if (cacheVersionRef.current !== tagManager?.cacheVersion) {
+                cacheRef.current = tagManager?.getCounterResults(
+                    entityType,
+                    entityIds,
+                    entityStatuses
+                );
+                cacheVersionRef.current = tagManager?.cacheVersion;
+                console.log("Cache update");
+            }
+            setCounters(cacheRef.current ?? []);
+        };
+        console.log("Effect update");
+        callback();
+
+        const cleanup = tagManager?.addCounterUpdateCallback(
             entityType,
             entityIds,
-            cacheKey
-        ) ?? emptySyncCallback,
-        () =>
-            tagManager?.getCounterResults(
-                entityType,
-                entityIds,
-                entityStatuses,
-                cacheKey
-            ) ?? [],
-        () =>
-            tagManager?.getCounterResults(
-                entityType,
-                entityIds,
-                entityStatuses,
-                cacheKey
-            ) ?? []
-    );
+            callback
+        );
+        return () => {
+            cleanup?.();
+        };
+    }, [tagManager, entityType, entityIds]);
+    return counters;
 };
 
 const useTagList = (
@@ -39,28 +54,62 @@ const useTagList = (
     entityType: TagEntityType,
     entityId: string | number
 ) => {
-    return useSyncExternalStore(
-        tagManager?.getTagListUpdateCallbackHook(entityType, entityId) ??
-            emptySyncCallback,
-        () => tagManager?.getTagIdsOnEntity(entityType, entityId),
-        () => tagManager?.getTagIdsOnEntity(entityType, entityId)
-    );
+    const [tags, setTags] = useState<TagId[]>([]);
+
+    useEffect(() => {
+        const callback = () => {
+            setTags(tagManager?.getTagIdsOnEntity(entityType, entityId) ?? []);
+        };
+        callback();
+        const cleanup = tagManager?.addTagListUpdateCallback(
+            entityType,
+            entityId,
+            callback
+        );
+        return () => {
+            cleanup?.();
+        };
+    }, [tagManager, entityType, entityId]);
+
+    return tags;
 };
 
 const useTagTypeList = (tagManager: TagManager) => {
-    return useSyncExternalStore(
-        tagManager?.getTypeListUpdateCallbackHook() ?? emptySyncCallback,
-        () => tagManager?.getTypeList(),
-        () => tagManager?.getTypeList()
+    const [tagTypes, setTagTypes] = useState<TagTypeV2[]>(
+        tagManager?.getTypeList() ?? []
     );
+
+    useEffect(() => {
+        const callback = () => {
+            console.log("Tag list callback");
+            setTagTypes(tagManager?.getTypeList() ?? []);
+        };
+
+        const cleanup = tagManager?.addTypeListUpdateCallback(callback);
+        console.log("tag list effect");
+        console.log(tagManager);
+        return () => {
+            cleanup?.();
+        };
+    }, [tagManager]);
+    return tagTypes;
 };
 
 const useTag = (tagManager: TagManager, tagId: TagId) => {
-    return useSyncExternalStore(
-        tagManager?.getTagUpdateCallbackHook(tagId) ?? emptySyncCallback,
-        () => tagManager?.getTagById(tagId),
-        () => tagManager?.getTagById(tagId)
-    );
+    const [tag, setTag] = useState<TagDataV2>(null);
+
+    useEffect(() => {
+        const callback = () => {
+            setTag(tagManager?.getTagById(tagId));
+        };
+        callback();
+        const cleanup = tagManager?.addTagUpdateCallback(tagId, callback);
+        return () => {
+            cleanup?.();
+        };
+    }, [tagManager, tagId]);
+
+    return tag;
 };
 
 export { useTagList, useTag, useTagTypeList, useTagCounters };

@@ -1,5 +1,4 @@
 import React, { useContext, useRef } from "react";
-import ServiceContext from "../../contexts/serviceContext";
 import { useTagList } from "../../hooks/tagHook";
 import { TagEntityType, TagId } from "../../services/tags/tagManager";
 import { useLocationStatus } from "../../hooks/sectionHooks";
@@ -9,6 +8,7 @@ import TagBar from "../tags/TagBar";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../shared/buttons";
 import { LocationId } from "../../services/locations/locationSource";
+import SlotContext from "../../contexts/slotContext";
 
 const LocationDetails = ({
     locationId,
@@ -17,10 +17,10 @@ const LocationDetails = ({
     locationId: LocationId;
     onClose: () => void;
 }) => {
-    const services = useContext(ServiceContext);
+    const slotContext = useContext(SlotContext);
     const lastTagAdded = useRef<TagId>(null);
-    const locationTagger = services.locationTagger;
-    const tagManager = services.tagManager;
+    const locationTagger = slotContext.locationTagger;
+    const tagManager = slotContext.tagManager;
     const locationStatus = useLocationStatus(locationId);
     const tags = useTagList(tagManager, TagEntityType.location, locationId);
     const tagStatus = {
