@@ -150,12 +150,14 @@ const SectionView = ({
         const sectionB = locationTracker.getSection(b);
         const indexA = section.children.indexOf(a);
         const indexB = section.children.indexOf(b);
-        const sectionAClear = false; // TODO fix
-        // sectionA.locationReport.checked.size ===
-        // sectionA.locationReport.existing.size;
-        const sectionBClear = false;
-        // sectionB.locationReport.checked.size ===
-        // sectionB.locationReport.existing.size;
+        const sectionALocations = new Set(sectionA.trackedLocations);
+        const sectionAClear = trackedLocations
+            .filter((l) => sectionALocations.has(l.locationId))
+            .every((l) => l.checked);
+        const sectionBLocations = new Set(sectionB.trackedLocations);
+        const sectionBClear = trackedLocations
+            .filter((l) => sectionBLocations.has(l.locationId))
+            .every((l) => l.checked);
 
         if (
             clearedSectionBehavior === "separate" &&
@@ -188,11 +190,14 @@ const SectionView = ({
      */
     const sectionFilter = (sectionName: string) => {
         const sectionInQuestion = locationTracker.getSection(sectionName);
-        return true; // todo FIX
-        // sectionInQuestion?.locationReport.existing.size > 0 &&
-        // (clearedSectionBehavior !== "hide" ||
-        //     sectionInQuestion.locationReport.checked.size <
-        //         sectionInQuestion.locationReport.existing.size)
+        const sectionLocations = new Set(sectionInQuestion.trackedLocations);
+        const sectionCleared = trackedLocations
+            .filter((l) => sectionLocations.has(l.locationId))
+            .every((l) => l.checked);
+        return (
+            sectionLocations.size > 0 &&
+            (clearedSectionBehavior !== "hide" || !sectionCleared)
+        );
     };
 
     const childSections = section?.children.filter(sectionFilter) ?? [];

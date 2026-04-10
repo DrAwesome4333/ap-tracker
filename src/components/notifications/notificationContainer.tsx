@@ -212,7 +212,7 @@ const NotificationContainer = () => {
         };
 
         const update = (time: number) => {
-            animationFrameRef.current = requestAnimationFrame(update);
+            animationFrameRef.current = 0; //requestAnimationFrame(update); TODO fix
             if (!timeRef.current) {
                 timeRef.current = time;
                 return;
@@ -226,7 +226,7 @@ const NotificationContainer = () => {
             updateStatusNotifications({ type: "tick", data: { delta } });
         };
 
-        animationFrameRef.current = requestAnimationFrame(update);
+        animationFrameRef.current = 0; //requestAnimationFrame(update);
         NotificationManager.addToastListener(addToast);
         NotificationManager.addStatusListener(addStatus);
         return () => {
