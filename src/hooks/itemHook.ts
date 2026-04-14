@@ -1,15 +1,21 @@
-import { useContext, useSyncExternalStore } from "react";
+import { useContext, useEffect, useEffectEvent, useState } from "react";
 import SlotContext from "../contexts/slotContext";
-import emptySyncCallback from "./emptyCallback";
 
 const useSlotItems = () => {
     const slotContext = useContext(SlotContext);
     const itemRepository = slotContext.itemRepository;
-    const items = useSyncExternalStore(
-        itemRepository?.anyItemUpdateHook ?? emptySyncCallback,
-        itemRepository?.getAllItems,
-        itemRepository?.getAllItems
-    );
+    const [items, setItems] = useState([]);
+
+    const updateItems = useEffectEvent(() => {
+        setItems(itemRepository?.getAllItems() ?? []);
+    });
+    useEffect(() => {
+        const cleanup = itemRepository?.anyItemUpdateHook(updateItems);
+        updateItems();
+        return () => {
+            cleanup?.();
+        };
+    }, [itemRepository]);
     if (!itemRepository) {
         return [];
     }

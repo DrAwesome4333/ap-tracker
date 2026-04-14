@@ -138,6 +138,21 @@ const SectionView = ({
         return locationNames;
     }, [locationOrder, checkedLocationBehavior, localLocations]);
 
+    const locationCounterStatuses = trackedLocations.map((status) => ({
+        checked: status.checked,
+        ignored: status.ignored,
+    }));
+
+    const locationIds = trackedLocations.map((l) => l.locationId);
+
+    const tagCounts = useTagCounters(
+        tagManager,
+        TagEntityType.location,
+        locationIds,
+        locationCounterStatuses
+    );
+
+    const sectionClearCache: Record<string, boolean> = {};
     /**
      * Compares two sections to determine their relative order
      * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
@@ -146,18 +161,25 @@ const SectionView = ({
      * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
      */
     const sectionCompare = (a: string, b: string): number => {
-        const sectionA = locationTracker.getSection(a);
-        const sectionB = locationTracker.getSection(b);
-        const indexA = section.children.indexOf(a);
-        const indexB = section.children.indexOf(b);
-        const sectionALocations = new Set(sectionA.trackedLocations);
-        const sectionAClear = trackedLocations
-            .filter((l) => sectionALocations.has(l.locationId))
-            .every((l) => l.checked);
-        const sectionBLocations = new Set(sectionB.trackedLocations);
-        const sectionBClear = trackedLocations
-            .filter((l) => sectionBLocations.has(l.locationId))
-            .every((l) => l.checked);
+        let sectionAClear = sectionClearCache[a];
+        let sectionBClear = sectionClearCache[b];
+        if (sectionAClear === undefined) {
+            const sectionA = locationTracker.getSection(a);
+            const sectionALocations = new Set(sectionA.trackedLocations);
+            sectionAClear = trackedLocations
+                .filter((l) => sectionALocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[a] = sectionAClear;
+        }
+
+        if (sectionBClear === undefined) {
+            const sectionB = locationTracker.getSection(b);
+            const sectionBLocations = new Set(sectionB.trackedLocations);
+            sectionBClear = trackedLocations
+                .filter((l) => sectionBLocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[b] = sectionBClear;
+        }
 
         if (
             clearedSectionBehavior === "separate" &&
@@ -166,22 +188,8 @@ const SectionView = ({
             return sectionAClear ? 1 : -1;
         }
         // maintain original order;
-        return indexA - indexB;
+        return 0;
     };
-
-    const locationCounterStatuses = trackedLocations.map((status) => ({
-        checked: status.checked,
-        ignored: status.ignored,
-    }));
-
-    const test = trackedLocations.map((l) => l.locationId);
-
-    const tagCounts = useTagCounters(
-        tagManager,
-        TagEntityType.location,
-        test,
-        locationCounterStatuses
-    );
 
     /**
      * Removes any section that should be hidden by settings such as empty and cleared sections
@@ -190,18 +198,27 @@ const SectionView = ({
      */
     const sectionFilter = (sectionName: string) => {
         const sectionInQuestion = locationTracker.getSection(sectionName);
-        const sectionLocations = new Set(sectionInQuestion.trackedLocations);
-        const sectionCleared = trackedLocations
-            .filter((l) => sectionLocations.has(l.locationId))
-            .every((l) => l.checked);
+        let sectionCleared = sectionClearCache[sectionName];
+        if (sectionCleared === undefined) {
+            const sectionLocations = new Set(
+                sectionInQuestion.trackedLocations
+            );
+            sectionCleared = trackedLocations
+                .filter((l) => sectionLocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[sectionName] = sectionCleared;
+        }
         return (
-            sectionLocations.size > 0 &&
+            sectionInQuestion.trackedLocations.length > 0 &&
             (clearedSectionBehavior !== "hide" || !sectionCleared)
         );
     };
 
-    const childSections = section?.children.filter(sectionFilter) ?? [];
-    childSections.sort(sectionCompare);
+    const childSections = useMemo(() => {
+        const result = section?.children.filter(sectionFilter) ?? [];
+        result.sort(sectionCompare);
+        return result;
+    }, [section?.children, trackedLocations]);
 
     return (
         <>

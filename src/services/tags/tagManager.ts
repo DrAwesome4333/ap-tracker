@@ -130,7 +130,7 @@ class TagManager implements LocationSource {
     #tagsByType: Map<string, Set<TagId>> = new Map();
     #tagListUpdateCallbacks: Map<
         TagEntityType,
-        Map<TagEntityId, Set<() => void>>
+        Map<Set<TagEntityId>, () => void>
     > = new Map();
     #tagUpdateCallbacks: Map<TagId, Set<() => void>> = new Map();
     #typeListUpdateCallbacks: Set<() => void> = new Set();
@@ -237,30 +237,23 @@ class TagManager implements LocationSource {
 
     addTagListUpdateCallback = (
         entityType: TagEntityType,
-        entityId: string | number,
+        entityId: (string | number) | (string | number)[],
         callback: () => void
     ) => {
+        // console.log("New tag list update callback added", entityId)
         const typeCallbacks: Map<
-            string | number,
-            Set<() => void>
+            Set<string | number>,
+            () => void
         > = this.#tagListUpdateCallbacks.get(entityType) ?? new Map();
-        const entityCallbacks: Set<() => void> =
-            typeCallbacks.get(entityId) ?? new Set();
+        const entityIds = Array.isArray(entityId)
+            ? new Set(entityId)
+            : new Set([entityId]);
         this.#tagListUpdateCallbacks.set(entityType, typeCallbacks);
-        typeCallbacks.set(entityId, entityCallbacks);
-        entityCallbacks.add(callback);
+        typeCallbacks.set(entityIds, callback);
+
         // return a clean up call
         return () => {
-            this.#tagListUpdateCallbacks
-                .get(entityType)
-                ?.get(entityId)
-                ?.delete(callback);
-            if (
-                this.#tagListUpdateCallbacks.get(entityType)?.get(entityId)
-                    ?.size === 0
-            ) {
-                this.#tagListUpdateCallbacks.get(entityType).delete(entityId);
-            }
+            this.#tagListUpdateCallbacks.get(entityType)?.delete(entityIds);
         };
     };
 
@@ -307,10 +300,18 @@ class TagManager implements LocationSource {
                 }
                 tagsOnEntityType.set(tag.entity_id, tagsOnEntity);
                 this.#tagsByEntity.set(tagType.entity_type, tagsOnEntityType);
-                let updateCallbacks =
-                    this.#tagListUpdateCallbacks
-                        .get(tagType.entity_type)
-                        ?.get(tag.entity_id) ?? new Set();
+                let updateCallbacks = new Set(
+                    [
+                        ...(this.#tagListUpdateCallbacks
+                            .get(tagType.entity_type)
+                            ?.entries() ?? []),
+                    ]
+                        .filter(([triggerIds, _callback]) =>
+                            triggerIds.has(tag.entity_id)
+                        )
+                        .map(([_triggerIds, callback]) => callback)
+                );
+
                 updateCallbacks = updateCallbacks.union(
                     this.#tagUpdateCallbacks.get(tag.tag_id) ?? new Set()
                 );
@@ -356,10 +357,17 @@ class TagManager implements LocationSource {
                 if (tagsOnEntity.size === 0) {
                     tagsOnEntityType.delete(tag.entity_id);
                 }
-                let updateCallbacks =
-                    this.#tagListUpdateCallbacks
-                        .get(tagType.entity_type)
-                        ?.get(tag.entity_id) ?? new Set();
+                let updateCallbacks = new Set(
+                    [
+                        ...this.#tagListUpdateCallbacks
+                            .get(tagType.entity_type)
+                            ?.entries(),
+                    ]
+                        .filter(([triggerIds, _callback]) =>
+                            triggerIds.has(tag.entity_id)
+                        )
+                        .map(([_triggerIds, callback]) => callback)
+                );
 
                 updateCallbacks = updateCallbacks.union(
                     this.#tagUpdateCallbacks.get(tag.tag_id) ?? new Set()

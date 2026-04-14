@@ -81,7 +81,7 @@ const InventoryView = () => {
     const items = useSlotItems();
 
     const sortedItems = useMemo(() => {
-        return items
+        const result = items
             ?.filter(
                 (collection) =>
                     (collection.flags.progression && showProgression) ||
@@ -112,6 +112,7 @@ const InventoryView = () => {
                 }
                 return orderValue;
             });
+        return result;
     }, [
         showProgression,
         showUseful,

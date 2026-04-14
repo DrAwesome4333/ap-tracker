@@ -60,7 +60,7 @@ const useLocationStatus = (locationId: LocationId) => {
             callback
         );
         return cleanUp;
-    }, []);
+    }, [locationId]);
     return locationStatus;
 };
 
