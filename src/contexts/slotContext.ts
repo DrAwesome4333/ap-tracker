@@ -22,6 +22,7 @@ const SlotContext: React.Context<{
     hintManager?: HintManager;
     locationTagger?: LocationTagger;
     gamePackage?: GamePackageWrapper;
+    liveSlot: boolean;
 }> = createContext({});
 
 export default SlotContext;

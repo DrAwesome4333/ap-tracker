@@ -8,6 +8,7 @@ import {
     TagTypeV2,
     TagVariantDef,
     TagId,
+    TagTypeV2Data,
 } from "./tagManager";
 import { OptionManager } from "../options/optionManager";
 
@@ -26,7 +27,7 @@ const baseHint: {
     ],
 };
 
-const hintTagTypes: { [status: number]: TagTypeV2[] } = {
+const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
     [API.HintStatus.unspecified]: [
         {
             ...baseHint,

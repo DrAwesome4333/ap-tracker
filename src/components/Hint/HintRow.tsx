@@ -1,6 +1,5 @@
 import { API, Hint, Item } from "archipelago.js";
 import React, { forwardRef, useCallback, useContext, useState } from "react";
-import ServiceContext from "../../contexts/serviceContext";
 import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
@@ -8,6 +7,7 @@ import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
 import Icon from "../icons/icons";
 import { TextButton } from "../shared/buttons";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
+import SlotContext from "../../contexts/slotContext";
 
 const statusSelections = [
     API.HintStatus.priority,
@@ -63,11 +63,11 @@ const HintRow = forwardRef(
     ) => {
         const hint = hints[index];
         const odd = index % 2 === 1;
-        const services = useContext(ServiceContext);
-        const playerSlot = useCurrentMultiworldSlot();
+        const slotContext = useContext(SlotContext);
         const canChangeStatus =
-            hint.item.receiver.slot === playerSlot.slot_number &&
-            hint.status !== API.HintStatus.found;
+            hint.item.receiver.slot === slotContext.slotNumber &&
+            hint.status !== API.HintStatus.found &&
+            slotContext.liveSlot;
         const [updateInProgress, setUpdateInProgress] = useState(false);
         const finishUpdate = useCallback(() => {
             setUpdateInProgress(false);
@@ -162,9 +162,12 @@ const HintRow = forwardRef(
                             value={hint.status}
                             disabled={updateInProgress}
                             onChange={(e) => {
-                                if (services.hintManager) {
+                                if (
+                                    slotContext.hintManager &&
+                                    slotContext.hintManager.canUpdate
+                                ) {
                                     setUpdateInProgress(true);
-                                    services.hintManager
+                                    slotContext.hintManager
                                         .updateHintStatus(
                                             hint,
                                             parseInt(e.target.value)

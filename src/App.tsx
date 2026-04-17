@@ -195,6 +195,7 @@ const App = (): React.ReactNode => {
                         locationTagger,
                         locationTracker,
                         itemTracker,
+                        liveSlot: true,
                     }}
                 >
                     <ServiceContext.Provider

@@ -14,6 +14,7 @@ const useTagCounters = (
     entityIds: (string | number)[],
     entityStatuses: { [statusName: string]: boolean }[]
 ) => {
+    // TODO fix this garbage
     const tags = useTagLists(tagManager, entityType, entityIds);
     const tagTypes = useTagTypeList(tagManager);
     const reverseIndexLookup = useMemo(() => {

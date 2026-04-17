@@ -121,4 +121,8 @@ export default class HintManager {
             this.#updateCallbacks.delete(callback);
         };
     };
+
+    get canUpdate() {
+        return this.#client?.authenticated && true;
+    }
 }

@@ -77,7 +77,7 @@ const CreateCustomTrackerModal = ({
                                         item_groups: {},
                                     },
                                     ""
-                                ), //locationManager, TODO find proper replacement
+                                ),
                                 data as CustomLocationTrackerDef_V2
                             );
                         } else if (
@@ -99,7 +99,7 @@ const CreateCustomTrackerModal = ({
                                     item_groups: {},
                                 },
                                 ""
-                            ), //locationManager, TODO find proper replacement
+                            ),
                             data as CustomLocationTrackerDef_V1
                         );
                     }
