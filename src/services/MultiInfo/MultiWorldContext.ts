@@ -18,7 +18,7 @@ interface SavedMultiWorldDetails {
     };
     /** Details related to getting room information */
     room_details?: {
-        host: string;
+        origin: string;
         room_suuid: string;
         tracker_suuid: string;
     };
@@ -42,7 +42,7 @@ interface SavedMultiWorldUpdate {
     };
     /** Details related to getting room information */
     room_details?: {
-        host: string;
+        origin: string;
         room_suuid: string;
         tracker_suuid: string;
     };
@@ -65,6 +65,7 @@ interface SavedSlotDetails {
     title: string;
     last_used_timestamp: number;
     last_item_index: number;
+    last_item_notification_index?: number;
     color?: string;
     version: 1;
 }
@@ -326,6 +327,7 @@ class MultiWorldContext {
             slot_alias?: string;
             title?: string;
             last_item_index?: number;
+            last_item_notification_index?: number;
             last_used_timestamp?: number;
             color?: string;
         }
@@ -339,6 +341,9 @@ class MultiWorldContext {
             ...update,
             last_used_timestamp: Date.now(),
         };
+        if(newSlot.last_item_notification_index < newSlot.last_item_index){
+            newSlot.last_item_notification_index = newSlot.last_item_index;
+        }
         slotDataStore.write(
             newSlot as unknown as JSONValue,
             computeSlotKey(newSlot.multi_save_id, newSlot.slot_number)

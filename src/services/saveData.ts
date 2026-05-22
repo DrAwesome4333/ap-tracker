@@ -1,9 +1,9 @@
 const DB_STORE_KEYS = {
     dataPackageCache: "data_package_cache",
-    // groupCache: "cached_groups_v2.1",
     customTrackers: "custom_trackers_v2",
     customTrackersDirectory: "custom_tracker_manifests_v2",
     tags: "tag_data",
+    locationListCache: "location_list_cache"
 };
 
 const retiredKeys = [
@@ -12,10 +12,10 @@ const retiredKeys = [
     "cached_groups",
     "custom_trackers",
     "cached_groups_v2",
-    //"cached_groups_v2.1", add for final launch
+    "cached_groups_v2.1"
 ];
-
-const database_request = window.indexedDB.open("checklist_db", 13);
+const environment = "_test";
+const database_request = window.indexedDB.open(`checklist_db${environment}`, 14);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -52,15 +52,6 @@ database_request.onupgradeneeded = (_event) => {
         });
     }
 
-    // if (!db.objectStoreNames.contains(DB_STORE_KEYS.groupCache)) {
-    //     const store = db.createObjectStore(DB_STORE_KEYS.groupCache, {
-    //         keyPath: ["multi_save_id", "slot_number"],
-    //     });
-    //     store.createIndex("multi-slot", ["multi_save_id", "slot_number"], {
-    //         unique: true,
-    //     });
-    // }
-
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
         const store = db.createObjectStore(DB_STORE_KEYS.customTrackers, {
             keyPath: ["uuid", "version", "type"],
@@ -83,6 +74,10 @@ database_request.onupgradeneeded = (_event) => {
         store.createIndex("multi-slot", ["multi_save_id", "slot_number"], {
             unique: true,
         });
+    }
+
+    if(!db.objectStoreNames.contains(DB_STORE_KEYS.locationListCache)) {
+
     }
 };
 

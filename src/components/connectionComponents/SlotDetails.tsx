@@ -7,18 +7,18 @@ import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
 import { Input } from "../inputs";
+import Spinner from "../icons/spinner";
+import WebHostAPIHandler from "../../services/WebHostAPI";
 
 /** Shows information about the slot */
 const SlotDetails = ({
     slot,
-    connectionId,
     onClose,
 }: {
     slot?: SavedSlotDetails;
-    connectionId?: string;
     onClose: () => void;
 }) => {
-    const open = (slot || connectionId) && true;
+    const open = slot && true;
     let multiWorld: SavedMultiWorldDetails = null;
 
     if (slot) {
@@ -31,13 +31,18 @@ const SlotDetails = ({
     const [password, setPassword] = useState(
         multiWorld?.connection_details.password ?? ""
     );
+    const [validatingRoom, setValidatingRoom] = useState<boolean>(false);
+    const roomConfigured = multiWorld?.room_details && multiWorld?.room_details.tracker_suuid && true;
+    const [roomLink, setRoomLink] = useState<string>("");
+    const [lastRoomError, setLastRoomError] = useState<string>("");
+    
 
     useEffect(() => {
         setTitle(slot?.title ?? "");
         setHost(multiWorld?.connection_details.host ?? "");
         setPort(multiWorld?.connection_details.port ?? "");
         setPassword(multiWorld?.connection_details.password ?? "");
-    }, [slot, connectionId]);
+    }, [slot]);
 
     const save = () => {
         if (slot) {
@@ -66,6 +71,28 @@ const SlotDetails = ({
         }
         onClose();
     };
+
+    const updateRoomInfoFromLink = async () => {
+        setLastRoomError("");
+        await WebHostAPIHandler.parseRoomLink(roomLink)
+            .then(roomInfo => {
+                const handler = new WebHostAPIHandler(roomInfo);
+                MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+                    room_details: roomInfo
+                });
+                setRoomLink('');
+            })
+            .catch((e: Error) => {
+                if(e.cause === "validation" || e.cause === "verification"){
+                    setLastRoomError(e.message);
+                } else {
+                    setLastRoomError(`An error occurred verifying room info. Error: ${e}`);
+                }
+            });
+        
+        setValidatingRoom(false);
+    };
+
     return (
         <Modal open={open}>
             <div>
@@ -121,13 +148,25 @@ const SlotDetails = ({
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
+                        <div>
+                            {roomConfigured && (!roomLink ? <p>Room information is saved.</p> : <p>Unsaved room changes.</p>)}
+                            <Input
+                                type="text"
+                                label="Room link"
+                                value={roomLink}
+                                onChange={(e) => {setRoomLink(e.target.value); setLastRoomError("");}}
+                            />
+                            {validatingRoom && <Spinner/>}
+                            <PrimaryButton disabled={!roomLink || validatingRoom} onClick={updateRoomInfoFromLink}>Update Room</PrimaryButton>
+                            {!!lastRoomError && <p>Error: {lastRoomError}</p>}
+                        </div>
                     </>
                 )}
             </div>
             <ButtonRow>
-                <PrimaryButton onClick={save}>Save</PrimaryButton>
-                <DangerButton onClick={deleteSlot}>Delete</DangerButton>
-                <GhostButton onClick={onClose}>Close</GhostButton>
+                <PrimaryButton onClick={save} disabled={!!roomLink || validatingRoom}>Save</PrimaryButton>
+                <DangerButton onClick={deleteSlot} disabled={validatingRoom}>Delete</DangerButton>
+                <GhostButton onClick={onClose} disabled={validatingRoom}>Close</GhostButton>
             </ButtonRow>
         </Modal>
     );

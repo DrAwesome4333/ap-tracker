@@ -15,7 +15,6 @@ const SavedSlotsView = ({
     connectToServer: (info: ConnectionConfiguration) => void;
 }) => {
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
-    const [editorConnection, setEditorConnection] = useState<string>(null);
     const connectionStatus = useAPConnectionStatus();
     const disabled = !connectionStatus.disconnected;
 
@@ -54,7 +53,6 @@ const SavedSlotsView = ({
                             connect={() => onConnect({ slot })}
                             edit={() => {
                                 setEditorSlot(slot);
-                                setEditorConnection(null);
                             }}
                             disabled={disabled}
                         />
@@ -73,10 +71,8 @@ const SavedSlotsView = ({
             </div>
             <SlotDetails
                 slot={editorSlot}
-                connectionId={editorConnection}
                 onClose={() => {
                     setEditorSlot(null);
-                    setEditorConnection(null);
                 }}
             />
         </div>
