@@ -1,22 +1,30 @@
 import styles from "./SavedSlots.module.css";
-import React from "react";
-import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldContext";
+import {
+    MultiWorldWithSlotDetails,
+    SavedSlotDetails,
+} from "../../services/MultiInfo/MultiWorldContext";
 import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 
 const SavedSlotView = ({
     slot,
+    multiWorld,
     edit,
     connect,
     disabled,
 }: {
     slot: SavedSlotDetails;
+    multiWorld: MultiWorldWithSlotDetails;
     edit: () => void;
     connect: () => void;
     disabled: boolean;
 }) => {
+    const colorVars = {
+        "--slot-color": slot.color ?? "#888888",
+        "--multi-world-color": multiWorld.color ?? "#888888",
+    } as React.CSSProperties;
     return (
-        <div className={styles.saved_slot}>
+        <div className={styles.saved_slot} style={{ ...colorVars }}>
             <div>
                 <div style={{ fontWeight: "bold" }}>{slot.title}</div>
                 <div>{slot.game}</div>

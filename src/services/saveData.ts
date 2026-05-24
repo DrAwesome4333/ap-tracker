@@ -1,9 +1,10 @@
+const DataDebug = false;
 const DB_STORE_KEYS = {
     dataPackageCache: "data_package_cache",
     customTrackers: "custom_trackers_v2",
     customTrackersDirectory: "custom_tracker_manifests_v2",
     tags: "tag_data",
-    locationListCache: "location_list_cache"
+    locationListCache: "location_list_cache",
 };
 
 const retiredKeys = [
@@ -12,10 +13,13 @@ const retiredKeys = [
     "cached_groups",
     "custom_trackers",
     "cached_groups_v2",
-    "cached_groups_v2.1"
+    "cached_groups_v2.1",
 ];
 const environment = "_test";
-const database_request = window.indexedDB.open(`checklist_db${environment}`, 14);
+const database_request = window.indexedDB.open(
+    `checklist_db${environment}`,
+    14
+);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -76,8 +80,7 @@ database_request.onupgradeneeded = (_event) => {
         });
     }
 
-    if(!db.objectStoreNames.contains(DB_STORE_KEYS.locationListCache)) {
-
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.locationListCache)) {
     }
 };
 
@@ -100,13 +103,23 @@ const getItem = (
                 const objectStore = transaction.objectStore(storeName);
                 const request = objectStore.get(key);
                 request.onerror = () => {
+                    if (DataDebug)
+                        console.log(`Failed to load ${storeName}`, key);
                     resolve(null);
                 };
                 request.onsuccess = () => {
+                    if (DataDebug)
+                        console.log(
+                            `Retrieved ${storeName}`,
+                            key,
+                            request.result
+                        );
                     resolve(request.result ?? null);
                 };
             } catch {
                 if (hasFailed) {
+                    if (DataDebug)
+                        console.log(`Failed to load ${storeName}`, key);
                     resolve(null);
                 } else {
                     hasFailed = true;
@@ -142,15 +155,25 @@ const storeItem = (storeName: string, item: unknown): Promise<boolean> => {
                 const objectStore = transaction.objectStore(storeName);
                 const request = objectStore.put(item);
                 request.onerror = () => {
+                    if (DataDebug)
+                        console.log(`Failed to save ${storeName}`, item);
                     resolve(false);
                 };
                 request.onsuccess = () => {
+                    if (DataDebug) console.log(`Saved ${storeName}`, item);
                     resolve(true);
                 };
             } catch {
                 if (hasFailed) {
+                    if (DataDebug)
+                        console.log(`Failed to save ${storeName}`, item);
                     resolve(false);
                 } else {
+                    if (DataDebug)
+                        console.log(
+                            `Failed to save ${storeName}, retry in 0.5s`,
+                            item
+                        );
                     hasFailed = true;
                     setTimeout(attemptSave, 500);
                 }

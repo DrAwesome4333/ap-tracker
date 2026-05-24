@@ -256,7 +256,6 @@ class APConnector implements LocationSource, ItemSource {
                     item: { [name: string]: string[] };
                     location: { [name: string]: string[] };
                 }> => {
-                    console.log("pulling groups");
                     // @ts-expect-error, typing error in archipelago.js
                     const locationGroups: { [groupName: string]: string[] } =
                         await this.client.storage
@@ -300,20 +299,21 @@ class APConnector implements LocationSource, ItemSource {
                             !gamePackage.item_groups ||
                             !gamePackage.location_groups
                         ) {
-                            return getGroups()
-                                .then((groups) => {
-                                    return DataPackageHelper.cachePackage(
-                                        dataPackage,
-                                        groups,
-                                        game
-                                    );
-                                })
-                                .then(() =>
-                                    DataPackageHelper.getCachedPackage(
-                                        game,
-                                        dataPackage.games[game].checksum
-                                    )
+                            return getGroups().then((groups) => {
+                                // no need to await saving
+                                DataPackageHelper.cachePackage(
+                                    dataPackage,
+                                    groups,
+                                    game
                                 );
+                                const a = {
+                                    ...dataPackage.games[game],
+                                    game,
+                                    location_groups: groups.location,
+                                    item_groups: groups.item,
+                                };
+                                return a;
+                            });
                         }
                         return gamePackage;
                     })
@@ -324,7 +324,6 @@ class APConnector implements LocationSource, ItemSource {
                         );
                     })
                     .catch((e) => console.error(e));
-
                 const result: ConnectedEventParams = {
                     gamePackage: wrappedGamePackage,
                     slotName,

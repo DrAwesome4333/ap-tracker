@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { KeyboardEventHandler, useState } from "react";
 import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
@@ -28,6 +28,12 @@ const NewConnection = ({
         });
     };
 
+    const submitOnEnter: KeyboardEventHandler = (event) => {
+        if (event.key === "Enter") {
+            connectToServer(connectionInfo);
+        }
+    };
+
     const connectionStatus = useAPConnectionStatus();
     const disabled = !connectionStatus.disconnected;
 
@@ -39,6 +45,7 @@ const NewConnection = ({
                 name="host"
                 value={connectionInfo.host}
                 onChange={defaultChangeHandler}
+                onKeyUpCapture={submitOnEnter}
                 label="Host"
                 disabled={disabled}
             />
@@ -47,6 +54,7 @@ const NewConnection = ({
                 name="port"
                 value={connectionInfo.port}
                 onChange={defaultChangeHandler}
+                onKeyUpCapture={submitOnEnter}
                 label="Port"
                 disabled={disabled}
             />
@@ -55,6 +63,7 @@ const NewConnection = ({
                 name="slot_name"
                 value={connectionInfo.slot_name}
                 onChange={defaultChangeHandler}
+                onKeyUpCapture={submitOnEnter}
                 label="Slot"
                 disabled={disabled}
             />
@@ -63,6 +72,7 @@ const NewConnection = ({
                 name="password"
                 value={connectionInfo.password}
                 onChange={defaultChangeHandler}
+                onKeyUpCapture={submitOnEnter}
                 label="Password"
                 disabled={disabled}
             />

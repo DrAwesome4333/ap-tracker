@@ -1,30 +1,30 @@
 type APIGamePackage = {
-    checksum: string,
-    item_name_groups: Record<string, string[]>,
-    item_name_to_id: Record<string, number>,
-    location_name_groups: Record<string, string[]>,
-    location_name_to_id: Record<string, number>,
+    checksum: string;
+    item_name_groups: Record<string, string[]>;
+    item_name_to_id: Record<string, number>;
+    location_name_groups: Record<string, string[]>;
+    location_name_to_id: Record<string, number>;
 };
 
 type APIDataPackage = {
-    games: Record<string, APIGamePackage>,
+    games: Record<string, APIGamePackage>;
 };
 
 type APISlotDownload = {
-    download: string,
-    slot: number,
-}
+    download: string;
+    slot: number;
+};
 type SlotName = string;
 type GameName = string;
 
 type APIRoomStatus = {
-    downloads: APISlotDownload[],
-    last_activity: string,
-    last_port: number,
-    players: [SlotName, GameName][],
-    timeout: number,
-    tracker: string,
-}
+    downloads: APISlotDownload[];
+    last_activity: string;
+    last_port: number;
+    players: [SlotName, GameName][];
+    timeout: number;
+    tracker: string;
+};
 
 type ItemId = number;
 type LocationId = number;
@@ -36,72 +36,81 @@ type ReceivingPlayer = number;
 type FindingPlayer = number;
 type HintFound = number;
 type Entrance = string;
-type HintStatus = number;// TODO replace with enum
-type APIHint = [ReceivingPlayer, FindingPlayer, LocationId, ItemId, HintFound, Entrance, ItemFlags, HintStatus];
-type ClientStatus = number;// TODO replace with enum
+type HintStatus = number; // TODO replace with enum
+type APIHint = [
+    ReceivingPlayer,
+    FindingPlayer,
+    LocationId,
+    ItemId,
+    HintFound,
+    Entrance,
+    ItemFlags,
+    HintStatus,
+];
+type ClientStatus = number; // TODO replace with enum
 
 type APITracker = {
     aliases: {
-        team: number,
-        player: number,
-        alias: string,
-    }[],
+        team: number;
+        player: number;
+        alias: string;
+    }[];
     player_items_received: {
-        team: number,
-        player: number,
-        items: APIItem[],
-    }[],
+        team: number;
+        player: number;
+        items: APIItem[];
+    }[];
     player_checks_done: {
-        team: number,
-        player: number,
-        locations: LocationId[]
-    }[],
+        team: number;
+        player: number;
+        locations: LocationId[];
+    }[];
     total_checks_done: {
-        team: number,
-        checks_done: number
-    }[],
+        team: number;
+        checks_done: number;
+    }[];
     hints: {
-        team: number,
-        player: number,
-        hints: APIHint[],
-    }[],
+        team: number;
+        player: number;
+        hints: APIHint[];
+    }[];
     activity_timers: {
-        team: number,
-        player: number,
-        time: string,
-    }[],
+        team: number;
+        player: number;
+        time: string;
+    }[];
     connection_timers: {
-        team: number,
-        player: number,
-        time: string,
-    }[],
+        team: number;
+        player: number;
+        time: string;
+    }[];
     player_status: {
-        team: number,
-        player: number,
-        status: ClientStatus,
-    }[],
-}
+        team: number;
+        player: number;
+        status: ClientStatus;
+    }[];
+};
 
 type APIStaticTracker = {
     groups: {
-        slot: number,
-        name: string,
-        members: number[],
-    }[],
-    datapackage: Record<string, {checksum: string}>,
+        slot: number;
+        name: string;
+        members: number[];
+    }[];
+    datapackage: Record<string, { checksum: string }>;
     player_locations_total: {
-        player: number,
-        team: number,
-        total_locations: number,
-    }[],
+        player: number;
+        team: number;
+        total_locations: number;
+    }[];
     player_game: {
-        team: number,
-        player: number,
-        game: string,
-    }[]
-}
+        team: number;
+        player: number;
+        game: string;
+    }[];
+};
 
-type RoomInfo =  {
+type RoomInfo = {
     origin: string;
     room_suuid: string;
     tracker_suuid: string;
@@ -115,5 +124,5 @@ export type {
     APIHint,
     APITracker,
     APIStaticTracker,
-    RoomInfo
-}
+    RoomInfo,
+};

@@ -70,36 +70,45 @@ const DataPackageHelper: DataPackageCache & {
         },
         gameName: string
     ) => {
-        Object.entries(dataPackage.games).forEach(async ([game, data]) => {
-            const cache = (await SaveData.getItem(
-                DB_STORE_KEYS.dataPackageCache,
-                [game, data.checksum]
-            )) as CachedGamePackage;
-            if (cache) {
-                cache.last_used = Date.now();
-                if (
-                    (!cache.location_groups || !cache.item_groups) &&
-                    gameName === game
-                ) {
-                    cache.location_groups = groups.location;
-                    cache.item_groups = groups.item;
+        const promises = Object.entries(dataPackage.games).map(
+            async ([game, data]) => {
+                const cache = (await SaveData.getItem(
+                    DB_STORE_KEYS.dataPackageCache,
+                    [game, data.checksum]
+                )) as CachedGamePackage;
+                if (cache) {
+                    cache.last_used = Date.now();
+                    if (
+                        (!cache.location_groups || !cache.item_groups) &&
+                        gameName === game
+                    ) {
+                        cache.location_groups = groups.location;
+                        cache.item_groups = groups.item;
+                    }
+                    await SaveData.storeItem(
+                        DB_STORE_KEYS.dataPackageCache,
+                        cache
+                    );
+                    return;
                 }
-                await SaveData.storeItem(DB_STORE_KEYS.dataPackageCache, cache);
-                return;
+                let newCache = {
+                    game,
+                    ...data,
+                    last_used: Date.now(),
+                    item_groups: undefined,
+                    location_groups: undefined,
+                };
+                if (game === gameName) {
+                    newCache.item_groups = groups.item;
+                    newCache.location_groups = groups.location;
+                }
+                await SaveData.storeItem(
+                    DB_STORE_KEYS.dataPackageCache,
+                    newCache
+                );
             }
-            let newCache = {
-                game,
-                ...data,
-                last_used: Date.now(),
-                item_groups: undefined,
-                location_groups: undefined,
-            };
-            if (game === gameName) {
-                newCache.item_groups = groups.item;
-                newCache.location_groups = groups.location;
-            }
-            await SaveData.storeItem(DB_STORE_KEYS.dataPackageCache, newCache);
-        });
+        );
+        await Promise.all(promises);
     },
 };
 

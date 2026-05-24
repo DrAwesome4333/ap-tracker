@@ -31,25 +31,35 @@ const SlotDetails = ({
     const [password, setPassword] = useState(
         multiWorld?.connection_details.password ?? ""
     );
+    const [multiColor, setMultiColor] = useState(
+        multiWorld?.color ?? "#888888"
+    );
+    const [slotColor, setSlotColor] = useState(slot?.color ?? "#888888");
     const [validatingRoom, setValidatingRoom] = useState<boolean>(false);
-    const roomConfigured = multiWorld?.room_details && multiWorld?.room_details.tracker_suuid && true;
+    const roomConfigured =
+        multiWorld?.room_details &&
+        multiWorld?.room_details.tracker_suuid &&
+        true;
     const [roomLink, setRoomLink] = useState<string>("");
     const [lastRoomError, setLastRoomError] = useState<string>("");
-    
 
     useEffect(() => {
         setTitle(slot?.title ?? "");
         setHost(multiWorld?.connection_details.host ?? "");
         setPort(multiWorld?.connection_details.port ?? "");
         setPassword(multiWorld?.connection_details.password ?? "");
-    }, [slot]);
+        setSlotColor(slot?.color ?? "#888888");
+        setMultiColor(multiWorld?.color ?? "#888888");
+    }, [slot, multiWorld]);
 
     const save = () => {
         if (slot) {
             MultiWorldContext.updateSlot(slot.multi_save_id, slot.slot_number, {
+                color: slotColor,
                 title,
             });
             MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+                color: multiColor,
                 connection_details: {
                     host,
                     port,
@@ -75,21 +85,23 @@ const SlotDetails = ({
     const updateRoomInfoFromLink = async () => {
         setLastRoomError("");
         await WebHostAPIHandler.parseRoomLink(roomLink)
-            .then(roomInfo => {
+            .then((roomInfo) => {
                 const handler = new WebHostAPIHandler(roomInfo);
                 MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
-                    room_details: roomInfo
+                    room_details: roomInfo,
                 });
-                setRoomLink('');
+                setRoomLink("");
             })
             .catch((e: Error) => {
-                if(e.cause === "validation" || e.cause === "verification"){
+                if (e.cause === "validation" || e.cause === "verification") {
                     setLastRoomError(e.message);
                 } else {
-                    setLastRoomError(`An error occurred verifying room info. Error: ${e}`);
+                    setLastRoomError(
+                        `An error occurred verifying room info. Error: ${e}`
+                    );
                 }
             });
-        
+
         setValidatingRoom(false);
     };
 
@@ -113,6 +125,14 @@ const SlotDetails = ({
                                 label="Slot Name"
                                 value={slot.slot_name}
                                 disabled
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="color"
+                                label="Color"
+                                value={slotColor}
+                                onChange={(e) => setSlotColor(e.target.value)}
                             />
                         </div>
                         <h4>Multi-world Info</h4>
@@ -149,24 +169,54 @@ const SlotDetails = ({
                             />
                         </div>
                         <div>
-                            {roomConfigured && (!roomLink ? <p>Room information is saved.</p> : <p>Unsaved room changes.</p>)}
+                            {roomConfigured &&
+                                (!roomLink ? (
+                                    <p>Room information is saved.</p>
+                                ) : (
+                                    <p>Unsaved room changes.</p>
+                                ))}
                             <Input
                                 type="text"
                                 label="Room link"
                                 value={roomLink}
-                                onChange={(e) => {setRoomLink(e.target.value); setLastRoomError("");}}
+                                onChange={(e) => {
+                                    setRoomLink(e.target.value);
+                                    setLastRoomError("");
+                                }}
                             />
-                            {validatingRoom && <Spinner/>}
-                            <PrimaryButton disabled={!roomLink || validatingRoom} onClick={updateRoomInfoFromLink}>Update Room</PrimaryButton>
+                            {validatingRoom && <Spinner />}
+                            <PrimaryButton
+                                disabled={!roomLink || validatingRoom}
+                                onClick={updateRoomInfoFromLink}
+                            >
+                                Update Room
+                            </PrimaryButton>
                             {!!lastRoomError && <p>Error: {lastRoomError}</p>}
+                        </div>
+                        <div>
+                            <Input
+                                type="color"
+                                label="Color"
+                                value={multiColor}
+                                onChange={(e) => setMultiColor(e.target.value)}
+                            />
                         </div>
                     </>
                 )}
             </div>
             <ButtonRow>
-                <PrimaryButton onClick={save} disabled={!!roomLink || validatingRoom}>Save</PrimaryButton>
-                <DangerButton onClick={deleteSlot} disabled={validatingRoom}>Delete</DangerButton>
-                <GhostButton onClick={onClose} disabled={validatingRoom}>Close</GhostButton>
+                <PrimaryButton
+                    onClick={save}
+                    disabled={!!roomLink || validatingRoom}
+                >
+                    Save
+                </PrimaryButton>
+                <DangerButton onClick={deleteSlot} disabled={validatingRoom}>
+                    Delete
+                </DangerButton>
+                <GhostButton onClick={onClose} disabled={validatingRoom}>
+                    Close
+                </GhostButton>
             </ButtonRow>
         </Modal>
     );

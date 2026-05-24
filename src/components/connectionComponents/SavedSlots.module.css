@@ -9,6 +9,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    border-bottom: solid 0.125em var(--slot-color);
+    border-right: solid 0.125em var(--slot-color);
+    border-left: solid 0.125em var(--multi-world-color);
+    border-top: solid 0.125em var(--multi-world-color);
 }
 
 .slot_actions {
@@ -38,6 +42,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 5em;
+    box-sizing: border-box;
     height: 100%;
     width: 100%;
     padding: 0 0.5em;
@@ -45,6 +50,17 @@
     scrollbar-gutter: stable;
     background-color: var(--background-level-0);
     box-shadow: inset var(--box-shadow-small);
+    --multi-world-color: #888888;
+    --slot-color: #888888;
+}
+
+@container body (width < 500px) {
+    .slots {
+        width: 100%;
+    }
+    .slot_list {
+        margin: 0;
+    }
 }
 
 .new_slot_panel {

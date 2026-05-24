@@ -62,6 +62,8 @@
 
 body {
     font-family: "Roboto", sans-serif;
+    container-type: inline-size;
+    container-name: body;
 }
 
 a {

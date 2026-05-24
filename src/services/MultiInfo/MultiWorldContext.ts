@@ -24,6 +24,8 @@ interface SavedMultiWorldDetails {
     };
     /** Maps games to their respective checksums in the multi-world */
     data_package_details?: { [game_name: string]: string };
+    /** Color to use for multi-world theme */
+    color?: string;
     options?: {
         auto_update_connection_details?: boolean;
     };
@@ -51,6 +53,7 @@ interface SavedMultiWorldUpdate {
     options?: {
         auto_update_connection_details?: boolean;
     };
+    color?: string;
 }
 
 interface SavedSlotDetails {
@@ -341,7 +344,7 @@ class MultiWorldContext {
             ...update,
             last_used_timestamp: Date.now(),
         };
-        if(newSlot.last_item_notification_index < newSlot.last_item_index){
+        if (newSlot.last_item_notification_index < newSlot.last_item_index) {
             newSlot.last_item_notification_index = newSlot.last_item_index;
         }
         slotDataStore.write(
