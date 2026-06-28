@@ -14,7 +14,6 @@ const useTagCounters = (
     entityIds: (string | number)[],
     entityStatuses: { [statusName: string]: boolean }[]
 ) => {
-    // TODO fix this garbage
     const tags = useTagLists(tagManager, entityType, entityIds);
     const tagTypes = useTagTypeList(tagManager);
     const reverseIndexLookup = useMemo(() => {
@@ -84,10 +83,23 @@ const useTagLists = (
                 newTags[id] =
                     tagManager?.getTagIdsOnEntity(entityType, id) ?? [];
                 hasNewTags = true;
+            } else {
+                const tagsInManager =
+                    tagManager?.getTagIdsOnEntity(entityType, id) ?? [];
+                const currentTags = tags[id];
+
+                // Check if there are changes between tag lists
+                if (
+                    tagsInManager.length !== currentTags.length ||
+                    tagsInManager.some((tagId) => !currentTags.includes(tagId))
+                ) {
+                    hasNewTags = true;
+                    newTags[id] = tagsInManager;
+                }
             }
         });
         if (hasNewTags) {
-            setTags(newTags);
+            setTags((oldTags) => ({ ...oldTags, ...newTags }));
         }
     });
     useEffect(() => {
@@ -110,17 +122,24 @@ const useTagList = (
     entityId: string | number
 ) => {
     const [tags, setTags] = useState<TagId[]>([]);
-
+    const updateTagList = useEffectEvent(() => {
+        const tagsInManager =
+            tagManager?.getTagIdsOnEntity(entityType, entityId) ?? [];
+        // Check if there are changes between tag lists to prevent un-needed re-renders
+        if (
+            tagsInManager.length !== tags.length ||
+            tagsInManager.some((tagId) => !tags.includes(tagId))
+        ) {
+            setTags(tagsInManager);
+        }
+    });
     useEffect(() => {
-        const callback = () => {
-            setTags(tagManager?.getTagIdsOnEntity(entityType, entityId) ?? []);
-        };
-        callback();
         const cleanup = tagManager?.addTagListUpdateCallback(
             entityType,
             entityId,
-            callback
+            updateTagList
         );
+        updateTagList();
         return () => {
             cleanup?.();
         };

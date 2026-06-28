@@ -361,9 +361,9 @@ class TagManager implements LocationSource {
                 }
                 let updateCallbacks = new Set(
                     [
-                        ...this.#tagListUpdateCallbacks
+                        ...(this.#tagListUpdateCallbacks
                             .get(tagType.entity_type)
-                            ?.entries(),
+                            ?.entries() ?? []),
                     ]
                         .filter(([triggerIds, _callback]) =>
                             triggerIds.has(tag.entity_id)

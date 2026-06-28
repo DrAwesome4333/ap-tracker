@@ -138,12 +138,19 @@ const SectionView = ({
         return locationNames;
     }, [locationOrder, checkedLocationBehavior, localLocations]);
 
-    const locationCounterStatuses = trackedLocations.map((status) => ({
-        checked: status.checked,
-        ignored: status.ignored,
-    }));
+    const locationCounterStatuses = useMemo(
+        () =>
+            trackedLocations.map((status) => ({
+                checked: status.checked,
+                ignored: status.ignored,
+            })),
+        [trackedLocations]
+    );
 
-    const locationIds = trackedLocations.map((l) => l.locationId);
+    const locationIds = useMemo(
+        () => trackedLocations.map((l) => l.locationId),
+        [trackedLocations]
+    );
 
     const tagCounts = useTagCounters(
         tagManager,

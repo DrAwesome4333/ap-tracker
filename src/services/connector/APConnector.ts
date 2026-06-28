@@ -8,9 +8,7 @@ import {
     LocationStatusUpdate,
 } from "../locations/locationSource";
 import { ConnectorValidationError } from "./connectorMessages";
-import MultiWorldContext, {
-    SavedSlotDetails,
-} from "../MultiInfo/MultiWorldContext";
+import MultiWorldContext from "../MultiInfo/MultiWorldContext";
 import { LocalStorageDataStore } from "../dataStores";
 import { randomUUID } from "../../utility/uuid";
 import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
@@ -19,7 +17,6 @@ import DataPackageHelper from "../MultiInfo/DatapackageHelper";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import HintManager from "../HintManager";
-import { LocationTagger } from "../tags/LocationTagger";
 
 interface ConnectionConfiguration {
     host?: string;
@@ -106,7 +103,6 @@ class APConnector implements LocationSource, ItemSource {
         setupAPTextSync(this.client, textClientManager);
         hintManager.initializeListeners(this.client);
         this.#hintManager = hintManager;
-        ``;
     }
 
     #setStatus = (newStatus: ConnectionStatus) => {
