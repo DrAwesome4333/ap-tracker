@@ -61,12 +61,11 @@ const StartScreen = () => {
                         Add Slot
                     </PrimaryButton>
                 </ButtonRow>
-                <Modal open={newModalOpen}>
-                    <NewConnection
-                        onClose={() => setNewModalOpen(false)}
-                        connectToServer={connectToServer}
-                    />
-                </Modal>
+                <NewConnection
+                    modalOpen={newModalOpen}
+                    onClose={() => setNewModalOpen(false)}
+                    connectToServer={connectToServer}
+                />
             </div>
         </div>
     );

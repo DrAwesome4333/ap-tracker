@@ -13,7 +13,15 @@ const TextClientFilterModal = ({
     onClose: () => void;
 }) => {
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Filters</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div>
                 <OptionView
                     option={baseTrackerOptions["TextClient:message_filter"]}
@@ -27,9 +35,6 @@ const TextClientFilterModal = ({
                         baseTrackerOptions["TextClient:IncludeMyOtherSlots"]
                     }
                 />
-                <ButtonRow>
-                    <GhostButton onClick={onClose}>Close</GhostButton>
-                </ButtonRow>
             </div>
         </Modal>
     );

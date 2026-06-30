@@ -1,14 +1,5 @@
 .notification_modal_container {
-    width: fit-content;
-    max-width: 75vw;
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    row-gap: 0.25em;
-    grid-template-areas:
-        "message"
-        "details"
-        "close";
+    white-space: pre-wrap;
 }
 
 /* Holds notification pop-ups*/
@@ -23,5 +14,5 @@
     margin: 0;
     padding: 0;
     pointer-events: none;
-    z-index: 100;
+    z-index: 9;
 }

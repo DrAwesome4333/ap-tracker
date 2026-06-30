@@ -128,8 +128,71 @@ const NameAnalysisModal = ({
     }, [mainTrackerManager, tokenOptions, otherOptions, open]);
 
     return (
-        <Modal open={open}>
-            <h2>Name Analysis</h2>
+        <Modal
+            open={open}
+            header={<h3>Name Analysis</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton
+                        onClick={() => {
+                            const customTracker = templateLocationTracker;
+                            const customTrackerExport =
+                                customTracker.exportDropdowns(randomUUID());
+                            customTrackerExport.manifest.game = slot.game;
+                            customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                            if (!customTracker || !customTrackerExport) {
+                                NotificationManager.createToast({
+                                    message:
+                                        "Failed to export and save tracker",
+                                    type: MessageType.error,
+                                });
+                                return;
+                            }
+
+                            customTrackerRepository.addTracker(
+                                customTrackerExport
+                            );
+                            mainTrackerManager.setGameTracker(slot.game, {
+                                type: ResourceType.locationTracker,
+                                uuid: customTrackerExport.manifest.uuid,
+                                version: customTrackerExport.manifest.version,
+                            });
+                            NotificationManager.createStatus({
+                                message: "Successfully added tracker",
+                                type: MessageType.success,
+                                progress: 1,
+                                duration: 3,
+                            });
+                        }}
+                    >
+                        Save and Use
+                    </PrimaryButton>
+                    <SecondaryButton
+                        onClick={() => {
+                            const customTracker = templateLocationTracker;
+                            const customTrackerExport =
+                                customTracker.exportDropdowns(randomUUID());
+                            customTrackerExport.manifest.game = slot.game;
+                            customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                            if (!customTracker) {
+                                NotificationManager.createToast({
+                                    message: "Failed to export tracker",
+                                    type: MessageType.error,
+                                });
+                                return;
+                            }
+                            exportJSONFile(
+                                `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
+                                customTrackerExport
+                            );
+                        }}
+                    >
+                        Export <Icon type="download" fontSize="14px" />
+                    </SecondaryButton>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div className={styles.analysis_grid}>
                 <div
                     style={{
@@ -326,62 +389,6 @@ const NameAnalysisModal = ({
                     <br />
                 </div>
             </div>
-            <ButtonRow>
-                <PrimaryButton
-                    onClick={() => {
-                        const customTracker = templateLocationTracker;
-                        const customTrackerExport =
-                            customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game = slot.game;
-                        customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
-                        if (!customTracker || !customTrackerExport) {
-                            NotificationManager.createToast({
-                                message: "Failed to export and save tracker",
-                                type: MessageType.error,
-                            });
-                            return;
-                        }
-
-                        customTrackerRepository.addTracker(customTrackerExport);
-                        mainTrackerManager.setGameTracker(slot.game, {
-                            type: ResourceType.locationTracker,
-                            uuid: customTrackerExport.manifest.uuid,
-                            version: customTrackerExport.manifest.version,
-                        });
-                        NotificationManager.createStatus({
-                            message: "Successfully added tracker",
-                            type: MessageType.success,
-                            progress: 1,
-                            duration: 3,
-                        });
-                    }}
-                >
-                    Save and Use
-                </PrimaryButton>
-                <SecondaryButton
-                    onClick={() => {
-                        const customTracker = templateLocationTracker;
-                        const customTrackerExport =
-                            customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game = slot.game;
-                        customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
-                        if (!customTracker) {
-                            NotificationManager.createToast({
-                                message: "Failed to export tracker",
-                                type: MessageType.error,
-                            });
-                            return;
-                        }
-                        exportJSONFile(
-                            `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
-                            customTrackerExport
-                        );
-                    }}
-                >
-                    Export <Icon type="download" fontSize="14px" />
-                </SecondaryButton>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

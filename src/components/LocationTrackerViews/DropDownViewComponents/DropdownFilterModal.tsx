@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Modal from "../../shared/Modal";
 import ChecklistSettings from "../../optionsComponents/ChecklistSettings";
 import ServiceContext from "../../../contexts/serviceContext";
@@ -20,8 +20,15 @@ const DropdownFilterModal = ({
     const slot = useCurrentMultiworldSlot();
 
     return (
-        <Modal open={open}>
-            <h2>Location Dropdown Settings</h2>
+        <Modal
+            open={open}
+            header={<h3>Location Dropdown Settings</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             Tracker: &nbsp;
             <TrackerDropdown
                 game={slot.game}
@@ -33,9 +40,6 @@ const DropdownFilterModal = ({
             <br />
             <br />
             <HintSettings />
-            <ButtonRow>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

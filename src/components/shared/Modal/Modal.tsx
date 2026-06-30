@@ -8,18 +8,16 @@ import { globalOptionManager } from "../../../services/options/optionManager";
 import apStyles from "../../sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "../../../services/theme/ColorManager";
 
-/**
- *
- * @param param0
- * @param param0.open If true the modal will render
- * @returns
- */
 const Modal = ({
     open,
+    header,
+    footer,
     children,
 }: {
     open: boolean;
     children: React.ReactNode;
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
 }) => {
     const serviceContext = useContext(ServiceContext);
     const optionManger = serviceContext.optionManager ?? globalOptionManager;
@@ -34,19 +32,23 @@ const Modal = ({
             {open &&
                 createPortal(
                     <div
-                        className={styles.modal_back_drop}
+                        className={["base", styles.modal_back_drop].join(" ")}
                         data-theme={readThemeValue(themeValue)}
                     >
                         <div
                             className={[
                                 "base",
                                 readThemeValue(themeValue),
-                                styles.modal_container,
+                                styles.modal_wrapper,
                                 apStyles.ap_color_wrapper,
-                                apColors,
                             ].join(" ")}
+                            style={{ ...apColors }}
                         >
-                            {children}
+                            <div className={styles.modal_header}>{header}</div>
+                            <div className={styles.modal_content}>
+                                {children}
+                            </div>
+                            <div className={styles.modal_footer}>{footer}</div>
                         </div>
                     </div>,
                     document.body

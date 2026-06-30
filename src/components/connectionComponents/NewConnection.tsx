@@ -5,14 +5,17 @@ import { Input } from "../inputs";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
+import Modal from "../shared/Modal";
 
 const NewConnection = ({
     onClose,
     connectToServer,
+    modalOpen,
     ...props
 }: {
     onClose: () => void;
     connectToServer: (info: ConnectionConfiguration) => void;
+    modalOpen: boolean;
 }) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
@@ -38,56 +41,64 @@ const NewConnection = ({
     const disabled = !connectionStatus.disconnected;
 
     return (
-        <div className={styles.new_slot_panel} {...props}>
-            <h2>New Slot</h2>
-            <Input
-                type="text"
-                name="host"
-                value={connectionInfo.host}
-                onChange={defaultChangeHandler}
-                onKeyUpCapture={submitOnEnter}
-                label="Host"
-                disabled={disabled}
-            />
-            <Input
-                type="text"
-                name="port"
-                value={connectionInfo.port}
-                onChange={defaultChangeHandler}
-                onKeyUpCapture={submitOnEnter}
-                label="Port"
-                disabled={disabled}
-            />
-            <Input
-                type="text"
-                name="slot_name"
-                value={connectionInfo.slot_name}
-                onChange={defaultChangeHandler}
-                onKeyUpCapture={submitOnEnter}
-                label="Slot"
-                disabled={disabled}
-            />
-            <Input
-                type="password"
-                name="password"
-                value={connectionInfo.password}
-                onChange={defaultChangeHandler}
-                onKeyUpCapture={submitOnEnter}
-                label="Password"
-                disabled={disabled}
-            />
-            <ButtonRow>
-                <PrimaryButton
-                    onClick={() => {
-                        connectToServer(connectionInfo);
-                    }}
+        <Modal
+            open={modalOpen}
+            header={<h3>New Slot</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton
+                        onClick={() => {
+                            connectToServer(connectionInfo);
+                        }}
+                        disabled={disabled}
+                    >
+                        Connect
+                    </PrimaryButton>
+                    {onClose && (
+                        <GhostButton onClick={onClose}>Close</GhostButton>
+                    )}
+                </ButtonRow>
+            }
+        >
+            <div className={styles.new_slot_panel} {...props}>
+                <Input
+                    type="text"
+                    name="host"
+                    value={connectionInfo.host}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Host"
                     disabled={disabled}
-                >
-                    Connect
-                </PrimaryButton>
-                {onClose && <GhostButton onClick={onClose}>Close</GhostButton>}
-            </ButtonRow>
-        </div>
+                />
+                <Input
+                    type="text"
+                    name="port"
+                    value={connectionInfo.port}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Port"
+                    disabled={disabled}
+                />
+                <Input
+                    type="text"
+                    name="slot_name"
+                    value={connectionInfo.slot_name}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Slot"
+                    disabled={disabled}
+                />
+                <Input
+                    type="password"
+                    name="password"
+                    value={connectionInfo.password}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Password"
+                    disabled={disabled}
+                />
+            </div>
+        </Modal>
     );
 };
 

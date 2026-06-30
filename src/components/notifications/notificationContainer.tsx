@@ -1,11 +1,5 @@
 import { createPortal } from "react-dom";
-import React, {
-    useEffect,
-    useState,
-    useRef,
-    useContext,
-    useReducer,
-} from "react";
+import { useEffect, useState, useRef, useContext, useReducer } from "react";
 import NotificationManager, {
     MessageType,
     StatusNotification,
@@ -245,21 +239,14 @@ const NotificationContainer = () => {
                     data-theme={readThemeValue(themeValue)}
                 >
                     {detailModalOpen && toastNotifications[detailIndex] && (
-                        <Modal open={detailModalOpen}>
-                            <div
-                                className={styles.notification_modal_container}
-                            >
-                                <h3 style={{ gridArea: "message" }}>
+                        <Modal
+                            open={detailModalOpen}
+                            header={
+                                <h3>
                                     {toastNotifications[detailIndex].message}
                                 </h3>
-                                <div
-                                    style={{
-                                        gridArea: "details",
-                                        whiteSpace: "pre-wrap",
-                                    }}
-                                >
-                                    {toastNotifications[detailIndex].details}
-                                </div>
+                            }
+                            footer={
                                 <SecondaryButton
                                     style={{ gridArea: "close" }}
                                     small
@@ -269,6 +256,12 @@ const NotificationContainer = () => {
                                 >
                                     Close
                                 </SecondaryButton>
+                            }
+                        >
+                            <div
+                                className={styles.notification_modal_container}
+                            >
+                                {toastNotifications[detailIndex].details}
                             </div>
                         </Modal>
                     )}
@@ -286,7 +279,7 @@ const NotificationContainer = () => {
                             click={() => {
                                 openDetailModal(index);
                             }}
-                        ></Toast>
+                        />
                     ))}
 
                     {statusNotifications.map((notification, index) => (
@@ -300,7 +293,7 @@ const NotificationContainer = () => {
                                 notification.remainingTime < 0
                             }
                             progress={notification.notification.progress}
-                        ></StatusNotificationView>
+                        />
                     ))}
                 </div>,
                 document.body

@@ -168,121 +168,122 @@ const CreateCustomTrackerModal = ({
     };
     return (
         <>
-            <Modal open={open}>
-                <div>
-                    <h2>Custom Trackers (experimental)</h2>
-                    <div className={styles.modal_grid}>
-                        <div
-                            style={{
-                                gridArea: "upload",
-                                alignSelf: "center",
-                            }}
-                        >
-                            <h3>Add Custom Tracker:</h3>
-                            <FileInput
-                                label="Upload file"
-                                id="custom_list_upload"
-                                accept="application/JSON"
-                                // renderAsDrop
-                                onChange={(e) => {
-                                    if (e.target.files.length > 0) {
-                                        loadCustomTracker(e.target.files[0]);
-                                    }
-                                }}
-                            />
-                        </div>
-                        <div
-                            style={{
-                                gridArea: "build",
-                                alignSelf: "center",
-                            }}
-                        >
-                            <div>
-                                <h3>Generate a Template:</h3>
-                                {slot?.game ? (
-                                    ""
-                                ) : (
-                                    <i style={{ color: tertiary }}>
-                                        (connect to a slot first)
-                                    </i>
-                                )}
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                    }}
-                                >
-                                    <PrimaryButton
-                                        disabled={!slot?.game}
-                                        onClick={() => {
-                                            // const trackerJSON =
-                                            //     LocationGroupCategoryGenerator.generateSectionDef(
-                                            //         connector.slotInfo.groups
-                                            //             .location
-                                            //     );
-                                            // trackerJSON.manifest.game =
-                                            //     slot.game;
-                                            // trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
-                                            // exportJSONFile(
-                                            //     `tracker-export-${slot.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
-                                            //     trackerJSON,
-                                            //     true
-                                            // );
-                                        }}
-                                    >
-                                        Location Group{" "}
-                                        <Icon fontSize="14px" type="download" />
-                                    </PrimaryButton>
-                                    <PrimaryButton
-                                        disabled={!slot?.game}
-                                        onClick={async () => {
-                                            const trackerId =
-                                                services.genericTrackerRepository.resources.filter(
-                                                    (manifest) =>
-                                                        manifest.type ===
-                                                        ResourceType.itemTracker
-                                                )[0];
-                                            if (!trackerId) {
-                                                return;
-                                            }
-                                            const tracker =
-                                                await services.genericTrackerRepository.loadResource(
-                                                    trackerId.uuid,
-                                                    trackerId.version,
-                                                    trackerId.type
-                                                );
-                                            const trackerJSON = (
-                                                tracker as GenericItemTracker
-                                            )?.exportGroups(randomUUID());
-                                            trackerJSON.manifest.game =
-                                                slot?.game;
-                                            trackerJSON.manifest.name = `${slot?.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
-                                            exportJSONFile(
-                                                `tracker-export-${slot?.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
-                                                trackerJSON,
-                                                true
-                                            );
-                                        }}
-                                    >
-                                        Item Group{" "}
-                                        <Icon fontSize="14px" type="download" />
-                                    </PrimaryButton>
-                                    <PrimaryButton
-                                        disabled={!slot?.game}
-                                        onClick={() => setNameModalOpen(true)}
-                                    >
-                                        Name Analysis
-                                    </PrimaryButton>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <Modal
+                open={open}
+                header={<h3>Custom Trackers</h3>}
+                footer={
                     <ButtonRow>
                         <SecondaryButton onClick={() => setHelpModalOpen(true)}>
                             Help
                         </SecondaryButton>
                         <GhostButton onClick={onClose}>Close</GhostButton>
                     </ButtonRow>
+                }
+            >
+                <div className={styles.modal_grid}>
+                    <div
+                        style={{
+                            gridArea: "upload",
+                            alignSelf: "center",
+                        }}
+                    >
+                        <h3>Add Custom Tracker:</h3>
+                        <FileInput
+                            label="Upload file"
+                            id="custom_list_upload"
+                            accept="application/JSON"
+                            // renderAsDrop
+                            onChange={(e) => {
+                                if (e.target.files.length > 0) {
+                                    loadCustomTracker(e.target.files[0]);
+                                }
+                            }}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            gridArea: "build",
+                            alignSelf: "center",
+                        }}
+                    >
+                        <div>
+                            <h3>Generate a Template:</h3>
+                            {slot?.game ? (
+                                ""
+                            ) : (
+                                <i style={{ color: tertiary }}>
+                                    (connect to a slot first)
+                                </i>
+                            )}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                }}
+                            >
+                                <PrimaryButton
+                                    disabled={!slot?.game}
+                                    onClick={() => {
+                                        // const trackerJSON =
+                                        //     LocationGroupCategoryGenerator.generateSectionDef(
+                                        //         connector.slotInfo.groups
+                                        //             .location
+                                        //     );
+                                        // trackerJSON.manifest.game =
+                                        //     slot.game;
+                                        // trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
+                                        // exportJSONFile(
+                                        //     `tracker-export-${slot.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
+                                        //     trackerJSON,
+                                        //     true
+                                        // );
+                                    }}
+                                >
+                                    Location Group{" "}
+                                    <Icon fontSize="14px" type="download" />
+                                </PrimaryButton>
+                                <PrimaryButton
+                                    disabled={!slot?.game}
+                                    onClick={async () => {
+                                        const trackerId =
+                                            services.genericTrackerRepository.resources.filter(
+                                                (manifest) =>
+                                                    manifest.type ===
+                                                    ResourceType.itemTracker
+                                            )[0];
+                                        if (!trackerId) {
+                                            return;
+                                        }
+                                        const tracker =
+                                            await services.genericTrackerRepository.loadResource(
+                                                trackerId.uuid,
+                                                trackerId.version,
+                                                trackerId.type
+                                            );
+                                        const trackerJSON = (
+                                            tracker as GenericItemTracker
+                                        )?.exportGroups(randomUUID());
+                                        trackerJSON.manifest.game = slot?.game;
+                                        trackerJSON.manifest.name = `${slot?.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
+                                        exportJSONFile(
+                                            `tracker-export-${slot?.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
+                                            trackerJSON,
+                                            true
+                                        );
+                                    }}
+                                >
+                                    Item Group{" "}
+                                    <Icon fontSize="14px" type="download" />
+                                </PrimaryButton>
+                                <PrimaryButton
+                                    disabled={!slot?.game}
+                                    onClick={() => setNameModalOpen(true)}
+                                >
+                                    Name Analysis
+                                </PrimaryButton>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </Modal>
             <CustomTrackerHelpModal

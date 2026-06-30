@@ -3,8 +3,8 @@
     column-gap: 2em;
 
     grid:
-        "upload" 25vh
-        "build" 25vh / auto;
+        "upload" auto
+        "build" auto / auto;
 }
 
 @media only screen and (orientation: landscape) {

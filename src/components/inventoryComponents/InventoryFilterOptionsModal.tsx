@@ -34,8 +34,15 @@ const InventoryFilterOptionsModal = ({
     };
 
     return (
-        <Modal open={open}>
-            <h2>Inventory Settings</h2>
+        <Modal
+            open={open}
+            header={<h3>Inventory Settings</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             Tracker: &nbsp;
             <TrackerDropdown
                 game={slotContext.game}
@@ -55,9 +62,6 @@ const InventoryFilterOptionsModal = ({
                         />
                     ))}
             </div>
-            <ButtonRow>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

@@ -69,13 +69,7 @@
 }
 
 .new_slot_panel {
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    justify-self: center;
-    margin: auto 0;
+    display: flex;
+    flex-direction: column;
     row-gap: 0.25em;
-    width: fit-content;
-    padding: 1em 2em;
-    grid-template-rows: repeat(5, 2.5em) 4em;
 }

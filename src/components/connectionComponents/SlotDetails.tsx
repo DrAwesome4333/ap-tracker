@@ -116,7 +116,29 @@ const SlotDetails = ({
     };
 
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Details:</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton
+                        onClick={save}
+                        disabled={!!roomLink || validatingRoom}
+                    >
+                        Save
+                    </PrimaryButton>
+                    <DangerButton
+                        onClick={deleteSlot}
+                        disabled={validatingRoom}
+                    >
+                        Delete
+                    </DangerButton>
+                    <GhostButton onClick={onClose} disabled={validatingRoom}>
+                        Close
+                    </GhostButton>
+                </ButtonRow>
+            }
+        >
             <div>
                 {slot && (
                     <>
@@ -245,20 +267,6 @@ const SlotDetails = ({
                     </>
                 )}
             </div>
-            <ButtonRow>
-                <PrimaryButton
-                    onClick={save}
-                    disabled={!!roomLink || validatingRoom}
-                >
-                    Save
-                </PrimaryButton>
-                <DangerButton onClick={deleteSlot} disabled={validatingRoom}>
-                    Delete
-                </DangerButton>
-                <GhostButton onClick={onClose} disabled={validatingRoom}>
-                    Close
-                </GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

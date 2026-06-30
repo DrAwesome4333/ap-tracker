@@ -38,16 +38,9 @@ const ConnectionOptions = ({
     };
 
     return (
-        <Modal open={open}>
-            <div
-                style={{ display: "flex", flexDirection: "column", gap: "1em" }}
-            >
-                <div>Status: {connectionStatus.status}</div>
-                <div>Title: {loadedSlot?.title}</div>
-                <div>
-                    Slot: {loadedSlot?.slot_alias ?? loadedSlot?.slot_name}
-                </div>
-                <div>Game: {loadedSlot?.game}</div>
+        <Modal
+            open={open}
+            footer={
                 <ButtonRow>
                     {connectionStatus.connected && (
                         <DangerButton onClick={disconnect}>
@@ -74,6 +67,17 @@ const ConnectionOptions = ({
                         )}
                     <GhostButton onClick={onClose}>Close</GhostButton>
                 </ButtonRow>
+            }
+        >
+            <div
+                style={{ display: "flex", flexDirection: "column", gap: "1em" }}
+            >
+                <div>Status: {connectionStatus.status}</div>
+                <div>Title: {loadedSlot?.title}</div>
+                <div>
+                    Slot: {loadedSlot?.slot_alias ?? loadedSlot?.slot_name}
+                </div>
+                <div>Game: {loadedSlot?.game}</div>
             </div>
         </Modal>
     );
