@@ -15,7 +15,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
-                <title>AP Checklist Tracker</title>
+                <title>Checklist Tracker</title>
                 <link rel="icon" href="./favicon.ico" sizes="any" />
                 <link rel="manifest" href="./manifest.json" />
             </head>

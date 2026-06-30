@@ -9,6 +9,7 @@ import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
 import { Input } from "../inputs";
 import Spinner from "../icons/spinner";
 import WebHostAPIHandler from "../../services/WebHostAPI";
+import Link from "next/link";
 
 /** Shows information about the slot */
 const SlotDetails = ({
@@ -36,6 +37,7 @@ const SlotDetails = ({
     );
     const [slotColor, setSlotColor] = useState(slot?.color ?? "#888888");
     const [validatingRoom, setValidatingRoom] = useState<boolean>(false);
+    const room = multiWorld?.room_details;
     const roomConfigured =
         multiWorld?.room_details &&
         multiWorld?.room_details.tracker_suuid &&
@@ -84,6 +86,7 @@ const SlotDetails = ({
 
     const updateRoomInfoFromLink = async () => {
         setLastRoomError("");
+        setValidatingRoom(true);
         await WebHostAPIHandler.parseRoomLink(roomLink)
             .then((roomInfo) => {
                 const handler = new WebHostAPIHandler(roomInfo);
@@ -103,6 +106,13 @@ const SlotDetails = ({
             });
 
         setValidatingRoom(false);
+    };
+
+    const removeRoom = () => {
+        MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+            room_details: null,
+        });
+        setRoomLink("");
     };
 
     return (
@@ -169,12 +179,36 @@ const SlotDetails = ({
                             />
                         </div>
                         <div>
-                            {roomConfigured &&
-                                (!roomLink ? (
-                                    <p>Room information is saved.</p>
-                                ) : (
-                                    <p>Unsaved room changes.</p>
-                                ))}
+                            <Input
+                                type="color"
+                                label="Color"
+                                value={multiColor}
+                                onChange={(e) => setMultiColor(e.target.value)}
+                            />
+                        </div>
+                        <h4>Room</h4>
+                        <div>
+                            <p>
+                                Room link is{" "}
+                                {roomConfigured
+                                    ? "configured"
+                                    : "not configured"}
+                                .{" "}
+                                {roomConfigured && (
+                                    <Link
+                                        target="blank"
+                                        href={`${room?.origin}/room/${room.room_suuid}`}
+                                    >
+                                        Open Room
+                                    </Link>
+                                )}
+                            </p>
+                        </div>
+                        <div>
+                            {roomConfigured && roomLink && (
+                                <p>Unsaved room changes.</p>
+                            )}
+
                             <Input
                                 type="text"
                                 label="Room link"
@@ -184,22 +218,29 @@ const SlotDetails = ({
                                     setLastRoomError("");
                                 }}
                             />
-                            {validatingRoom && <Spinner />}
-                            <PrimaryButton
-                                disabled={!roomLink || validatingRoom}
-                                onClick={updateRoomInfoFromLink}
-                            >
-                                Update Room
-                            </PrimaryButton>
+                            <ButtonRow>
+                                <PrimaryButton
+                                    disabled={!roomLink || validatingRoom}
+                                    onClick={updateRoomInfoFromLink}
+                                >
+                                    {validatingRoom ? (
+                                        <Spinner style={{ height: "18px" }} />
+                                    ) : roomConfigured ? (
+                                        "Change Room"
+                                    ) : (
+                                        "Add Room"
+                                    )}
+                                </PrimaryButton>
+                                {roomConfigured && (
+                                    <DangerButton
+                                        disabled={validatingRoom}
+                                        onClick={removeRoom}
+                                    >
+                                        Remove Room
+                                    </DangerButton>
+                                )}
+                            </ButtonRow>
                             {!!lastRoomError && <p>Error: {lastRoomError}</p>}
-                        </div>
-                        <div>
-                            <Input
-                                type="color"
-                                label="Color"
-                                value={multiColor}
-                                onChange={(e) => setMultiColor(e.target.value)}
-                            />
                         </div>
                     </>
                 )}

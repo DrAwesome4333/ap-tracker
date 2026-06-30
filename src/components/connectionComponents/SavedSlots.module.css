@@ -3,16 +3,21 @@
     width: 95%;
     justify-self: center;
     background-color: var(--background-level-2);
-    margin: 0.5rem 0.75rem;
+    margin: 0.5rem 0.5rem;
     padding: 0.5rem;
     box-shadow: var(--box-shadow);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    border-bottom: solid 0.125em var(--slot-color);
-    border-right: solid 0.125em var(--slot-color);
-    border-left: solid 0.125em var(--multi-world-color);
-    border-top: solid 0.125em var(--multi-world-color);
+    border-left: solid 0.25em var(--slot-color);
+}
+
+.saved_multi {
+    border-left: solid 0.25em var(--multi-world-color);
+    background-color: var(--background-level-1);
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.125rem 0.5rem 0.5rem;
+    box-shadow: var(--box-shadow);
 }
 
 .slot_actions {
@@ -49,7 +54,7 @@
     margin: 0 0.5em;
     scrollbar-gutter: stable;
     background-color: var(--background-level-0);
-    box-shadow: inset var(--box-shadow-small);
+    box-shadow: inset var(--box-shadow);
     --multi-world-color: #888888;
     --slot-color: #888888;
 }

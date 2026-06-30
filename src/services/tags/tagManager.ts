@@ -277,7 +277,6 @@ class TagManager implements LocationSource {
     };
 
     #updateTags = (tags: TagDataV2[]) => {
-        console.log(`Adding ${tags.length} tags`);
         let triggeredCallbacks: Set<() => void> = new Set();
         const affectedLocations: Set<number> = new Set();
         tags.forEach((tag) => {
@@ -331,7 +330,6 @@ class TagManager implements LocationSource {
     };
 
     #removeTags = (tagIds: TagId[]) => {
-        console.log(`Removing ${tagIds.length} tags`);
         let triggeredCallbacks: Set<() => void> = new Set();
         const tags = tagIds
             .map((tagId) => this.#tags.get(tagId))

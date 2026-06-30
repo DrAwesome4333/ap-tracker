@@ -21,7 +21,6 @@ const SavedSlotView = ({
 }) => {
     const colorVars = {
         "--slot-color": slot.color ?? "#888888",
-        "--multi-world-color": multiWorld.color ?? "#888888",
     } as React.CSSProperties;
     return (
         <div className={styles.saved_slot} style={{ ...colorVars }}>

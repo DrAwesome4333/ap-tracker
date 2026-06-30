@@ -45,21 +45,18 @@ const SavedSlotsView = ({
         <div className={styles.slots} {...props}>
             <h2>Saved Slots</h2>
             <div className={styles.slot_list}>
-                {/* {slots.length > 0 &&
-                    slots.map((slot) => (
-                        <SavedSlotView
-                            key={`${slot.multi_save_id}_${slot.slot_number}`}
-                            slot={slot}
-                            connect={() => onConnect({ slot })}
-                            edit={() => {
-                                setEditorSlot(slot);
-                            }}
-                            disabled={disabled}
-                        />
-                    ))} */}
                 {multiSlots.map((multiWorld) => (
-                    <React.Fragment key={multiWorld.multi_save_id}>
-                        <div>{multiWorld.multi_save_id}</div>
+                    <div
+                        className={styles.saved_multi}
+                        style={
+                            {
+                                "--multi-world-color":
+                                    multiWorld.color ?? "#888888",
+                            } as React.CSSProperties
+                        }
+                        key={multiWorld.multi_save_id}
+                    >
+                        <div>{multiWorld.title}</div>
                         {multiWorld.slots.map((slot) => (
                             <SavedSlotView
                                 key={`${slot.multi_save_id}_${slot.slot_number}`}
@@ -72,7 +69,7 @@ const SavedSlotsView = ({
                                 disabled={disabled}
                             />
                         ))}
-                    </React.Fragment>
+                    </div>
                 ))}
                 {slots.length === 0 && (
                     <div
