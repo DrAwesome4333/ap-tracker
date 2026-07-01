@@ -64,7 +64,12 @@ const TrackerScreen = () => {
     }, [showTextClient]);
 
     if (useTabLayout) {
-        return <Tabs tabs={tabs} style={{ width: "100%", height: "100%" }} />;
+        return (
+            <Tabs
+                tabs={tabs}
+                style={{ width: "100%", height: "100%", overflow: "scroll" }}
+            />
+        );
     }
     return (
         <div

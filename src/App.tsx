@@ -1,9 +1,4 @@
-import React, {
-    useCallback,
-    useEffect,
-    useState,
-    useSyncExternalStore,
-} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import MainHeader from "./components/header/MainHeader";
 import StartScreen from "./components/StartScreen/StartScreen";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
@@ -29,7 +24,6 @@ import { useAPColorStyles } from "./services/theme/ColorManager";
 import { useActivityContext } from "./hooks/activityHook";
 import ActivityContext from "./contexts/activityContext";
 import SlotContext from "./contexts/slotContext";
-import MultiWorldContext from "./services/MultiInfo/MultiWorldContext";
 import LocationRepository from "./services/locations/locationRepository";
 import ItemRepository from "./services/items/itemRepository";
 import APConnector, {
@@ -50,11 +44,6 @@ trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
 const textClientManager = new TextClientManager();
 
-// const tagManager = new TagManager();
-//tagManager.enableLocationEffects(locationRepository);
-//tagManager.addSource(locationTagger);
-//tagManager.addSource(hintTagger);
-// const locationTagger = new LocationTagger();
 const hintTagger = new HintTagger(optionManager);
 const hintManager = new HintManager(hintTagger);
 

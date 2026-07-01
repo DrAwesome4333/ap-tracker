@@ -1,4 +1,3 @@
-import React from "react";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../shared/buttons";
@@ -15,7 +14,7 @@ const TextClientFilterModal = ({
     return (
         <Modal
             open={open}
-            header={<h3>Filters</h3>}
+            header={<h3>Text Client Settings</h3>}
             footer={
                 <ButtonRow>
                     <GhostButton onClick={onClose}>Close</GhostButton>
