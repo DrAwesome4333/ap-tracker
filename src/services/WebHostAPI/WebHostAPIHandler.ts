@@ -41,6 +41,10 @@ class WebHostAPIHandler {
         return { ...this.#roomInfo };
     }
 
+    get roomLink() {
+        return `${this.#roomInfo.origin}/room/${this.#roomInfo.room_suuid}`;
+    }
+
     // static getGamePackage = async (checksum: string, origin = "https://archipelago.gg"): Promise<APIGamePackage> => {
     //     return fetchAsJson(`${origin}/api/datapackage/${checksum}`);
     // }

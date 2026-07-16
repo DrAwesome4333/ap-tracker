@@ -1,4 +1,4 @@
-import React, { KeyboardEventHandler, useState } from "react";
+import { KeyboardEventHandler, useState } from "react";
 import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";

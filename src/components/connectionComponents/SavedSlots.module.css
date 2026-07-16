@@ -73,3 +73,9 @@
     flex-direction: column;
     row-gap: 0.25em;
 }
+
+.multi_title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}

@@ -1,7 +1,7 @@
-import React from "react";
 import { MessageType } from "../../services/notifications/notifications";
 import { filledTextPrimary, secondary } from "../../constants/colors";
 import Spinner from "../icons/spinner";
+import Icon from "../icons/icons";
 const STATUS_HEIGHT_EM = 4;
 const StatusNotificationView = ({
     message,
@@ -22,16 +22,19 @@ const StatusNotificationView = ({
     hide: boolean;
 }) => {
     let boxColor = "grey";
-    let icon = "ⓘ";
+    let iconColor = "grey";
+    let icon = "info";
     switch (type) {
         case MessageType.error: {
             boxColor = "red";
-            icon = "❌";
+            icon = "bomb";
+            iconColor = "var(--danger-accent)";
             break;
         }
         case MessageType.info: {
             boxColor = "blue";
-            icon = "ⓘ";
+            icon = "info";
+            iconColor = "#FFFFFF";
             break;
         }
         case MessageType.progress: {
@@ -41,18 +44,20 @@ const StatusNotificationView = ({
         }
         case MessageType.success: {
             boxColor = "green";
-            icon = "✅";
+            icon = "check_circle";
+            iconColor = "#00AA00";
             break;
         }
         case MessageType.warning: {
             boxColor = "orange";
-            icon = "⚠️";
+            icon = "warning";
+            iconColor = "orange";
             break;
         }
 
         default: {
             boxColor = "grey";
-            icon = "ⓘ";
+            icon = "info";
             break;
         }
     }
@@ -92,18 +97,21 @@ const StatusNotificationView = ({
                     textAlign: "center",
                 }}
             />
-            <div
-                style={{
-                    gridColumn: "1 / span 1",
-                    gridRow: "1 /span 1",
-                    justifySelf: "center",
-                    alignSelf: "center",
-                    textAlign: "center",
-                    fontSize: "large",
-                }}
-            >
-                {icon}
-            </div>
+            {icon && (
+                <Icon
+                    type={icon}
+                    style={{
+                        gridColumn: "1 / span 1",
+                        gridRow: "1 /span 1",
+                        justifySelf: "center",
+                        alignSelf: "center",
+                        textAlign: "center",
+                        color: iconColor,
+                    }}
+                    fontSize="large"
+                />
+            )}
+
             <div
                 style={{
                     gridColumn: "2 / span 1",

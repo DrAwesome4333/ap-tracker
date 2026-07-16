@@ -27,6 +27,7 @@ const SlotDetails = ({
     }
 
     const [title, setTitle] = useState(slot?.title ?? "");
+    const [multiTitle, setMultiTitle] = useState(multiWorld?.title ?? "");
     const [host, setHost] = useState(multiWorld?.connection_details.host ?? "");
     const [port, setPort] = useState(multiWorld?.connection_details.port ?? "");
     const [password, setPassword] = useState(
@@ -47,6 +48,7 @@ const SlotDetails = ({
 
     useEffect(() => {
         setTitle(slot?.title ?? "");
+        setMultiTitle(multiWorld?.title);
         setHost(multiWorld?.connection_details.host ?? "");
         setPort(multiWorld?.connection_details.port ?? "");
         setPassword(multiWorld?.connection_details.password ?? "");
@@ -62,6 +64,7 @@ const SlotDetails = ({
             });
             MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
                 color: multiColor,
+                title: multiTitle,
                 connection_details: {
                     host,
                     port,
@@ -179,8 +182,17 @@ const SlotDetails = ({
                         <div>
                             <Input
                                 type="text"
+                                label="Title"
+                                value={multiTitle}
+                                onChange={(e) => setMultiTitle(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                type="text"
                                 label="Host"
                                 value={host}
+                                disabled={roomConfigured}
                                 onChange={(e) => setHost(e.target.value)}
                             />
                         </div>
@@ -189,6 +201,7 @@ const SlotDetails = ({
                                 type="text"
                                 label="Port"
                                 value={port}
+                                disabled={roomConfigured}
                                 onChange={(e) => setPort(e.target.value)}
                             />
                         </div>
@@ -242,6 +255,7 @@ const SlotDetails = ({
                             />
                             <ButtonRow>
                                 <PrimaryButton
+                                    small
                                     disabled={!roomLink || validatingRoom}
                                     onClick={updateRoomInfoFromLink}
                                 >
@@ -255,6 +269,7 @@ const SlotDetails = ({
                                 </PrimaryButton>
                                 {roomConfigured && (
                                     <DangerButton
+                                        small
                                         disabled={validatingRoom}
                                         onClick={removeRoom}
                                     >

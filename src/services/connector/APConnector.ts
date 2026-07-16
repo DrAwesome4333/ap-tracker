@@ -1,4 +1,4 @@
-import { API, Client } from "archipelago.js";
+import { API, Client, SocketError } from "archipelago.js";
 import { Item, ItemSource, ItemUpdateCallback } from "../items/itemSource";
 import {
     LocationStatus,
@@ -7,7 +7,6 @@ import {
     LocationUpdateCallback,
     LocationStatusUpdate,
 } from "../locations/locationSource";
-import { ConnectorValidationError } from "./connectorMessages";
 import MultiWorldContext from "../MultiInfo/MultiWorldContext";
 import { LocalStorageDataStore } from "../dataStores";
 import { randomUUID } from "../../utility/uuid";
@@ -17,6 +16,10 @@ import DataPackageHelper from "../MultiInfo/DatapackageHelper";
 import TextClientManager from "../textClientManager";
 import { setupAPTextSync } from "./textSync";
 import HintManager from "../HintManager";
+import WebHostAPIHandler from "../WebHostAPI";
+import NotificationManager, {
+    MessageType,
+} from "../notifications/notifications";
 
 interface ConnectionConfiguration {
     host?: string;
@@ -45,6 +48,14 @@ type ConnectedEventParams = {
 };
 
 const clientUuidStore = new LocalStorageDataStore("ap-checklist-client-uuid");
+
+const validationError = (message: string, duration: number = 5) => {
+    NotificationManager.createToast({
+        message,
+        type: MessageType.warning,
+        duration,
+    });
+};
 
 class APConnector implements LocationSource, ItemSource {
     readonly client: Client = null;
@@ -129,14 +140,12 @@ class APConnector implements LocationSource, ItemSource {
 
     connect = async (config: ConnectionConfiguration) => {
         if (this.status === ConnectionStatus.connected) {
-            throw new Error("Tracker already connected.", {
-                cause: ConnectorValidationError.alreadyConnected,
-            });
+            validationError("Already connected.");
+            return null;
         }
         if (this.status === ConnectionStatus.connecting) {
-            throw new Error("Tracker already connecting.", {
-                cause: ConnectorValidationError.alreadyConnecting,
-            });
+            validationError("Already connecting.");
+            return null;
         }
 
         let multiSlot = config.multi_slot;
@@ -154,25 +163,55 @@ class APConnector implements LocationSource, ItemSource {
                 multiSlot.slot_number
             );
             if (!multiWorldInfo || !slotInfo) {
-                throw new Error(
-                    `Could not find slot info for multi world ${multiSlot.multi_save_id} slot ${multiSlot.slot_number}`,
-                    { cause: ConnectorValidationError.slotNotFound }
+                validationError(
+                    "Failed to load saved multi-world, data may be corrupt or missing.",
+                    10
                 );
             }
+
             ({ host, port, password } = multiWorldInfo.connection_details);
+            if (multiWorldInfo.room_details?.room_suuid) {
+                const apiHandler = new WebHostAPIHandler(
+                    multiWorldInfo.room_details
+                );
+                const roomStatus = await apiHandler.getRoomStatus();
+                const newPort = roomStatus.last_port.toString();
+                const lastActivity = Date.parse(roomStatus.last_activity);
+                const isAwake =
+                    Date.now() - lastActivity < roomStatus.timeout * 1000;
+                if (!isAwake) {
+                    NotificationManager.createToast({
+                        message: "The room is asleep",
+                        type: MessageType.warning,
+                        details: `Your room hasn't been active for a while, you need to open the room page to wake it up.`,
+                        action: () =>
+                            window?.open(apiHandler.roomLink, "_blank"),
+                        actionName: "Open Room Page",
+                    });
+                    return null;
+                }
+
+                if (newPort !== port) {
+                    NotificationManager.createToast({
+                        message: "Your room's port has changed!",
+                        type: MessageType.info,
+                        details: `Your new port is ${newPort}, previously it was ${port}`,
+                        duration: 5,
+                    });
+                    port = newPort;
+                }
+            }
             slotName = slotInfo.slot_name;
         }
 
         if (host.trim().length === 0) {
-            throw new Error("Please provide a host name", {
-                cause: ConnectorValidationError.invalidHost,
-            });
+            validationError("Please provide a host name");
+            return null;
         }
 
         if (slotName.trim().length === 0) {
-            throw new Error("Please provide a slot name", {
-                cause: ConnectorValidationError.invalidSlotName,
-            });
+            validationError("Please provide a slot name");
+            return null;
         }
 
         if (!port) {
@@ -180,6 +219,11 @@ class APConnector implements LocationSource, ItemSource {
         }
 
         this.#setStatus(ConnectionStatus.connecting);
+        const connectionStatusHandle = NotificationManager.createStatus({
+            message: "Connecting to server",
+            type: MessageType.progress,
+            progress: -1,
+        });
 
         return this.client
             .login(`${host}:${port}`, slotName, undefined, {
@@ -232,6 +276,7 @@ class APConnector implements LocationSource, ItemSource {
                         slot_number: slotNumber,
                     };
                 }
+
                 // resolve(MultiWorldContext.getSlot(multiSlot.multi_save_id, slotNumber));
                 // update time stamp
                 MultiWorldContext.updateSlot(
@@ -246,6 +291,10 @@ class APConnector implements LocationSource, ItemSource {
                     multiSlot.multi_save_id,
                     slotNumber
                 );
+
+                MultiWorldContext.updateMultiWorld(multiSlot.multi_save_id, {
+                    connection_details: { host, port, password },
+                });
 
                 const dataPackage = this.client.package.exportPackage();
                 const getGroups = async (): Promise<{
@@ -285,6 +334,9 @@ class APConnector implements LocationSource, ItemSource {
                 }
                 enableDataSync(this.client);
                 let wrappedGamePackage: GamePackageWrapper = null;
+                connectionStatusHandle.update({
+                    message: "Loading data packages...",
+                });
                 await DataPackageHelper.getCachedPackage(
                     game,
                     dataPackage.games[game].checksum
@@ -330,12 +382,78 @@ class APConnector implements LocationSource, ItemSource {
                 this.#connectedCallbacks.forEach((callback) =>
                     callback(result)
                 );
+                connectionStatusHandle.update({
+                    message: "Connected",
+                    duration: 3,
+                    type: MessageType.success,
+                    progress: 1,
+                });
                 return result;
             })
             .catch((error) => {
+                connectionStatusHandle.update({
+                    message: "Connection failed",
+                    duration: 3,
+                    type: MessageType.error,
+                    progress: 0,
+                });
                 this.client.socket.disconnect();
                 this.#setStatus(ConnectionStatus.disconnected);
-                throw error;
+                const errorString = `\n\nOriginal Error:\n\t${error}`;
+                if (error?.errors) {
+                    const e = error.errors[0];
+                    switch (e) {
+                        case "InvalidSlot": {
+                            NotificationManager.createToast({
+                                message: `Failed to connect to slot. The slot name was invalid.`,
+                                type: MessageType.warning,
+                                details: `An Archipelago server was running at ${host}:${port}, but "${slotName}" was not a player in that server.
+Please verify you have the correct slot details.${errorString}`,
+                            });
+                            return null;
+                        }
+                        default: {
+                            NotificationManager.createToast({
+                                message: "Failed to connect",
+                                type: MessageType.error,
+                                details: `Failed to connect to the slot for the following reason: ${e}.${errorString}`,
+                            });
+                            return null;
+                        }
+                    }
+                } else if (["localhost", "127.0.0.1"].includes(host)) {
+                    NotificationManager.createToast({
+                        type: MessageType.error,
+                        message: "Failed to connect to server",
+                        details: `Failed to connect to your locally hosted server on port ${port}.\nPlease Verify the port is correct (visible in server console) and the server is running.${errorString}`,
+                    });
+                    return null;
+                } else if (["archipelago.gg"].includes(host)) {
+                    NotificationManager.createToast({
+                        type: MessageType.error,
+                        message: "Failed to connect to server",
+                        details: `Failed to connect to the server on port ${port}.\nPlease Verify the port is correct and has not changed (visible on the room page).
+You can restart the server by refreshing the room page if it has gone to sleep after 2 hours.${errorString}`,
+                    });
+                    return null;
+                }
+                const wssRequired = window?.location.protocol === "https:";
+                NotificationManager.createToast({
+                    type: MessageType.error,
+                    message: "An unexpected error occurred",
+                    details: `Failed to connect to the server at ${host}:${port}.\n\nPlease verify the host and port are correct and the server is running (check with your server host).
+${wssRequired ? "\n\nNote this version of the app requires secure websockets (wss) to be enabled on the server, if you see a security related error below, that remote server may not be secured.\n\nUse the local download version of the app available on GitHub (link below)." : ""}
+                    ${errorString}`,
+                    action: wssRequired
+                        ? () =>
+                              window.open(
+                                  "https://github.com/DrAwesome4333/ap-tracker#running-locally",
+                                  "_blank"
+                              )
+                        : undefined,
+                    actionName: wssRequired ? "Go to GitHub" : undefined,
+                });
+                return null;
             });
     };
 

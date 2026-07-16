@@ -105,18 +105,30 @@ const NotePad = ({
     }, [loading, noteContent]);
 
     useEffect(() => {
-        if (noteContent === "" && !disabled && !loading && !initialLoad) {
+        if (
+            noteContent === "" &&
+            !disabled &&
+            !loading &&
+            !initialLoad &&
+            open
+        ) {
             setInitialLoad(true);
             retrieveNote();
         }
-    }, [disabled, noteContent, retrieveNote, loading, initialLoad]);
+    }, [disabled, noteContent, retrieveNote, loading, initialLoad, open]);
     return (
         <Modal
             open={open}
             header={
                 <div className={styles.note_header}>
-                    <h3>Notepad</h3>
-                    {loading ? <Spinner /> : unsavedChanges ? " Not saved" : ""}
+                    <h3 style={{ display: "inline-block" }}>Notepad</h3>
+                    {loading ? (
+                        <Spinner />
+                    ) : unsavedChanges ? (
+                        "\tNot saved"
+                    ) : (
+                        ""
+                    )}
                 </div>
             }
             footer={

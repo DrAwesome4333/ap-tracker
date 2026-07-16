@@ -37,6 +37,8 @@ interface ToastNotification {
     type: MessageType;
     message: string;
     details?: string;
+    actionName?: string;
+    action?: () => void;
     duration: number;
     id: string;
 }
@@ -58,6 +60,8 @@ const NotificationManager = (() => {
         type,
         details,
         id,
+        action,
+        actionName,
         duration = 7,
     }: {
         message: string;
@@ -65,6 +69,8 @@ const NotificationManager = (() => {
         type: MessageType;
         id?: string;
         duration?: number;
+        action?: () => void;
+        actionName?: string;
     }) => {
         const toast: ToastNotification = {
             type,
@@ -72,6 +78,8 @@ const NotificationManager = (() => {
             details,
             duration: duration * 1000,
             id: id ?? randomId(),
+            action,
+            actionName,
         };
 
         toastListeners.forEach((listener) => {

@@ -7,12 +7,13 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import Toast from "./toastNotification";
 import styles from "./notification.module.css";
-import { SecondaryButton } from "../shared/buttons";
+import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Modal from "../shared/Modal";
 import ServiceContext from "../../contexts/serviceContext";
 import useOption from "../../hooks/optionHook";
 import { readThemeValue } from "../../services/theme/theme";
 import StatusNotificationView from "./statusNotification";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 interface ToastNotificationData {
     notification: ToastNotification;
@@ -22,6 +23,8 @@ interface ToastNotificationData {
     remainingTime: number;
     duration: number;
     details?: string;
+    actionName?: string;
+    action?: () => void;
     timed?: boolean;
 }
 
@@ -76,6 +79,8 @@ const toastNotificationReducer = (
                     remainingTime: action.data.notification.duration,
                     duration: action.data.notification.duration,
                     details: action.data.notification.details,
+                    action: action.data.notification.action,
+                    actionName: action.data.notification.actionName,
                 });
             } else {
                 // update an older one
@@ -247,15 +252,29 @@ const NotificationContainer = () => {
                                 </h3>
                             }
                             footer={
-                                <SecondaryButton
-                                    style={{ gridArea: "close" }}
-                                    small
-                                    onClick={() => {
-                                        setDetailModalOpen(false);
-                                    }}
-                                >
-                                    Close
-                                </SecondaryButton>
+                                <ButtonRow>
+                                    {toastNotifications[detailIndex].action && (
+                                        <PrimaryButton
+                                            onClick={
+                                                toastNotifications[detailIndex]
+                                                    .action
+                                            }
+                                        >
+                                            {toastNotifications[detailIndex]
+                                                .actionName ??
+                                                "<No Action Name>"}
+                                        </PrimaryButton>
+                                    )}
+
+                                    <SecondaryButton
+                                        small
+                                        onClick={() => {
+                                            setDetailModalOpen(false);
+                                        }}
+                                    >
+                                        Close
+                                    </SecondaryButton>
+                                </ButtonRow>
                             }
                         >
                             <div

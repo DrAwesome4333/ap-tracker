@@ -27,7 +27,7 @@ const SavedSlotView = ({
             <div>
                 <div style={{ fontWeight: "bold" }}>{slot.title}</div>
                 <div>{slot.game}</div>
-                <div style={{ fontStyle: "italic" }}>
+                {/* <div style={{ fontStyle: "italic" }}>
                     {new Date(slot.last_used_timestamp).toLocaleTimeString([], {
                         year: "numeric",
                         month: "numeric",
@@ -35,7 +35,7 @@ const SavedSlotView = ({
                         hour: "2-digit",
                         minute: "2-digit",
                     })}
-                </div>
+                </div> */}
             </div>
             <div className={styles.slot_actions}>
                 <PrimaryButton small disabled={disabled} onClick={connect}>

@@ -1,7 +1,6 @@
-import React, { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import NewConnection from "../connectionComponents/NewConnection";
 import SavedSlotsView from "../connectionComponents/SavedSlotsView";
-import Modal from "../shared/Modal";
 import styles from "./StartScreen.module.css";
 import { PrimaryButton } from "../shared/buttons";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
@@ -19,10 +18,11 @@ const StartScreen = () => {
     const connector = serviceContext.connector;
     const connectToServer = useCallback(
         (connectionInfo: ConnectionConfiguration) => {
+            setNewModalOpen(false);
             connector
                 ?.connect(connectionInfo)
-                .then(() => {
-                    activityContext.add("slot-tracker");
+                .then((success) => {
+                    if (success) activityContext.add("slot-tracker");
                 })
                 .catch((result) => {
                     if (result instanceof Error) {

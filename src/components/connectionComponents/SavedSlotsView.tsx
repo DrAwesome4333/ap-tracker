@@ -7,6 +7,7 @@ import SavedSlotView from "./SavedSlotView";
 import styles from "./SavedSlots.module.css";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
+import { PrimaryButton } from "../shared/buttons";
 
 const SavedSlotsView = ({
     connectToServer,
@@ -56,7 +57,12 @@ const SavedSlotsView = ({
                         }
                         key={multiWorld.multi_save_id}
                     >
-                        <div>{multiWorld.title}</div>
+                        <div className={styles.multi_title}>
+                            <div>{multiWorld.title}</div>
+                            {multiWorld.room_details?.tracker_suuid && (
+                                <PrimaryButton small>View</PrimaryButton>
+                            )}
+                        </div>
                         {multiWorld.slots.map((slot) => (
                             <SavedSlotView
                                 key={`${slot.multi_save_id}_${slot.slot_number}`}
