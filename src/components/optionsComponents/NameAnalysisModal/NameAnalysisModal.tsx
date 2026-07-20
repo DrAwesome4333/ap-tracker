@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+    useContext,
+    useEffect,
+    useEffectEvent,
+    useRef,
+    useState,
+} from "react";
 import Modal from "../../shared/Modal";
 import styles from "./NameAnalysis.module.css";
 import ButtonRow from "../../LayoutUtilities/ButtonRow";
@@ -25,6 +31,10 @@ import ItemRepository from "../../../services/items/itemRepository";
 import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 import LocationRepository from "../../../services/locations/locationRepository";
 import SlotContext from "../../../contexts/slotContext";
+import MultiWorldContext from "../../../services/MultiInfo/MultiWorldContext";
+import DataPackageHelper from "../../../services/MultiInfo/DatapackageHelper";
+import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
+import TemplateLocationSource from "../../../services/tracker/generic/locationTrackerGenerators/templateLocationSource";
 
 interface AdditionalParams {
     minChecksPerGroup?: number;
@@ -32,9 +42,6 @@ interface AdditionalParams {
     maxDepth?: number;
 }
 
-const previewLocationRepository = new LocationRepository();
-const previewItemRepository = new ItemRepository();
-const templateLocationTracker = new TemplateLocationTracker();
 const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
@@ -46,9 +53,71 @@ const NameAnalysisModal = ({
 }) => {
     const services = useContext(ServiceContext);
     const mainTrackerManager = services.trackerManager;
-    // const connection = services.connector.connection;
     const slot = useCurrentMultiworldSlot();
     const customTrackerRepository = services.customTrackerRepository;
+
+    const [locationRepository, setLocationRepository] =
+        useState<LocationRepository>(null);
+    const [templateLocationTracker, setTemplateLocationTracker] =
+        useState<TemplateLocationTracker>(null);
+    const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
+
+    const loadDataPackage = async () => {
+        if (!slot || !slot.game || !slot.multi_save_id) {
+            return null;
+        }
+        const multiworld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        const dataPackageHash = multiworld?.data_package_details[slot.game];
+        const cachedPackage = await DataPackageHelper.getCachedPackage(
+            slot.game,
+            dataPackageHash
+        );
+        if (!cachedPackage) {
+            NotificationManager.createToast({
+                message: "Failed to load game's data package",
+                details:
+                    "Could not find the current game's data package to generate tracker file. Please reload the page and try again.",
+                type: MessageType.error,
+                duration: 5,
+            });
+            return null;
+        }
+        return cachedPackage;
+    };
+
+    const resetTemplateRepository = useEffectEvent(async () => {
+        const dataPackage = await loadDataPackage();
+        const newLocationRepository = new LocationRepository();
+        const packageWrapper = dataPackage
+            ? new GamePackageWrapper(dataPackage, slot.game)
+            : null;
+        if (packageWrapper) {
+            const locationSource = new TemplateLocationSource(packageWrapper);
+            newLocationRepository.addSource(locationSource);
+        }
+        setLocationRepository(newLocationRepository);
+        setGamePackage(packageWrapper);
+    });
+
+    const resetTemplate = useEffectEvent(() => {
+        if (open && gamePackage) {
+            const newTemplateLocationTracker = new TemplateLocationTracker(
+                gamePackage
+            );
+            newTemplateLocationTracker.configure(
+                GenericGameMethod.nameAnalysis,
+                {
+                    tokenOptions,
+                    groupRequirements: {
+                        minGroupSize: otherOptions.minChecksPerGroup,
+                        maxDepth: otherOptions.maxDepth,
+                        minTokenCount: otherOptions.minTokenCount,
+                    },
+                }
+            );
+            setTemplateLocationTracker(newTemplateLocationTracker);
+        }
+    });
 
     const [tokenOptions, setTokenOptions]: [
         NameTokenizationOptions,
@@ -95,37 +164,12 @@ const NameAnalysisModal = ({
     };
 
     useEffect(() => {
-        if (slot?.game && open) {
-            // previewLocationManager.pauseUpdateBroadcast();
-            // previewLocationManager.deleteAllLocations();
-            // connection.slotInfo.groups.location["Everywhere"].forEach(
-            //     (location) => {
-            //         previewLocationManager.updateLocationStatus(
-            //             previewSourceId,
-            //             location,
-            //             {
-            //                 exists: true,
-            //             }
-            //         );
-            //     }
-            // );
-            // previewLocationManager.resumeUpdateBroadcast();
-        }
-        if (open) {
-            // templateLocationTracker.configure(
-            //     connection.slotInfo.groups,
-            //     GenericGameMethod.nameAnalysis,
-            //     {
-            //         tokenOptions,
-            //         groupRequirements: {
-            //             minGroupSize: otherOptions.minChecksPerGroup,
-            //             maxDepth: otherOptions.maxDepth,
-            //             minTokenCount: otherOptions.minTokenCount,
-            //         },
-            //     }
-            // );
-        }
-    }, [mainTrackerManager, tokenOptions, otherOptions, open]);
+        resetTemplateRepository();
+    }, [slot]);
+
+    useEffect(() => {
+        resetTemplate();
+    }, [mainTrackerManager, tokenOptions, otherOptions, open, gamePackage]);
 
     return (
         <Modal
@@ -185,6 +229,7 @@ const NameAnalysisModal = ({
                                 `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
                                 customTrackerExport
                             );
+                            onClose();
                         }}
                     >
                         Export <Icon type="download" fontSize="14px" />
@@ -213,6 +258,8 @@ const NameAnalysisModal = ({
                                 slotAlias: "Example Slot Alias",
                                 tagManager: previewTagManager,
                                 locationTracker: templateLocationTracker,
+                                locationRepository: locationRepository,
+                                liveSlot: false,
                             }}
                         >
                             <SectionView name="root" />

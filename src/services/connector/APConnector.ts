@@ -1,4 +1,4 @@
-import { API, Client, SocketError } from "archipelago.js";
+import { API, Client } from "archipelago.js";
 import { Item, ItemSource, ItemUpdateCallback } from "../items/itemSource";
 import {
     LocationStatus,
@@ -19,6 +19,7 @@ import HintManager from "../HintManager";
 import WebHostAPIHandler from "../WebHostAPI";
 import NotificationManager, {
     MessageType,
+    StatusNotificationHandle,
 } from "../notifications/notifications";
 
 interface ConnectionConfiguration {
@@ -49,12 +50,24 @@ type ConnectedEventParams = {
 
 const clientUuidStore = new LocalStorageDataStore("ap-checklist-client-uuid");
 
-const validationError = (message: string, duration: number = 5) => {
+const validationError = (
+    message: string,
+    duration: number = 5,
+    statusHandler: StatusNotificationHandle = null
+) => {
     NotificationManager.createToast({
         message,
         type: MessageType.warning,
         duration,
     });
+    if (statusHandler) {
+        statusHandler.update({
+            message: "Validation failed",
+            type: MessageType.warning,
+            duration: 3,
+            progress: 0,
+        });
+    }
 };
 
 class APConnector implements LocationSource, ItemSource {
@@ -154,6 +167,12 @@ class APConnector implements LocationSource, ItemSource {
         let password = config.password;
         let slotName = config.slot_name;
 
+        const connectionStatusHandle = NotificationManager.createStatus({
+            message: "Validating details",
+            type: MessageType.progress,
+            progress: -1,
+        });
+
         if (multiSlot) {
             const multiWorldInfo = MultiWorldContext.getMultiWorld(
                 multiSlot.multi_save_id
@@ -165,12 +184,16 @@ class APConnector implements LocationSource, ItemSource {
             if (!multiWorldInfo || !slotInfo) {
                 validationError(
                     "Failed to load saved multi-world, data may be corrupt or missing.",
-                    10
+                    10,
+                    connectionStatusHandle
                 );
             }
 
             ({ host, port, password } = multiWorldInfo.connection_details);
             if (multiWorldInfo.room_details?.room_suuid) {
+                connectionStatusHandle.update({
+                    message: "Checking room status",
+                });
                 const apiHandler = new WebHostAPIHandler(
                     multiWorldInfo.room_details
                 );
@@ -180,6 +203,12 @@ class APConnector implements LocationSource, ItemSource {
                 const isAwake =
                     Date.now() - lastActivity < roomStatus.timeout * 1000;
                 if (!isAwake) {
+                    connectionStatusHandle.update({
+                        type: MessageType.warning,
+                        duration: 3,
+                        message: "The room is asleep",
+                        progress: 0,
+                    });
                     NotificationManager.createToast({
                         message: "The room is asleep",
                         type: MessageType.warning,
@@ -205,12 +234,20 @@ class APConnector implements LocationSource, ItemSource {
         }
 
         if (host.trim().length === 0) {
-            validationError("Please provide a host name");
+            validationError(
+                "Please provide a host name",
+                5,
+                connectionStatusHandle
+            );
             return null;
         }
 
         if (slotName.trim().length === 0) {
-            validationError("Please provide a slot name");
+            validationError(
+                "Please provide a slot name",
+                5,
+                connectionStatusHandle
+            );
             return null;
         }
 
@@ -219,7 +256,7 @@ class APConnector implements LocationSource, ItemSource {
         }
 
         this.#setStatus(ConnectionStatus.connecting);
-        const connectionStatusHandle = NotificationManager.createStatus({
+        connectionStatusHandle.update({
             message: "Connecting to server",
             type: MessageType.progress,
             progress: -1,

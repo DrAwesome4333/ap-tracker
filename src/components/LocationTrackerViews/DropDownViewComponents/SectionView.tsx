@@ -208,7 +208,7 @@ const SectionView = ({
         let sectionCleared = sectionClearCache[sectionName];
         if (sectionCleared === undefined) {
             const sectionLocations = new Set(
-                sectionInQuestion.trackedLocations
+                sectionInQuestion?.trackedLocations ?? []
             );
             sectionCleared = trackedLocations
                 .filter((l) => sectionLocations.has(l.locationId))
@@ -216,7 +216,7 @@ const SectionView = ({
             sectionClearCache[sectionName] = sectionCleared;
         }
         return (
-            sectionInQuestion.trackedLocations.length > 0 &&
+            sectionInQuestion?.trackedLocations.length > 0 &&
             (clearedSectionBehavior !== "hide" || !sectionCleared)
         );
     };

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import styles from "./CreateCustomTrackerModal.module.css";
 import Modal from "../../shared/Modal";
 import {
@@ -27,6 +27,10 @@ import GenericItemTracker from "../../../services/tracker/generic/GenericItemTra
 import { randomUUID } from "../../../utility/uuid";
 import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
+import DataPackageHelper from "../../../services/MultiInfo/DatapackageHelper";
+import MultiWorldContext from "../../../services/MultiInfo/MultiWorldContext";
+import GenericTrackerRepository from "../../../services/tracker/generic/genericTrackerRepository";
+import EmptyGamePackageWrapper from "../../../services/gamepackage/EmptyGamePackageWrapper";
 
 const CreateCustomTrackerModal = ({
     open,
@@ -42,6 +46,43 @@ const CreateCustomTrackerModal = ({
     const customTrackerRepository = services.customTrackerRepository;
     const trackerManager = services.trackerManager;
     const optionManager = services.optionManager;
+    const genericTrackerRepository = useMemo(
+        () => new GenericTrackerRepository(optionManager),
+        [optionManager]
+    );
+
+    const loadDataPackage = async () => {
+        if (!slot || !slot.game || !slot.multi_save_id) {
+            return null;
+        }
+        const multiworld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        const dataPackageHash = multiworld?.data_package_details[slot.game];
+        const cachedPackage = await DataPackageHelper.getCachedPackage(
+            slot.game,
+            dataPackageHash
+        );
+        if (!cachedPackage) {
+            NotificationManager.createToast({
+                message: "Failed to load game's data package",
+                details:
+                    "Could not find the current game's data package to generate tracker file. Please reload the page and try again.",
+                type: MessageType.error,
+                duration: 5,
+            });
+            return null;
+        }
+        if (!cachedPackage.location_groups) {
+            NotificationManager.createToast({
+                message: "Game data package is incomplete",
+                details:
+                    "The game's data package is missing important details to generate a tracker file. Please reload the page and try again.",
+                type: MessageType.error,
+                duration: 5,
+            });
+            return null;
+        }
+        return cachedPackage;
+    };
 
     /**
      * Passes the contents of a file to the CustomTrackerManager
@@ -68,16 +109,7 @@ const CreateCustomTrackerModal = ({
                             data.manifest.type === ResourceType.locationTracker
                         ) {
                             testTracker = new CustomLocationTracker(
-                                new GamePackageWrapper(
-                                    {
-                                        location_name_to_id: {},
-                                        item_name_to_id: {},
-                                        checksum: "",
-                                        location_groups: {},
-                                        item_groups: {},
-                                    },
-                                    ""
-                                ),
+                                new EmptyGamePackageWrapper(),
                                 data as CustomLocationTrackerDef_V2
                             );
                         } else if (
@@ -90,16 +122,7 @@ const CreateCustomTrackerModal = ({
                         }
                     } else if ("customTrackerVersion" in data) {
                         testTracker = new CustomLocationTracker(
-                            new GamePackageWrapper(
-                                {
-                                    location_name_to_id: {},
-                                    item_name_to_id: {},
-                                    checksum: "",
-                                    location_groups: {},
-                                    item_groups: {},
-                                },
-                                ""
-                            ),
+                            new EmptyGamePackageWrapper(),
                             data as CustomLocationTrackerDef_V1
                         );
                     }
@@ -223,20 +246,21 @@ const CreateCustomTrackerModal = ({
                             >
                                 <PrimaryButton
                                     disabled={!slot?.game}
-                                    onClick={() => {
-                                        // const trackerJSON =
-                                        //     LocationGroupCategoryGenerator.generateSectionDef(
-                                        //         connector.slotInfo.groups
-                                        //             .location
-                                        //     );
-                                        // trackerJSON.manifest.game =
-                                        //     slot.game;
-                                        // trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
-                                        // exportJSONFile(
-                                        //     `tracker-export-${slot.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
-                                        //     trackerJSON,
-                                        //     true
-                                        // );
+                                    onClick={async () => {
+                                        const cachedPackage =
+                                            await loadDataPackage();
+                                        const trackerJSON =
+                                            LocationGroupCategoryGenerator.generateSectionDef(
+                                                cachedPackage.location_groups
+                                            );
+                                        trackerJSON.manifest.game = slot.game;
+                                        trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
+
+                                        exportJSONFile(
+                                            `tracker-export-${slot.game.replace(/\s/g, "")}-${trackerJSON.manifest.uuid.substring(0, 8)}`,
+                                            trackerJSON,
+                                            true
+                                        );
                                     }}
                                 >
                                     Location Group{" "}
@@ -246,7 +270,7 @@ const CreateCustomTrackerModal = ({
                                     disabled={!slot?.game}
                                     onClick={async () => {
                                         const trackerId =
-                                            services.genericTrackerRepository.resources.filter(
+                                            genericTrackerRepository.resources.filter(
                                                 (manifest) =>
                                                     manifest.type ===
                                                     ResourceType.itemTracker
@@ -254,11 +278,19 @@ const CreateCustomTrackerModal = ({
                                         if (!trackerId) {
                                             return;
                                         }
+                                        const cachedPackage =
+                                            await loadDataPackage();
+                                        const gamePackage =
+                                            new GamePackageWrapper(
+                                                cachedPackage,
+                                                slot.game
+                                            );
                                         const tracker =
-                                            await services.genericTrackerRepository.loadResource(
+                                            await genericTrackerRepository.loadResource(
                                                 trackerId.uuid,
                                                 trackerId.version,
-                                                trackerId.type
+                                                trackerId.type,
+                                                gamePackage
                                             );
                                         const trackerJSON = (
                                             tracker as GenericItemTracker

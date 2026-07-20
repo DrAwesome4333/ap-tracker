@@ -216,6 +216,7 @@ const ChecklistSettings = ({
                             locationRepository: mockLocationRepository,
                             slotName: "Mock Slot Name",
                             tagManager: mockTagManager,
+                            liveSlot: false,
                         }}
                     >
                         <SectionView name="root" startOpen />
