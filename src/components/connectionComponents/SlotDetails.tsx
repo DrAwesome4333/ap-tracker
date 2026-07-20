@@ -91,8 +91,45 @@ const SlotDetails = ({
         setLastRoomError("");
         setValidatingRoom(true);
         await WebHostAPIHandler.parseRoomLink(roomLink)
-            .then((roomInfo) => {
+            .then(async (roomInfo) => {
                 const handler = new WebHostAPIHandler(roomInfo);
+                const staticTracker = await handler.getStaticTracker();
+                const roomStatus = await handler.getRoomStatus();
+                const allSlots = MultiWorldContext.findAllSlotsForMultiWorld(
+                    multiWorld.multi_save_id
+                );
+                // validate some properties for the multiworld match
+                const dataPackageCompare = (
+                    a: [string, unknown],
+                    b: [string, unknown]
+                ) => (a[0] < b[0] ? 1 : -1);
+                const currentPackages = Object.entries(
+                    multiWorld.data_package_details
+                );
+                currentPackages.sort(dataPackageCompare);
+                const roomPackages = Object.entries(staticTracker.datapackage);
+                roomPackages.sort(dataPackageCompare);
+
+                if (
+                    currentPackages.length !== roomPackages.length ||
+                    currentPackages.some(
+                        ([_game, checksum], index) =>
+                            roomPackages[index][1].checksum !== checksum
+                    ) ||
+                    allSlots.some(
+                        (mwSlot) =>
+                            roomStatus.players[mwSlot.slot_number - 1][0] !==
+                                mwSlot.slot_name ||
+                            roomStatus.players[mwSlot.slot_number - 1][1] !==
+                                mwSlot.game
+                    )
+                ) {
+                    throw new Error(
+                        "Room does not match this slot's multi-world",
+                        { cause: "verification" }
+                    );
+                }
+
                 MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
                     room_details: roomInfo,
                 });
