@@ -31,6 +31,12 @@ type LocationId = number;
 type SlotNumber = number;
 type ItemFlags = number;
 type APIItem = [ItemId, LocationId, SlotNumber, ItemFlags];
+enum APIOffsets_Item {
+    itemId = 0,
+    locationId = 1,
+    slotNumber = 2,
+    itemFlags = 3,
+}
 
 type ReceivingPlayer = number;
 type FindingPlayer = number;
@@ -126,3 +132,5 @@ export type {
     APIStaticTracker,
     RoomInfo,
 };
+
+export { APIOffsets_Item };

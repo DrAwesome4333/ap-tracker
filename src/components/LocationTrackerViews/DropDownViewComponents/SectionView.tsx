@@ -225,7 +225,7 @@ const SectionView = ({
         const result = section?.children.filter(sectionFilter) ?? [];
         result.sort(sectionCompare);
         return result;
-    }, [section?.children, trackedLocations]);
+    }, [section?.children, trackedLocations, clearedSectionBehavior]);
 
     return (
         <>

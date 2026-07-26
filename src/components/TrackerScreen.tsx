@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import InventoryView from "./inventoryComponents/InventoryView";
 import ServiceContext from "../contexts/serviceContext";
 import useOption from "../hooks/optionHook";

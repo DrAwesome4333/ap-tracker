@@ -8,7 +8,7 @@ import HintManager from "../services/HintManager";
 import { LocationTagger } from "../services/tags/LocationTagger";
 import { GamePackageWrapper } from "../services/gamepackage/GamePackageWrapper";
 
-const SlotContext: React.Context<{
+type SlotContextData = {
     game?: string;
     slotName?: string;
     slotAlias?: string;
@@ -23,6 +23,9 @@ const SlotContext: React.Context<{
     locationTagger?: LocationTagger;
     gamePackage?: GamePackageWrapper;
     liveSlot: boolean;
-}> = createContext({});
+};
+
+const SlotContext: React.Context<SlotContextData> = createContext({});
 
 export default SlotContext;
+export type { SlotContextData };

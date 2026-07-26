@@ -1,4 +1,9 @@
-import React, { useCallback, useState, useSyncExternalStore } from "react";
+import React, {
+    useCallback,
+    useContext,
+    useState,
+    useSyncExternalStore,
+} from "react";
 import SlotDetails from "./SlotDetails";
 import MultiWorldContext, {
     SavedSlotDetails,
@@ -8,6 +13,7 @@ import styles from "./SavedSlots.module.css";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
 import { PrimaryButton } from "../shared/buttons";
+import ActivityContext from "../../contexts/activityContext";
 
 const SavedSlotsView = ({
     connectToServer,
@@ -15,6 +21,7 @@ const SavedSlotsView = ({
 }: {
     connectToServer: (info: ConnectionConfiguration) => void;
 }) => {
+    const activityContext = useContext(ActivityContext);
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
     const connectionStatus = useAPConnectionStatus();
     const disabled = !connectionStatus.disconnected;
@@ -42,6 +49,10 @@ const SavedSlotsView = ({
         [connectToServer]
     );
 
+    const openMultiWorldTracker = (multiWorldId: string) => {
+        activityContext.add(`multi-world-tracker/${multiWorldId}`);
+    };
+
     return (
         <div className={styles.slots} {...props}>
             <h2>Saved Slots</h2>
@@ -60,7 +71,16 @@ const SavedSlotsView = ({
                         <div className={styles.multi_title}>
                             <div>{multiWorld.title}</div>
                             {multiWorld.room_details?.tracker_suuid && (
-                                <PrimaryButton small>View</PrimaryButton>
+                                <PrimaryButton
+                                    small
+                                    onClick={() =>
+                                        openMultiWorldTracker(
+                                            multiWorld.multi_save_id
+                                        )
+                                    }
+                                >
+                                    View
+                                </PrimaryButton>
                             )}
                         </div>
                         {multiWorld.slots.map((slot) => (

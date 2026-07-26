@@ -21,7 +21,7 @@ import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
 import ApStyles from "./components/sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "./services/theme/ColorManager";
-import { useActivityContext } from "./hooks/activityHook";
+import { useActivityContext, useCurrentActivity } from "./hooks/activityHook";
 import ActivityContext from "./contexts/activityContext";
 import SlotContext from "./contexts/slotContext";
 import LocationRepository from "./services/locations/locationRepository";
@@ -32,6 +32,7 @@ import APConnector, {
 import { TrackerManager } from "./services/tracker/TrackerManager";
 import { useCurrentGameTracker } from "./hooks/trackerHooks";
 import { GamePackageWrapper } from "./services/gamepackage/GamePackageWrapper";
+import MultiWorldTracker from "./components/MultiWorldTracker/MultiworldTracker";
 
 const optionManager = globalOptionManager;
 const mainTrackerManagerStore = new LocalStorageDataStore(
@@ -55,6 +56,10 @@ hintManager.initializeListeners(connector.client);
 
 const App = (): React.ReactNode => {
     const activityContext = useActivityContext();
+    const currentActivityName =
+        activityContext.stack.length > 0
+            ? activityContext.stack[activityContext.stack.length - 1]
+            : null;
     const optionWindowOpen = activityContext.stack.includes("options");
     const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
@@ -208,9 +213,12 @@ const App = (): React.ReactNode => {
                         />
                         {optionWindowOpen && <OptionsScreen />}
                         {activityContext.stack.length === 0 && <StartScreen />}
-                        {activityContext.stack[
-                            activityContext.stack.length - 1
-                        ] === "slot-tracker" && <TrackerScreen />}
+                        {currentActivityName === "slot-tracker" && (
+                            <TrackerScreen />
+                        )}
+                        {currentActivityName?.startsWith(
+                            "multi-world-tracker"
+                        ) && <MultiWorldTracker />}
                     </ServiceContext.Provider>
                 </SlotContext.Provider>
             </ActivityContext.Provider>

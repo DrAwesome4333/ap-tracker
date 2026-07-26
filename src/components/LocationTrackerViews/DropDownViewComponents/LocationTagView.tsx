@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
@@ -34,14 +34,14 @@ const LocationTagView = ({
     });
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const [text, setText] = useState(tag?.data ?? tagType?.display_name ?? "");
+    const storedText = tag?.data ?? tagType?.display_name ?? "";
+    const [textField, setTextField] = useState("");
     const [editMode, setEditMode] = useState(false);
     const canClear = tagType?.user_managed && true;
     const canEdit = tagType?.allows_text && true;
 
     useEffect(() => {
         if (editMode) {
-            setText(tag?.data ?? "");
             inputRef.current?.focus();
         }
     }, [editMode]);
@@ -72,21 +72,21 @@ const LocationTagView = ({
                 <Input
                     ref={inputRef}
                     type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    value={textField}
+                    onChange={(e) => setTextField(e.target.value)}
                     onKeyUp={(e) => {
                         if (e.key === "Enter") {
-                            onText(tagId, text.toString());
+                            onText(tagId, textField);
                             setEditMode(false);
                         }
                         if (e.key === "Escape") {
-                            setText(tag?.data ?? tagType?.display_name ?? "");
+                            setTextField(storedText.toString());
                             setEditMode(false);
                         }
                     }}
                 />
             ) : (
-                text
+                storedText
             )}
             {editMode ? (
                 <>
@@ -96,7 +96,7 @@ const LocationTagView = ({
                             margin: "1em",
                         }}
                         onClick={() => {
-                            onText(tagId, text.toString());
+                            onText(tagId, textField);
                             setEditMode(false);
                         }}
                     >
@@ -110,7 +110,7 @@ const LocationTagView = ({
                         }}
                         onClick={() => {
                             setEditMode(false);
-                            setText(tag?.data ?? tagType?.display_name ?? "");
+                            setTextField(storedText.toString());
                         }}
                     >
                         {" "}
@@ -123,7 +123,10 @@ const LocationTagView = ({
                         margin: "1em",
                     }}
                     tiny
-                    onClick={() => setEditMode(true)}
+                    onClick={() => {
+                        setEditMode(true);
+                        setTextField(storedText.toString());
+                    }}
                 >
                     {" "}
                     <Icon type="edit" fontSize="14px" />{" "}
