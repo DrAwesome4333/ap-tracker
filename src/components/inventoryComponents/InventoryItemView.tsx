@@ -4,7 +4,7 @@ import { GhostButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 import SlotContext from "../../contexts/slotContext";
 
 const InventoryItemView = forwardRef(
@@ -31,7 +31,7 @@ const InventoryItemView = forwardRef(
         const playerClass =
             item.senderSlot === slotContext.slotNumber
                 ? ap_styles.player
-                : MultiWorldContext.loadedMultiWorld.slots.find(
+                : MultiWorldService.loadedMultiWorld?.slots.find(
                         (slot) => slot.slot_number === item.senderSlot
                     )
                   ? ap_styles.player_alt

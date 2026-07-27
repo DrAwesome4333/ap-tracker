@@ -3,7 +3,7 @@ import { API, MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
 import { EchoMessageNode } from "../../services/textClientManager";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 const hintStatusToClassMap: { [status: number]: string } = {
     [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
     [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
@@ -42,10 +42,10 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
     } else if (part.type === "location") {
         className = ap_styles.location;
     } else if (part.type === "player") {
-        if (part.player.slot === MultiWorldContext.loadedSlot.slot_number) {
+        if (part.player.slot === MultiWorldService.loadedSlot?.slot_number) {
             className = ap_styles.player;
         } else if (
-            MultiWorldContext.loadedMultiWorld?.slots
+            MultiWorldService.loadedMultiWorld?.slots
                 .map((slot) => slot.slot_number)
                 .includes(part.player.slot)
         ) {

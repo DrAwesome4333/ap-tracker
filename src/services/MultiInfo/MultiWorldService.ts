@@ -85,7 +85,7 @@ const slotDataStore = new LocalStorageDataStore(slotLocalStorageKey);
 const computeSlotKey = (multi_save_id: string, slot_number: number) =>
     `${multi_save_id}_${slot_number}`;
 
-class MultiWorldContext {
+class MultiWorldService {
     static loadedMultiWorld: MultiWorldWithSlotDetails;
     static loadedSlot: SavedSlotDetails;
     static #cachedAllWorlds: MultiWorldWithSlotDetails[];
@@ -98,29 +98,29 @@ class MultiWorldContext {
     > = new Set();
 
     static configureUpdate = () => {
-        if (MultiWorldContext.#updateConfigured) {
+        if (MultiWorldService.#updateConfigured) {
             return;
         }
         const callUpdates = () => {
-            MultiWorldContext.#dataUpdateListeners.forEach((callback) =>
+            MultiWorldService.#dataUpdateListeners.forEach((callback) =>
                 callback()
             );
         };
         multiDataStore.getUpdateSubscriber()(callUpdates);
         slotDataStore.getUpdateSubscriber()(callUpdates);
-        MultiWorldContext.#updateConfigured = true;
+        MultiWorldService.#updateConfigured = true;
     };
 
     static addUpdateCallback = (callback: () => void) => {
-        MultiWorldContext.#dataUpdateListeners.add(callback);
-        return () => MultiWorldContext.#dataUpdateListeners.delete(callback);
+        MultiWorldService.#dataUpdateListeners.add(callback);
+        return () => MultiWorldService.#dataUpdateListeners.delete(callback);
     };
 
     static addDeleteCallback = (
         callback: (multi_save_id: string, slot_number?: number) => void
     ) => {
-        MultiWorldContext.#deleteListeners.add(callback);
-        return () => MultiWorldContext.#deleteListeners.delete(callback);
+        MultiWorldService.#deleteListeners.add(callback);
+        return () => MultiWorldService.#deleteListeners.delete(callback);
     };
 
     static getAllMultiWorldsWithSlots = (): MultiWorldWithSlotDetails[] => {
@@ -173,14 +173,14 @@ class MultiWorldContext {
         ) as unknown as SavedSlotDetails;
         const multiWithSlots: MultiWorldWithSlotDetails = {
             ...saveMultiWorldData,
-            slots: MultiWorldContext.findAllSlotsForMultiWorld(multi_world_id),
+            slots: MultiWorldService.findAllSlotsForMultiWorld(multi_world_id),
             last_used_timestamp: 0,
         };
         multiWithSlots.last_used_timestamp = Math.max(
             ...multiWithSlots.slots.map((slot) => slot.last_used_timestamp)
         );
-        MultiWorldContext.loadedMultiWorld = multiWithSlots;
-        MultiWorldContext.loadedSlot = slot;
+        MultiWorldService.loadedMultiWorld = multiWithSlots;
+        MultiWorldService.loadedSlot = slot;
     };
 
     static findMatchingMultiWorld = (seed_name: string) => {
@@ -265,11 +265,11 @@ class MultiWorldContext {
         };
         multiDataStore.write(newCopy as unknown as JSONValue, multi_save_id);
         if (
-            MultiWorldContext.loadedMultiWorld?.multi_save_id === multi_save_id
+            MultiWorldService.loadedMultiWorld?.multi_save_id === multi_save_id
         ) {
             this.setLoadedSlot(
                 multi_save_id,
-                MultiWorldContext.loadedSlot.slot_number
+                MultiWorldService.loadedSlot.slot_number
             );
         }
         return newCopy;
@@ -284,7 +284,7 @@ class MultiWorldContext {
             slot_alias?: string;
         }
     ) => {
-        const multi = MultiWorldContext.getMultiWorld(multi_save_id);
+        const multi = MultiWorldService.getMultiWorld(multi_save_id);
         if (!multi) {
             throw "Cannot save slot on non-existing multi world";
         }
@@ -309,15 +309,15 @@ class MultiWorldContext {
         slotDataStore.delete(
             computeSlotKey(slot.multi_save_id, slot.slot_number)
         );
-        const slotInWorldCount = MultiWorldContext.findAllSlotsForMultiWorld(
+        const slotInWorldCount = MultiWorldService.findAllSlotsForMultiWorld(
             slot.multi_save_id
         ).length;
-        MultiWorldContext.#deleteListeners.forEach((listener) =>
+        MultiWorldService.#deleteListeners.forEach((listener) =>
             listener(slot.multi_save_id, slot.slot_number)
         );
         if (slotInWorldCount === 0) {
             multiDataStore.delete(slot.multi_save_id);
-            MultiWorldContext.#deleteListeners.forEach((listener) =>
+            MultiWorldService.#deleteListeners.forEach((listener) =>
                 listener(slot.multi_save_id)
             );
         }
@@ -335,7 +335,7 @@ class MultiWorldContext {
             color?: string;
         }
     ) => {
-        const oldSlot = MultiWorldContext.getSlot(multi_save_id, slot_number);
+        const oldSlot = MultiWorldService.getSlot(multi_save_id, slot_number);
         if (!oldSlot) {
             return false;
         }
@@ -352,20 +352,20 @@ class MultiWorldContext {
             computeSlotKey(newSlot.multi_save_id, newSlot.slot_number)
         );
         if (
-            MultiWorldContext.loadedMultiWorld?.multi_save_id === multi_save_id
+            MultiWorldService.loadedMultiWorld?.multi_save_id === multi_save_id
         ) {
             this.setLoadedSlot(
                 multi_save_id,
-                MultiWorldContext.loadedSlot.slot_number
+                MultiWorldService.loadedSlot.slot_number
             );
         }
         return true;
     };
 }
 
-MultiWorldContext.configureUpdate();
+MultiWorldService.configureUpdate();
 
-export default MultiWorldContext;
+export default MultiWorldService;
 export type {
     MultiWorldWithSlotDetails,
     SavedMultiWorldDetails,

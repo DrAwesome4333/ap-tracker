@@ -31,7 +31,7 @@ import ItemRepository from "../../../services/items/itemRepository";
 import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 import LocationRepository from "../../../services/locations/locationRepository";
 import SlotContext from "../../../contexts/slotContext";
-import MultiWorldContext from "../../../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../../../services/MultiInfo/MultiWorldService";
 import DataPackageHelper from "../../../services/MultiInfo/DatapackageHelper";
 import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
 import TemplateLocationSource from "../../../services/tracker/generic/locationTrackerGenerators/templateLocationSource";
@@ -66,7 +66,7 @@ const NameAnalysisModal = ({
         if (!slot || !slot.game || !slot.multi_save_id) {
             return null;
         }
-        const multiworld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        const multiworld = MultiWorldService.getMultiWorld(slot.multi_save_id);
         const dataPackageHash = multiworld?.data_package_details[slot.game];
         const cachedPackage = await DataPackageHelper.getCachedPackage(
             slot.game,

@@ -5,9 +5,9 @@ import React, {
     useSyncExternalStore,
 } from "react";
 import SlotDetails from "./SlotDetails";
-import MultiWorldContext, {
+import MultiWorldService, {
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldContext";
+} from "../../services/MultiInfo/MultiWorldService";
 import SavedSlotView from "./SavedSlotView";
 import styles from "./SavedSlots.module.css";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
@@ -27,9 +27,9 @@ const SavedSlotsView = ({
     const disabled = !connectionStatus.disconnected;
 
     const multiSlots = useSyncExternalStore(
-        MultiWorldContext.addUpdateCallback,
-        MultiWorldContext.getAllMultiWorldsWithSlots,
-        MultiWorldContext.getAllMultiWorldsWithSlots
+        MultiWorldService.addUpdateCallback,
+        MultiWorldService.getAllMultiWorldsWithSlots,
+        MultiWorldService.getAllMultiWorldsWithSlots
     );
 
     const slots = multiSlots

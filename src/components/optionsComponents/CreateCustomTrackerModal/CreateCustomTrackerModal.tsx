@@ -28,7 +28,7 @@ import { randomUUID } from "../../../utility/uuid";
 import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
 import DataPackageHelper from "../../../services/MultiInfo/DatapackageHelper";
-import MultiWorldContext from "../../../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../../../services/MultiInfo/MultiWorldService";
 import GenericTrackerRepository from "../../../services/tracker/generic/genericTrackerRepository";
 import EmptyGamePackageWrapper from "../../../services/gamepackage/EmptyGamePackageWrapper";
 
@@ -55,7 +55,7 @@ const CreateCustomTrackerModal = ({
         if (!slot || !slot.game || !slot.multi_save_id) {
             return null;
         }
-        const multiworld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        const multiworld = MultiWorldService.getMultiWorld(slot.multi_save_id);
         const dataPackageHash = multiworld?.data_package_details[slot.game];
         const cachedPackage = await DataPackageHelper.getCachedPackage(
             slot.game,

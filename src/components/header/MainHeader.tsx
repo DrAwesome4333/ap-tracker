@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { PrimaryButton, SecondaryButton, TextButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import NotePad from "../NotePad/NotePad";
 import ConnectionOptions from "./ConnectionOptions";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
+import { useCurrentActivity } from "../../hooks/activityHook";
+import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
+import SlotContext from "../../contexts/slotContext";
 
 const MainHeader = ({
     optionsCallback,
@@ -16,6 +19,15 @@ const MainHeader = ({
     const [notePadOpen, setNotePadOpen] = useState(false);
     const [connectionModalOpen, setConnectionModalOpen] = useState(false);
     const slot = useCurrentMultiworldSlot();
+
+    const currentPage = useCurrentActivity();
+    const slotContext = useContext(SlotContext);
+    const multiWorldId =
+        currentPage?.split("/")[1] ?? slotContext.multiWorldId ?? null;
+    const multiWorld = multiWorldId
+        ? MultiWorldService.getMultiWorld(multiWorldId)
+        : null;
+    const onMultiTrackerScreen = currentPage?.startsWith("multi-world-tracker");
 
     // if (
     //     trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
@@ -53,16 +65,18 @@ const MainHeader = ({
                     type="circle"
                     fontSize="0.5rem"
                     style={{
-                        color: connectionStatus.connected
-                            ? "chartreuse"
-                            : connectionStatus.connecting
-                              ? "gold"
-                              : connectionStatus.disconnected
-                                ? "gray"
-                                : "purple",
+                        color: onMultiTrackerScreen
+                            ? "blue"
+                            : connectionStatus.connected
+                              ? "chartreuse"
+                              : connectionStatus.connecting
+                                ? "gold"
+                                : connectionStatus.disconnected
+                                  ? "gray"
+                                  : "purple",
                     }}
                 ></Icon>{" "}
-                {slot?.slot_alias && (
+                {(slot?.slot_alias || onMultiTrackerScreen) && (
                     <TextButton
                         style={{
                             textOverflow: "ellipsis",
@@ -71,7 +85,9 @@ const MainHeader = ({
                         }}
                         onClick={() => setConnectionModalOpen(true)}
                     >
-                        {slot.slot_alias}
+                        {onMultiTrackerScreen
+                            ? multiWorld.title
+                            : slot.slot_alias}
                     </TextButton>
                 )}
                 <ConnectionOptions

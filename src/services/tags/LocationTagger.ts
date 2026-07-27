@@ -1,5 +1,5 @@
 import { randomNumericId } from "../../utility/uuid";
-import MultiWorldContext from "../MultiInfo/MultiWorldContext";
+import MultiWorldService from "../MultiInfo/MultiWorldService";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import {
     TagCounterV2,
@@ -218,6 +218,6 @@ class LocationTagger implements TagSource {
     }
 }
 
-MultiWorldContext.addDeleteCallback(LocationTagger.deleteTags);
+MultiWorldService.addDeleteCallback(LocationTagger.deleteTags);
 
 export { LocationTagger };

@@ -6,28 +6,39 @@ import {
     LocationStatus,
     LocationUpdateCallback,
 } from "../locations/locationSource";
-import { APIOffsets_Item, APITracker } from "../WebHostAPI/types";
+import {
+    APIOffsets_Item,
+    APIRoomStatus,
+    APIStaticTracker,
+    APITracker,
+} from "../WebHostAPI/types";
 
 class WebHostSlotSource implements LocationSource, ItemSource {
+    #players: Record<number, { name: string; game: string }>;
     #slotNumber: number;
     #teamNumber: number;
     // #clearedLocations: Set<Number> = new Set();
     #locationStatuses: LocationStatus[] = [];
     #items: Item[] = [];
     #itemIndex = 0;
-    #gamePackage: GamePackageWrapper;
+    #gamePackages: Record<string, GamePackageWrapper>;
+    #game: string;
 
     #locationListeners: Set<LocationUpdateCallback> = new Set();
     #itemListeners: Set<ItemUpdateCallback> = new Set();
 
     constructor(
-        gamePackage: GamePackageWrapper,
+        gamePackages: Record<string, GamePackageWrapper>,
+        game: string,
+        players: Record<number, { name: string; game: string }>,
         slot: number,
         team: number = 0
     ) {
         this.#slotNumber = slot;
-        this.#gamePackage = gamePackage;
+        this.#gamePackages = gamePackages;
         this.#teamNumber = team;
+        this.#game = game;
+        this.#players = players;
     }
 
     locationUpdateHook = (callback: LocationUpdateCallback) => {
@@ -43,7 +54,10 @@ class WebHostSlotSource implements LocationSource, ItemSource {
     };
 
     refresh = (apiData: APITracker) => {
-        console.log("Refresh");
+        // console.log("Refresh");
+        if (!this.#players) {
+            apiData.aliases;
+        }
         const slotItems = apiData.player_items_received.find(
             (slot) =>
                 slot.player === this.#slotNumber &&
@@ -57,16 +71,16 @@ class WebHostSlotSource implements LocationSource, ItemSource {
             .slice(this.#itemIndex)
             .map((apiItem, relativeIndex) => ({
                 itemId: apiItem[APIOffsets_Item.itemId],
-                name: this.#gamePackage.getItemName(
+                name: this.#gamePackages[this.#game].getItemName(
                     apiItem[APIOffsets_Item.itemId]
                 ),
                 index: this.#itemIndex + relativeIndex,
                 locationId: apiItem[APIOffsets_Item.locationId],
-                location: this.#gamePackage.getLocationName(
-                    apiItem[APIOffsets_Item.locationId]
-                ),
+                location: this.#gamePackages[
+                    this.#players[apiItem[APIOffsets_Item.slotNumber]].game
+                ].getLocationName(apiItem[APIOffsets_Item.locationId]),
                 senderSlot: apiItem[APIOffsets_Item.slotNumber],
-                sender: `Slot-${apiItem[APIOffsets_Item.slotNumber]}-TODO`,
+                sender: this.#players[apiItem[APIOffsets_Item.slotNumber]].name,
                 flags: {
                     progression:
                         apiItem[APIOffsets_Item.itemFlags] &
@@ -86,6 +100,23 @@ class WebHostSlotSource implements LocationSource, ItemSource {
         this.#items = [...this.#items, ...newItems];
         this.#itemListeners.forEach((callback) => callback(newItems));
         this.#itemIndex = slotItems.length;
+    };
+
+    static buildPlayersForRoom = (roomStatus: APIRoomStatus) => {
+        const players: Record<number, { name: string; game: string }> = {
+            0: {
+                name: "Server",
+                game: "Archipelago",
+            },
+        };
+        roomStatus.players.forEach(([slotName, playerGame], index) => {
+            // TODO verify this with item links
+            players[index + 1] = {
+                name: slotName,
+                game: playerGame,
+            };
+        });
+        return players;
     };
 }
 

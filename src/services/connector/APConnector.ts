@@ -7,7 +7,7 @@ import {
     LocationUpdateCallback,
     LocationStatusUpdate,
 } from "../locations/locationSource";
-import MultiWorldContext from "../MultiInfo/MultiWorldContext";
+import MultiWorldService from "../MultiInfo/MultiWorldService";
 import { LocalStorageDataStore } from "../dataStores";
 import { randomUUID } from "../../utility/uuid";
 import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
@@ -174,10 +174,10 @@ class APConnector implements LocationSource, ItemSource {
         });
 
         if (multiSlot) {
-            const multiWorldInfo = MultiWorldContext.getMultiWorld(
+            const multiWorldInfo = MultiWorldService.getMultiWorld(
                 multiSlot.multi_save_id
             );
-            const slotInfo = MultiWorldContext.getSlot(
+            const slotInfo = MultiWorldService.getSlot(
                 multiSlot.multi_save_id,
                 multiSlot.slot_number
             );
@@ -278,7 +278,7 @@ class APConnector implements LocationSource, ItemSource {
                 const game = this.client.game;
 
                 if (multiSlot) {
-                    const multiDetails = MultiWorldContext.getMultiWorld(
+                    const multiDetails = MultiWorldService.getMultiWorld(
                         multiSlot.multi_save_id
                     );
                     seedMatchesSave = multiDetails.seed_name === seedName;
@@ -286,19 +286,19 @@ class APConnector implements LocationSource, ItemSource {
 
                 if (!seedMatchesSave) {
                     let multiInfo =
-                        MultiWorldContext.findMatchingMultiWorld(seedName);
+                        MultiWorldService.findMatchingMultiWorld(seedName);
                     if (!multiInfo) {
-                        multiInfo = MultiWorldContext.createMultiWorldDetails({
+                        multiInfo = MultiWorldService.createMultiWorldDetails({
                             seed_name: seedName,
                             connection_details: { host, port, password },
                         });
                     }
-                    let slotInfo = MultiWorldContext.getSlot(
+                    let slotInfo = MultiWorldService.getSlot(
                         multiInfo.multi_save_id,
                         slotNumber
                     );
                     if (!slotInfo) {
-                        slotInfo = MultiWorldContext.addSlot(
+                        slotInfo = MultiWorldService.addSlot(
                             multiInfo.multi_save_id,
                             {
                                 game,
@@ -314,9 +314,9 @@ class APConnector implements LocationSource, ItemSource {
                     };
                 }
 
-                // resolve(MultiWorldContext.getSlot(multiSlot.multi_save_id, slotNumber));
+                // resolve(MultiWorldService.getSlot(multiSlot.multi_save_id, slotNumber));
                 // update time stamp
-                MultiWorldContext.updateSlot(
+                MultiWorldService.updateSlot(
                     multiSlot.multi_save_id,
                     multiSlot.slot_number,
                     {}
@@ -324,12 +324,12 @@ class APConnector implements LocationSource, ItemSource {
 
                 this.#loadLocations();
 
-                MultiWorldContext.setLoadedSlot(
+                MultiWorldService.setLoadedSlot(
                     multiSlot.multi_save_id,
                     slotNumber
                 );
 
-                MultiWorldContext.updateMultiWorld(multiSlot.multi_save_id, {
+                MultiWorldService.updateMultiWorld(multiSlot.multi_save_id, {
                     connection_details: { host, port, password },
                 });
 
@@ -357,15 +357,15 @@ class APConnector implements LocationSource, ItemSource {
                     return groups;
                 };
 
-                if (!MultiWorldContext.loadedMultiWorld.data_package_details) {
+                if (!MultiWorldService.loadedMultiWorld.data_package_details) {
                     const details: { [gameName: string]: string } = {};
                     Object.entries(dataPackage.games).forEach(
                         ([game, gamePackage]) => {
                             details[game] = gamePackage.checksum;
                         }
                     );
-                    MultiWorldContext.updateMultiWorld(
-                        MultiWorldContext.loadedMultiWorld.multi_save_id,
+                    MultiWorldService.updateMultiWorld(
+                        MultiWorldService.loadedMultiWorld.multi_save_id,
                         { data_package_details: details }
                     );
                 }

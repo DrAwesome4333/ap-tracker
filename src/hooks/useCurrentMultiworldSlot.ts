@@ -1,11 +1,11 @@
 import { useSyncExternalStore } from "react";
-import MultiWorldContext from "../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../services/MultiInfo/MultiWorldService";
 
 const useCurrentMultiworldSlot = () => {
     const slot = useSyncExternalStore(
-        MultiWorldContext.addUpdateCallback,
-        () => MultiWorldContext.loadedSlot,
-        () => MultiWorldContext.loadedSlot
+        MultiWorldService.addUpdateCallback,
+        () => MultiWorldService.loadedSlot,
+        () => MultiWorldService.loadedSlot
     );
     return slot;
 };

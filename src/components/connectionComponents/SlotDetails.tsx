@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import MultiWorldContext, {
+import MultiWorldService, {
     SavedMultiWorldDetails,
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldContext";
+} from "../../services/MultiInfo/MultiWorldService";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
@@ -23,7 +23,7 @@ const SlotDetails = ({
     let multiWorld: SavedMultiWorldDetails = null;
 
     if (slot) {
-        multiWorld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        multiWorld = MultiWorldService.getMultiWorld(slot.multi_save_id);
     }
 
     const [title, setTitle] = useState(slot?.title ?? "");
@@ -58,11 +58,11 @@ const SlotDetails = ({
 
     const save = () => {
         if (slot) {
-            MultiWorldContext.updateSlot(slot.multi_save_id, slot.slot_number, {
+            MultiWorldService.updateSlot(slot.multi_save_id, slot.slot_number, {
                 color: slotColor,
                 title,
             });
-            MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+            MultiWorldService.updateMultiWorld(multiWorld.multi_save_id, {
                 color: multiColor,
                 title: multiTitle,
                 connection_details: {
@@ -81,7 +81,7 @@ const SlotDetails = ({
         );
         if (result) {
             if (slot) {
-                MultiWorldContext.deleteSlot(slot);
+                MultiWorldService.deleteSlot(slot);
             }
         }
         onClose();
@@ -95,7 +95,7 @@ const SlotDetails = ({
                 const handler = new WebHostAPIHandler(roomInfo);
                 const staticTracker = await handler.getStaticTracker();
                 const roomStatus = await handler.getRoomStatus();
-                const allSlots = MultiWorldContext.findAllSlotsForMultiWorld(
+                const allSlots = MultiWorldService.findAllSlotsForMultiWorld(
                     multiWorld.multi_save_id
                 );
                 // validate some properties for the multiworld match
@@ -130,7 +130,7 @@ const SlotDetails = ({
                     );
                 }
 
-                MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+                MultiWorldService.updateMultiWorld(multiWorld.multi_save_id, {
                     room_details: roomInfo,
                 });
                 setRoomLink("");
@@ -149,7 +149,7 @@ const SlotDetails = ({
     };
 
     const removeRoom = () => {
-        MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
+        MultiWorldService.updateMultiWorld(multiWorld.multi_save_id, {
             room_details: null,
         });
         setRoomLink("");

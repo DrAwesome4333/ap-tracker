@@ -1,9 +1,4 @@
-import React, {
-    useContext,
-    useMemo,
-    useState,
-    useSyncExternalStore,
-} from "react";
+import { useContext, useMemo, useState, useSyncExternalStore } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import InventoryItemListView from "./InventoryItemListView";
 import StickySpacer from "../shared/StickySpacer";
@@ -22,7 +17,7 @@ import InventoryItemGroupView from "./InventoryItemGroupView";
 import SlotContext from "../../contexts/slotContext";
 import { useSlotItems } from "../../hooks/itemHook";
 const emptyList = [];
-const InventoryView = () => {
+const InventoryView = ({ title }: { title?: string }) => {
     const services = useContext(ServiceContext);
     const optionManager = services.optionManager ?? globalOptionManager;
     const slotContext = useContext(SlotContext);
@@ -213,7 +208,7 @@ const InventoryView = () => {
                     height: "100%",
                 }}
             >
-                <PanelHeader title="Inventory">
+                <PanelHeader title={title ?? "Inventory"}>
                     <PrimaryButton
                         tiny
                         style={{ height: "20px" }}
@@ -231,8 +226,10 @@ const InventoryView = () => {
                         boxSizing: "border-box",
                     }}
                 >
-                    {itemTracker?.manifest.itemTrackerType !==
-                    ItemTrackerType.group ? (
+                    {!itemTracker ? (
+                        "Item Tracker Loading"
+                    ) : itemTracker?.manifest.itemTrackerType !==
+                      ItemTrackerType.group ? (
                         <>
                             Unsupported Tracker type{" "}
                             {itemTracker?.manifest.itemTrackerType}

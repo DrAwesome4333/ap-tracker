@@ -3,10 +3,9 @@ import React, { forwardRef, useCallback, useContext, useState } from "react";
 import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-import MultiWorldContext from "../../services/MultiInfo/MultiWorldContext";
+import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 import Icon from "../icons/icons";
 import { TextButton } from "../shared/buttons";
-import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 import SlotContext from "../../contexts/slotContext";
 
 const statusSelections = [
@@ -31,11 +30,11 @@ const hintStatusToClassMap: { [status: number]: string } = {
 };
 
 const getPlayerClass = (player: number) => {
-    if (player === MultiWorldContext.loadedSlot.slot_number)
+    if (player === MultiWorldService.loadedSlot?.slot_number)
         return ap_styles.player + " " + ap_styles.ap_text;
 
     if (
-        MultiWorldContext.loadedMultiWorld.slots.find(
+        MultiWorldService.loadedMultiWorld.slots?.find(
             (s) => s.slot_number === player
         )
     )

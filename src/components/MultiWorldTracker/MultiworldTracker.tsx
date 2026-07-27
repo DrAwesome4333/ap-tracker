@@ -1,14 +1,18 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useCurrentActivity } from "../../hooks/activityHook";
 import { GamePackageWrapper } from "../../services/gamepackage/GamePackageWrapper";
-import MultiWorldContext, {
+import MultiWorldService, {
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldContext";
+} from "../../services/MultiInfo/MultiWorldService";
 import WebHostSlotSource from "../../services/WebHostConnector/WebHostSlotSource";
 import DataPackageHelper from "../../services/MultiInfo/DatapackageHelper";
 import WebHostAPIHandler from "../../services/WebHostAPI";
 import SlotTracker from "./SlotTracker";
 import Spinner from "../icons/spinner";
+import NotificationManager, {
+    MessageType,
+} from "../../services/notifications/notifications";
+import Tabs, { Tab } from "../LayoutUtilities/Tabs";
 
 const useWebHostSlots = (multiSaveId: string) => {
     const initialized = useRef(false);
@@ -25,7 +29,11 @@ const useWebHostSlots = (multiSaveId: string) => {
         if (!loaded.current || !apiHandlerRef.current) {
             return false;
         }
-        setRefreshing(true);
+        const notificationHandle = NotificationManager.createStatus({
+            type: MessageType.info,
+            message: "Refreshing",
+            progress: -1,
+        });
         await apiHandlerRef.current
             .getTracker()
             .then((apiResult) => {
@@ -34,14 +42,19 @@ const useWebHostSlots = (multiSaveId: string) => {
             .catch((e) => {
                 // TODO error handling;
             });
-        setRefreshing(false);
+        notificationHandle.update({
+            type: MessageType.success,
+            progress: 0,
+            duration: 0,
+        });
         return true;
     });
 
     const initialize = async () => {
         initialized.current = true;
         loaded.current = false;
-        const multiWorld = MultiWorldContext.getMultiWorld(multiSaveId);
+
+        const multiWorld = MultiWorldService.getMultiWorld(multiSaveId);
         if (!multiWorld.room_details) {
             return;
         }
@@ -65,12 +78,17 @@ const useWebHostSlots = (multiSaveId: string) => {
             throw new Error("Missing data package details?");
         }
 
-        const slots = MultiWorldContext.findAllSlotsForMultiWorld(multiSaveId);
+        const roomStatus = await apiHandlerRef.current.getRoomStatus();
+        const players = WebHostSlotSource.buildPlayersForRoom(roomStatus);
+
+        const slots = MultiWorldService.findAllSlotsForMultiWorld(multiSaveId);
         setSlotDetails(slots);
         const sources = slots.map(
             (slot) =>
                 new WebHostSlotSource(
-                    packageResults[slot.game],
+                    packageResults,
+                    slot.game,
+                    players,
                     slot.slot_number
                 )
         );
@@ -109,6 +127,46 @@ const MultiWorldTracker = () => {
     const currentActivityName = useCurrentActivity();
     const multiWorldId = currentActivityName?.split("/")[1];
     const contexts = useWebHostSlots(multiWorldId);
+    const multiWorld = MultiWorldService.getMultiWorld(multiWorldId);
+
+    const inventoryTab = useMemo(
+        () =>
+            new Tab(
+                "Inventory",
+                (
+                    <div
+                        style={{
+                            display: "flex",
+                            height: "100%",
+                            width: "100%",
+                            flexWrap: "wrap",
+                            alignContent: "stretch",
+                        }}
+                    >
+                        {contexts.contexts.map((c) => (
+                            <div
+                                style={{
+                                    minWidth: "20rem",
+                                    height: "50%",
+                                    overflow: "hidden",
+                                    flexGrow: 1,
+                                    flexBasis: 1,
+                                }}
+                                key={`${c.slot.multi_save_id}_${c.slot.slot_number}`}
+                            >
+                                <SlotTracker
+                                    gamePackages={contexts.gamePackages}
+                                    {...c}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )
+            ),
+        [contexts]
+    );
+
+    const hintTab = useMemo(() => new Tab("Hints", <></>), []);
 
     return (
         <div
@@ -121,32 +179,15 @@ const MultiWorldTracker = () => {
             {contexts.refreshing && (
                 <Spinner style={{ width: "1rem" }} size={28} />
             )}
-            Multi-world Tracker: {multiWorldId}
-            <div
+            {/* {multiWorld.title} */}
+            <Tabs
                 style={{
-                    display: "flex",
-                    height: "100%",
                     width: "100%",
-                    flexWrap: "wrap",
+                    height: "100%",
+                    overflow: "auto",
                 }}
-            >
-                {contexts.contexts.map((c) => (
-                    <div
-                        style={{
-                            maxWidth: "50rem",
-                            minWidth: "20rem",
-                            height: "50%",
-                            overflow: "hidden",
-                        }}
-                        key={`${c.slot.multi_save_id}_${c.slot.slot_number}`}
-                    >
-                        <SlotTracker
-                            gamePackages={contexts.gamePackages}
-                            {...c}
-                        />
-                    </div>
-                ))}
-            </div>
+                tabs={[inventoryTab, hintTab]}
+            />
         </div>
     );
 };

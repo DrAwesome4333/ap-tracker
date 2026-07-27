@@ -13,13 +13,11 @@ import { GamePackageWrapper } from "../../services/gamepackage/GamePackageWrappe
 import HintManager from "../../services/HintManager";
 import ItemRepository from "../../services/items/itemRepository";
 import LocationRepository from "../../services/locations/locationRepository";
-import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldContext";
-import { OptionManager } from "../../services/options/optionManager";
+import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldService";
 import HintTagger from "../../services/tags/HintTagger";
 import { LocationTagger } from "../../services/tags/LocationTagger";
 import { TagManager } from "../../services/tags/tagManager";
 import { ResourceType } from "../../services/tracker/resourceEnums";
-import { TrackerManager } from "../../services/tracker/TrackerManager";
 import WebHostSlotSource from "../../services/WebHostConnector/WebHostSlotSource";
 import { LocationTracker } from "../../services/tracker/locationTrackers/locationTrackers";
 import { ItemTracker } from "../../services/tracker/itemTrackers/itemTrackers";
@@ -158,8 +156,7 @@ const SlotTracker = ({
     const context = useSlotContext(slot, webHostSource, gamePackages);
     return (
         <SlotContext.Provider value={context}>
-            {slot.slot_alias}
-            <InventoryView />
+            <InventoryView title={`${slot.slot_alias ?? slot.slot_name}`} />
         </SlotContext.Provider>
     );
 };

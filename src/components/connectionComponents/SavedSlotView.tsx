@@ -2,7 +2,7 @@ import styles from "./SavedSlots.module.css";
 import {
     MultiWorldWithSlotDetails,
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldContext";
+} from "../../services/MultiInfo/MultiWorldService";
 import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 
