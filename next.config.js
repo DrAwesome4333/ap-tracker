@@ -7,7 +7,7 @@ const nextConfig = {
     distDir: "build", // Changes the build output directory to `build`
     assetPrefix: "./", //comment out for local server builds to work with hot reload
     experimental: {
-        lightningCssFeatures: false, // broke all colors...
+        useLightningcss: false,
     },
 };
 
