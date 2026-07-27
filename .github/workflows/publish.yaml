@@ -27,7 +27,7 @@ jobs:
 
             - name: Set environment variables based on tags
               run: |
-                touch .env.production.local
+                touch .env.production.local;
                 if [[ "${{ github.ref_name }}" == *"-test"*]]; then
                   echo "NEXT_PUBLIC_ENVIRONMENT_NAME=\"test\"" >> .env.production.local
                 fi
