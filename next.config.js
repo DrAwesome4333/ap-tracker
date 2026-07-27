@@ -7,7 +7,9 @@ const nextConfig = {
     distDir: "build", // Changes the build output directory to `build`
     assetPrefix: "./", //comment out for local server builds to work with hot reload
     experimental: {
-        useLightningcss: false,
+        lightningCssFeatures: {
+            exclude: ["oklab-colors", "light-dark"],
+        },
     },
 };
 
