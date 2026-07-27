@@ -86,7 +86,7 @@ const MainHeader = ({
                         onClick={() => setConnectionModalOpen(true)}
                     >
                         {onMultiTrackerScreen
-                            ? multiWorld.title
+                            ? multiWorld?.title
                             : slot.slot_alias}
                     </TextButton>
                 )}
