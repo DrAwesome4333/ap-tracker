@@ -1,40 +1,33 @@
 {
-  "compilerOptions": {
-    "target": "ES2024",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+    "compilerOptions": {
+        "target": "ES2024",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": false,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "plugins": [
+            {
+                "name": "next"
+            }
+        ],
+        "incremental": true,
+        "module": "esnext"
+    },
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "build/types/**/*.ts",
+        "next-env.d.ts",
+        ".next/types/**/*.ts",
+        "build/dev/types/**/*.ts",
+        ".next/dev/types/**/*.ts"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "incremental": true,
-    "module": "esnext"
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "build/types/**/*.ts",
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "build/dev/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "external"
-  ]
+    "exclude": ["node_modules", "external"]
 }

@@ -35,8 +35,11 @@ import { GamePackageWrapper } from "./services/gamepackage/GamePackageWrapper";
 import MultiWorldTracker from "./components/MultiWorldTracker/MultiworldTracker";
 
 const optionManager = globalOptionManager;
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+    : "";
 const mainTrackerManagerStore = new LocalStorageDataStore(
-    "AP_ChecklistTracker_TrackerChoices"
+    `AP_ChecklistTracker_TrackerChoices${environment}`
 );
 const trackerManager = new TrackerManager(mainTrackerManagerStore);
 const customTrackerRepository = new CustomTrackerRepository(optionManager);

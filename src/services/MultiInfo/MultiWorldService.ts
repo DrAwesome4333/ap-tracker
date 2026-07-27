@@ -77,10 +77,12 @@ type MultiWorldWithSlotDetails = {
     slots: SavedSlotDetails[];
     last_used_timestamp: number;
 } & SavedMultiWorldDetails;
-
-const multiLocalStorageKey = "ap_checklist_multi_details";
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+    : "";
+const multiLocalStorageKey = `ap_checklist_multi_details${environment}`;
 const multiDataStore = new LocalStorageDataStore(multiLocalStorageKey);
-const slotLocalStorageKey = "ap_checklist_slot_details";
+const slotLocalStorageKey = `ap_checklist_slot_details${environment}`;
 const slotDataStore = new LocalStorageDataStore(slotLocalStorageKey);
 const computeSlotKey = (multi_save_id: string, slot_number: number) =>
     `${multi_save_id}_${slot_number}`;

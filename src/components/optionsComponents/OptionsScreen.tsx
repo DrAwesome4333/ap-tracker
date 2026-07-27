@@ -133,6 +133,9 @@ const OptionsScreen = () => {
                 }}
             >
                 Version: {process.env.NEXT_PUBLIC_APP_VERSION}
+                {process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+                    ? `-${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+                    : ""}
             </div>
             <StickySpacer />
         </div>

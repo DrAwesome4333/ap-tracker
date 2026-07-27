@@ -15,7 +15,9 @@ const retiredKeys = [
     "cached_groups_v2",
     "cached_groups_v2.1",
 ];
-const environment = "_test";
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+    : "";
 const database_request = window.indexedDB.open(
     `checklist_db${environment}`,
     14
