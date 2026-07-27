@@ -50,7 +50,7 @@ const SavedSlotsView = ({
     );
 
     const openMultiWorldTracker = (multiWorldId: string) => {
-        activityContext.add(`multi-world-tracker/${multiWorldId}`);
+        activityContext.add(`multi-world-tracker.${multiWorldId}`);
     };
 
     return (

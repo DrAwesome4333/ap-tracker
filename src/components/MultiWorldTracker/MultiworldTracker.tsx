@@ -55,7 +55,7 @@ const useWebHostSlots = (multiSaveId: string) => {
         loaded.current = false;
 
         const multiWorld = MultiWorldService.getMultiWorld(multiSaveId);
-        if (!multiWorld.room_details) {
+        if (!multiWorld?.room_details) {
             return;
         }
 
@@ -125,7 +125,7 @@ const useWebHostSlots = (multiSaveId: string) => {
 
 const MultiWorldTracker = () => {
     const currentActivityName = useCurrentActivity();
-    const multiWorldId = currentActivityName?.split("/")[1];
+    const multiWorldId = currentActivityName?.split(".")[1];
     const contexts = useWebHostSlots(multiWorldId);
     const multiWorld = MultiWorldService.getMultiWorld(multiWorldId);
 

@@ -23,7 +23,7 @@ const MainHeader = ({
     const currentPage = useCurrentActivity();
     const slotContext = useContext(SlotContext);
     const multiWorldId =
-        currentPage?.split("/")[1] ?? slotContext.multiWorldId ?? null;
+        currentPage?.split(".")[1] ?? slotContext.multiWorldId ?? null;
     const multiWorld = multiWorldId
         ? MultiWorldService.getMultiWorld(multiWorldId)
         : null;
