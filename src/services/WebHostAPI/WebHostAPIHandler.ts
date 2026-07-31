@@ -145,7 +145,7 @@ class WebHostAPIHandler {
                 groups: staticTracker.groups.reduce(
                     (result, group) =>
                         group.members.includes(slotNumber)
-                            ? result.add(slotNumber)
+                            ? result.add(group.slot)
                             : result,
                     new Set() as Set<number>
                 ),

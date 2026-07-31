@@ -26,28 +26,39 @@ const HintTable = ({
     const hints = useHints(serviceContext.hintManager);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
     const lowerSearchKey = searchKey.toLowerCase().trim();
-
+    const trackSingleSlot = multiWorldContext.trackedSlot !== undefined;
     const filteredHints =
         hints?.filter((hint) => {
             let passesPlayerFilter = false;
             let passesStatusFilter = false;
             let passesSearchKeyFilter = false;
+
+            const adequateRelevance = trackSingleSlot
+                ? [SlotRelevance.own, SlotRelevance.own_group]
+                : [
+                      SlotRelevance.own,
+                      SlotRelevance.own_group,
+                      SlotRelevance.tracked,
+                      SlotRelevance.tracked_group,
+                  ];
             const itemRelevance = MultiWorldContextHelper.getSlotRelevance(
                 multiWorldContext,
                 hint.receivingPlayer
             );
+            const locationRelevance = MultiWorldContextHelper.getSlotRelevance(
+                multiWorldContext,
+                hint.findingPlayer
+            );
             if (
                 filters.own.includes("items") &&
-                [SlotRelevance.own, SlotRelevance.own_group].includes(
-                    itemRelevance
-                )
+                adequateRelevance.includes(itemRelevance)
             ) {
                 passesPlayerFilter = true;
             }
 
             if (
                 filters.own.includes("locations") &&
-                hint.findingPlayer === multiWorldContext.trackedSlot
+                adequateRelevance.includes(locationRelevance)
             ) {
                 passesPlayerFilter = true;
             }
@@ -84,7 +95,6 @@ const HintTable = ({
                 passesSearchKeyFilter
             );
         }) ?? [];
-
     filteredHints.sort((a, b) => {
         let sortValue = 0;
         switch (filters.sort) {

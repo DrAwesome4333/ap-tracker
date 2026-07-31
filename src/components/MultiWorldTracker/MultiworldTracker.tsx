@@ -1,4 +1,11 @@
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+import {
+    useContext,
+    useEffect,
+    useEffectEvent,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useCurrentActivity } from "../../hooks/activityHook";
 import MultiWorldService, {
     SavedSlotDetails,
@@ -15,6 +22,8 @@ import { MultiWorldContextData } from "../../services/MultiInfo/MultiWorldContex
 import MultiWorldContext, {
     MultiWorldConnectionMode,
 } from "../../contexts/multiWorldContext";
+import HintTab from "../Hint/HintTab";
+import ServiceContext from "../../contexts/serviceContext";
 
 const useWebHostSlots = (multiSaveId: string) => {
     const initialized = useRef(false);
@@ -25,6 +34,7 @@ const useWebHostSlots = (multiSaveId: string) => {
         useState<MultiWorldContextData>(null);
     const [slotDetails, setSlotDetails] = useState<SavedSlotDetails[]>([]);
     const [hostSources, setHostSources] = useState<WebHostSlotSource[]>([]);
+    const serviceContext = useContext(ServiceContext);
 
     const update = useEffectEvent(async () => {
         if (!loaded.current || !apiHandlerRef.current) {
@@ -38,6 +48,7 @@ const useWebHostSlots = (multiSaveId: string) => {
         await apiHandlerRef.current
             .getTracker()
             .then((apiResult) => {
+                serviceContext.hintManager?.addWebHostHints(apiResult);
                 hostSources.forEach((source) => source.refresh(apiResult));
             })
             .catch((e) => {
@@ -79,6 +90,7 @@ const useWebHostSlots = (multiSaveId: string) => {
                 new WebHostSlotSource(contextData, slot.game, slot.slot_number)
         );
         setHostSources(sources);
+        serviceContext.hintManager?.setMultiWorldContext(contextData, true);
         loaded.current = true;
     };
 
@@ -159,7 +171,7 @@ const MultiWorldTracker = () => {
         [contexts]
     );
 
-    const hintTab = useMemo(() => new Tab("Hints", <></>), []);
+    const hintTab = useMemo(() => new Tab("Hints", <HintTab />), []);
 
     return (
         <div

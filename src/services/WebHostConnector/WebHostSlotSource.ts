@@ -1,17 +1,11 @@
 import { itemClassifications } from "archipelago.js";
-import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
 import { Item, ItemSource, ItemUpdateCallback } from "../items/itemSource";
 import {
     LocationSource,
     LocationStatus,
     LocationUpdateCallback,
 } from "../locations/locationSource";
-import {
-    APIOffsets_Item,
-    APIRoomStatus,
-    APIStaticTracker,
-    APITracker,
-} from "../WebHostAPI/types";
+import { APIOffsets_Item, APITracker } from "../WebHostAPI/types";
 import { MultiWorldContextData } from "../MultiInfo/MultiWorldContextData";
 
 class WebHostSlotSource implements LocationSource, ItemSource {
@@ -63,7 +57,6 @@ class WebHostSlotSource implements LocationSource, ItemSource {
         ).items;
 
         // TODO, when all locations can be fetched via the API, do so
-        // TODO, hints
 
         const newItems: Item[] = slotItems
             .slice(this.#itemIndex)

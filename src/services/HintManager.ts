@@ -5,6 +5,7 @@ import {
     MultiWorldContextHelper,
     MultiWorldPlayer,
 } from "./MultiInfo/MultiWorldContextData";
+import { APIHint, APIOffsets_Hint, APITracker } from "./WebHostAPI/types";
 
 const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
     let ownerString = `${MultiWorldContextHelper.getSlotName(multiWorldContext, hint.receivingPlayer)}'s`;
@@ -73,6 +74,20 @@ const convertAPJSHint = (ap_hint: APJS_Hint): Hint => {
     };
 };
 
+const convertAPIHint = (api_hint: APIHint, team: number): Hint => {
+    return {
+        team,
+        receivingPlayer: api_hint[APIOffsets_Hint.receivingPlayer],
+        findingPlayer: api_hint[APIOffsets_Hint.findingPlayer],
+        locationId: api_hint[APIOffsets_Hint.locationId],
+        itemId: api_hint[APIOffsets_Hint.itemId],
+        found: !!api_hint[APIOffsets_Hint.hintFound],
+        status: api_hint[APIOffsets_Hint.status],
+        itemFlags: api_hint[APIOffsets_Hint.itemFlags],
+        entrance: api_hint[APIOffsets_Hint.entrance],
+    };
+};
+
 const convertAPJSHints = (ap_hints: APJS_Hint[]): Hint[] => {
     return ap_hints.map(convertAPJSHint);
 };
@@ -93,8 +108,16 @@ export default class HintManager {
         this.#tagger = hintTagger;
     }
 
-    setMultiWorldContext = (context: MultiWorldContextData) => {
+    setMultiWorldContext = (
+        context: MultiWorldContextData,
+        clearHints = false
+    ) => {
         this.#multiWorldContext = context;
+        if (clearHints) {
+            this.#hints.clear();
+            this.#tagger?.clear();
+            this.#callListeners();
+        }
     };
 
     initializeListeners = (client: Client) => {
@@ -105,25 +128,26 @@ export default class HintManager {
             this.#callListeners();
         });
         this.#client.items
-            .on("hintsInitialized", (hints) =>
-                this.#addHints(convertAPJSHints(hints))
-            )
+            .on("hintsInitialized", (hints) => {
+                this.#hints.clear();
+                this.#tagger?.clear();
+                this.#addHints(convertAPJSHints(hints));
+            })
             .on("hintReceived", (hint) => this.#addHint(convertAPJSHint(hint)))
             .on("hintUpdated", (hint) => this.#addHint(convertAPJSHint(hint)));
     };
 
-    // addWebHostHints = (apiTracker: APITracker, trackedSlots: number[]) => {
-    //     const newHints:  Map<string, Hint> = new Map();
-    //     const trackedSlotsSet = new Set(trackedSlots);
-    //     apiTracker.hints.forEach(
-    //         (playerHints) => {
-    //             if(!trackedSlotsSet.has(playerHints.player)) return;
-    //             playerHints.hints.forEach((apiHint) => {
-
-    //             })
-    //         }
-    //     )
-    // }
+    addWebHostHints = (apiTracker: APITracker) => {
+        const newHints: Map<string, Hint> = new Map();
+        apiTracker.hints.forEach((playerHints) => {
+            playerHints.hints.forEach((apiHint) => {
+                const hint = convertAPIHint(apiHint, playerHints.team);
+                const hintKey = computeHintId(hint);
+                newHints.set(hintKey, hint);
+            });
+        });
+        this.#addHints([...newHints.values()]);
+    };
 
     #callListeners = () => {
         this.#hintCache = null;
@@ -146,7 +170,7 @@ export default class HintManager {
         const hintsForTagging = hints
             .filter(
                 (hint) =>
-                    hint.findingPlayer === this.#multiWorldContext.trackedSlot
+                    hint.findingPlayer === this.#multiWorldContext?.trackedSlot
             )
             .map((hint) => ({
                 location: hint.locationId,
