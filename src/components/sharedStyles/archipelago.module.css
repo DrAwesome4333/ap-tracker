@@ -11,8 +11,11 @@
     --ap-salmon: #ff8e72;
 
     --ap-player: var(--ap-magenta);
+    --ap-group: var(--ap-plum);
     --ap-player-alt: var(--ap-yellow);
+    --ap-group-alt: var(--ap-orange);
     --ap-player-other: var(--ap-light-yellow);
+    --ap-group-other: var(--ap-salmon);
 
     --ap-item-prog: var(--ap-plum);
     --ap-item-normal: var(--ap-cyan);
@@ -55,13 +58,27 @@
     text-decoration: wavy underline var(--color);
 }
 
+.group {
+    --color: var(--ap-group);
+    text-decoration: wavy underline var(--color);
+}
+
 .player_alt {
     --color: var(--ap-player-alt);
     text-decoration: wavy underline var(--color);
 }
 
+.group_alt {
+    --color: var(--ap-group-alt);
+    text-decoration: wavy underline var(--color);
+}
+
 .player_other {
     --color: var(--ap-player-other);
+}
+
+.group_other {
+    --color: var(--ap-group-other);
 }
 
 .item_prog {

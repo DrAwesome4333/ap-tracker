@@ -1,6 +1,17 @@
-// import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
-// import { APIGamePackage, APIRoomStatus, APIStaticTracker, APITracker, RoomInfo } from "./types";
-import { APIRoomStatus, APIStaticTracker, APITracker, RoomInfo } from "./types";
+import EmptyGamePackageWrapper from "../gamepackage/EmptyGamePackageWrapper";
+import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
+import DataPackageHelper from "../MultiInfo/DatapackageHelper";
+import { MultiWorldContextData } from "../MultiInfo/MultiWorldContextData";
+import {
+    APIGamePackage,
+    APIOffsets_Hint,
+    APIOffsets_Item,
+    APIOffsets_Player,
+    APIRoomStatus,
+    APIStaticTracker,
+    APITracker,
+    RoomInfo,
+} from "./types";
 
 const fetchAsJson = async (path: string) => {
     return fetch(path)
@@ -45,13 +56,35 @@ class WebHostAPIHandler {
         return `${this.#roomInfo.origin}/room/${this.#roomInfo.room_suuid}`;
     }
 
-    // static getGamePackage = async (checksum: string, origin = "https://archipelago.gg"): Promise<APIGamePackage> => {
-    //     return fetchAsJson(`${origin}/api/datapackage/${checksum}`);
-    // }
+    static getGamePackage = async (
+        checksum: string,
+        origin = "https://archipelago.gg"
+    ): Promise<APIGamePackage> => {
+        return fetchAsJson(`${origin}/api/datapackage/${checksum}`);
+    };
 
-    // getGamePackage = async (checksum: string, game: string): Promise<GamePackageWrapper> => {
-
-    // };
+    getGamePackage = async (
+        checksum: string,
+        game: string
+    ): Promise<GamePackageWrapper> => {
+        return fetchAsJson(
+            `${this.#roomInfo.origin}/api/datapackage/${checksum}`
+        ).then((gamePackage: APIGamePackage) => {
+            if (!gamePackage) {
+                return null;
+            }
+            return new GamePackageWrapper(
+                {
+                    checksum: gamePackage.checksum,
+                    item_name_to_id: gamePackage.item_name_to_id,
+                    location_name_to_id: gamePackage.item_name_to_id,
+                    location_groups: gamePackage.location_name_groups,
+                    item_groups: gamePackage.item_name_groups,
+                },
+                game
+            );
+        });
+    };
 
     static async parseRoomLink(roomLink: string): Promise<RoomInfo> {
         const parsedUrl = URL.parse(roomLink);
@@ -83,6 +116,105 @@ class WebHostAPIHandler {
                 origin: parsedUrl.origin,
             };
         });
+    }
+
+    static async buildMultiWorldContext(
+        roomStatus: APIRoomStatus,
+        staticTracker: APIStaticTracker,
+        origin = "https://archipelago.gg"
+    ): Promise<MultiWorldContextData> {
+        const context: MultiWorldContextData = {
+            groups: {},
+            players: {
+                0: {
+                    name: "Server",
+                    game: "Archipelago",
+                    slot: 0,
+                    groups: new Set(),
+                },
+            },
+            gamePackages: {},
+        };
+
+        roomStatus.players.forEach((player, index) => {
+            const slotNumber = index + 1;
+            context.players[slotNumber] = {
+                slot: slotNumber,
+                name: player[APIOffsets_Player.slotName],
+                game: player[APIOffsets_Player.gameName],
+                groups: staticTracker.groups.reduce(
+                    (result, group) =>
+                        group.members.includes(slotNumber)
+                            ? result.add(slotNumber)
+                            : result,
+                    new Set() as Set<number>
+                ),
+            };
+        });
+
+        staticTracker.groups.forEach((group) => {
+            context.groups[group.slot] = {
+                game: context.players[group.members[0] ?? 0].game,
+                name: group.name,
+                slot: group.slot,
+                players: new Set(group.members),
+            };
+        });
+
+        const dataPackagePromises = Object.entries(
+            staticTracker.datapackage
+        ).map(async ([game, { checksum }]) => {
+            const localPackage = await DataPackageHelper.getCachedPackage(
+                game,
+                checksum
+            );
+            if (localPackage) {
+                return [game, new GamePackageWrapper(localPackage, game)] as [
+                    string,
+                    GamePackageWrapper,
+                ];
+            }
+            const remotePackage = await WebHostAPIHandler.getGamePackage(
+                checksum,
+                origin
+            );
+            if (remotePackage) {
+                DataPackageHelper.cacheGamePackage({
+                    game,
+                    checksum,
+                    last_used: Date.now(),
+                    location_groups: remotePackage.item_name_groups,
+                    item_groups: remotePackage.location_name_groups,
+                    location_name_to_id: remotePackage.location_name_to_id,
+                    item_name_to_id: remotePackage.item_name_to_id,
+                });
+                return [
+                    game,
+                    new GamePackageWrapper(
+                        {
+                            location_groups: remotePackage.item_name_groups,
+                            item_groups: remotePackage.location_name_groups,
+                            location_name_to_id:
+                                remotePackage.location_name_to_id,
+                            item_name_to_id: remotePackage.item_name_to_id,
+                            checksum,
+                        },
+                        game
+                    ),
+                ] as [string, GamePackageWrapper];
+            }
+            return [game, new EmptyGamePackageWrapper()] as [
+                string,
+                GamePackageWrapper,
+            ];
+        });
+
+        const dataPackageResults = await Promise.all(dataPackagePromises);
+        dataPackageResults.forEach(([game, gamePackage]) => {
+            context.gamePackages[game] = gamePackage;
+        });
+
+        return context;
     }
 }
 

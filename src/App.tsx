@@ -33,6 +33,10 @@ import { TrackerManager } from "./services/tracker/TrackerManager";
 import { useCurrentGameTracker } from "./hooks/trackerHooks";
 import { GamePackageWrapper } from "./services/gamepackage/GamePackageWrapper";
 import MultiWorldTracker from "./components/MultiWorldTracker/MultiworldTracker";
+import { MultiWorldContextData } from "./services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext, {
+    MultiWorldConnectionMode,
+} from "./contexts/multiWorldContext";
 
 const optionManager = globalOptionManager;
 const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
@@ -96,6 +100,9 @@ const App = (): React.ReactNode => {
     const [tagManager, setTagManager] = useState<TagManager>(null);
     const [locationTagger, setLocationTagger] = useState<LocationTagger>(null);
     const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
+    const [multiWorldContextData, setMultiWorldContextData] = useState<
+        MultiWorldContextData & { connectionMode: MultiWorldConnectionMode }
+    >(null);
 
     const titleParts = ["Checklist Tracker"];
     if (slotAlias) {
@@ -109,6 +116,7 @@ const App = (): React.ReactNode => {
             multiWorldId: multi_id,
             slotNumber: slot_number,
             gamePackage,
+            multiWorldContext,
         }: ConnectedEventParams) => {
             setSlotName(slot_name);
             setSlotAlias(slot_alias);
@@ -124,12 +132,17 @@ const App = (): React.ReactNode => {
             newTagManager.enableLocationEffects(newLocationRepository);
             newItemRepository.addSource(connector);
             newLocationRepository.addSource(connector);
+            hintManager.setMultiWorldContext(multiWorldContext);
             setItemRepository(newItemRepository);
             setLocationRepository(newLocationRepository);
             setGame(gamePackage.game);
             setGamePackage(gamePackage);
             setTagManager(newTagManager);
             setLocationTagger(newLocationTagger);
+            setMultiWorldContextData({
+                ...multiWorldContext,
+                connectionMode: MultiWorldConnectionMode.Server,
+            });
         },
         []
     );
@@ -178,52 +191,57 @@ const App = (): React.ReactNode => {
         >
             <title>{titleParts.join(" | ")}</title>
             <ActivityContext.Provider value={activityContext}>
-                <SlotContext.Provider
-                    value={{
-                        game,
-                        slotName,
-                        slotNumber,
-                        slotAlias,
-                        multiWorldId,
-                        locationRepository,
-                        itemRepository,
-                        hintManager,
-                        tagManager,
-                        locationTagger,
-                        locationTracker,
-                        itemTracker,
-                        liveSlot: true,
-                    }}
-                >
-                    <ServiceContext.Provider
+                <MultiWorldContext.Provider value={multiWorldContextData}>
+                    <SlotContext.Provider
                         value={{
-                            connector,
-                            optionManager,
-                            trackerManager,
-                            textClientManager,
-                            customTrackerRepository,
+                            game,
+                            slotName,
+                            slotNumber,
+                            slotAlias,
+                            multiWorldId,
+                            locationRepository,
+                            itemRepository,
+                            hintManager,
+                            tagManager,
+                            locationTagger,
+                            locationTracker,
+                            itemTracker,
+                            liveSlot: true,
                         }}
                     >
-                        <NotificationContainer />
-                        <MainHeader
-                            optionsCallback={() => {
-                                if (optionWindowOpen) {
-                                    activityContext.drop("options");
-                                } else {
-                                    activityContext.add("options");
-                                }
+                        <ServiceContext.Provider
+                            value={{
+                                connector,
+                                optionManager,
+                                trackerManager,
+                                textClientManager,
+                                customTrackerRepository,
+                                hintManager,
                             }}
-                        />
-                        {optionWindowOpen && <OptionsScreen />}
-                        {activityContext.stack.length === 0 && <StartScreen />}
-                        {currentActivityName === "slot-tracker" && (
-                            <TrackerScreen />
-                        )}
-                        {currentActivityName?.startsWith(
-                            "multi-world-tracker"
-                        ) && <MultiWorldTracker />}
-                    </ServiceContext.Provider>
-                </SlotContext.Provider>
+                        >
+                            <NotificationContainer />
+                            <MainHeader
+                                optionsCallback={() => {
+                                    if (optionWindowOpen) {
+                                        activityContext.drop("options");
+                                    } else {
+                                        activityContext.add("options");
+                                    }
+                                }}
+                            />
+                            {optionWindowOpen && <OptionsScreen />}
+                            {activityContext.stack.length === 0 && (
+                                <StartScreen />
+                            )}
+                            {currentActivityName === "slot-tracker" && (
+                                <TrackerScreen />
+                            )}
+                            {currentActivityName?.startsWith(
+                                "multi-world-tracker"
+                            ) && <MultiWorldTracker />}
+                        </ServiceContext.Provider>
+                    </SlotContext.Provider>
+                </MultiWorldContext.Provider>
             </ActivityContext.Provider>
         </div>
     );

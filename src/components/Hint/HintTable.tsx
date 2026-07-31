@@ -1,13 +1,16 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import { useHints } from "../../hooks/hintHook";
 import HintRow from "./HintRow";
 import { naturalSort } from "../../utility/comparisons";
 import { HintFilter } from "./HintOptionDef";
+import {
+    MultiWorldContextHelper,
+    SlotRelevance,
+} from "../../services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext from "../../contexts/multiWorldContext";
 
 import { List, useDynamicRowHeight } from "react-window";
-import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
-import SlotContext from "../../contexts/slotContext";
 
 const HintTable = ({
     filters,
@@ -18,8 +21,9 @@ const HintTable = ({
     searchKey: string;
     searchFilterMode: string;
 }) => {
-    const slotContext = useContext(SlotContext);
-    const hints = useHints(slotContext.hintManager);
+    const multiWorldContext = useContext(MultiWorldContext);
+    const serviceContext = useContext(ServiceContext);
+    const hints = useHints(serviceContext.hintManager);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
     const lowerSearchKey = searchKey.toLowerCase().trim();
 
@@ -28,16 +32,22 @@ const HintTable = ({
             let passesPlayerFilter = false;
             let passesStatusFilter = false;
             let passesSearchKeyFilter = false;
+            const itemRelevance = MultiWorldContextHelper.getSlotRelevance(
+                multiWorldContext,
+                hint.receivingPlayer
+            );
             if (
                 filters.own.includes("items") &&
-                hint.item.receiver.slot === slotContext.slotNumber
+                [SlotRelevance.own, SlotRelevance.own_group].includes(
+                    itemRelevance
+                )
             ) {
                 passesPlayerFilter = true;
             }
 
             if (
                 filters.own.includes("locations") &&
-                hint.item.sender.slot === slotContext.slotNumber
+                hint.findingPlayer === multiWorldContext.trackedSlot
             ) {
                 passesPlayerFilter = true;
             }
@@ -49,9 +59,19 @@ const HintTable = ({
             if (
                 !lowerSearchKey ||
                 (searchFilterMode === "item" &&
-                    hint.item.name.toLowerCase().includes(lowerSearchKey)) ||
+                    MultiWorldContextHelper.getItemName(
+                        multiWorldContext,
+                        hint.receivingPlayer,
+                        hint.itemId
+                    )
+                        .toLowerCase()
+                        .includes(lowerSearchKey)) ||
                 (searchFilterMode === "location" &&
-                    hint.item.locationName
+                    MultiWorldContextHelper.getLocationName(
+                        multiWorldContext,
+                        hint.findingPlayer,
+                        hint.locationId
+                    )
                         .toLowerCase()
                         .includes(lowerSearchKey))
             ) {
@@ -69,10 +89,10 @@ const HintTable = ({
         let sortValue = 0;
         switch (filters.sort) {
             case "sender":
-                sortValue = b.item.sender.slot - a.item.sender.slot;
+                sortValue = b.findingPlayer - a.findingPlayer;
                 break;
             case "receiver":
-                sortValue = b.item.receiver.slot - a.item.receiver.slot;
+                sortValue = b.receivingPlayer - a.receivingPlayer;
                 break;
             default:
             case "status":
@@ -80,7 +100,18 @@ const HintTable = ({
                 break;
         }
         if (sortValue === 0) {
-            sortValue = naturalSort(a.item.name, b.item.name);
+            sortValue = naturalSort(
+                MultiWorldContextHelper.getItemName(
+                    multiWorldContext,
+                    a.receivingPlayer,
+                    a.itemId
+                ),
+                MultiWorldContextHelper.getItemName(
+                    multiWorldContext,
+                    b.receivingPlayer,
+                    b.itemId
+                )
+            );
         }
         return sortValue;
     });

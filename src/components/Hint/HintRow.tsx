@@ -1,12 +1,19 @@
-import { API, Hint, Item } from "archipelago.js";
+import { API } from "archipelago.js";
+import { Hint, hintToText } from "../../services/HintManager";
 import React, { forwardRef, useCallback, useContext, useState } from "react";
 import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 import Icon from "../icons/icons";
 import { TextButton } from "../shared/buttons";
 import SlotContext from "../../contexts/slotContext";
+import {
+    MultiWorldContextData,
+    MultiWorldContextHelper,
+    SlotRelevance,
+} from "../../services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext from "../../contexts/multiWorldContext";
+import ServiceContext from "../../contexts/serviceContext";
 
 const statusSelections = [
     API.HintStatus.priority,
@@ -29,29 +36,41 @@ const hintStatusToClassMap: { [status: number]: string } = {
     [API.HintStatus.found]: ap_styles.hint_found,
 };
 
-const getPlayerClass = (player: number) => {
-    if (player === MultiWorldService.loadedSlot?.slot_number)
-        return ap_styles.player + " " + ap_styles.ap_text;
-
-    if (
-        MultiWorldService.loadedMultiWorld.slots?.find(
-            (s) => s.slot_number === player
-        )
-    )
-        return ap_styles.player_alt + " " + ap_styles.ap_text;
-    return ap_styles.player_other + " " + ap_styles.ap_text;
+const getPlayerClass = (
+    player: number,
+    multiWorldContext?: MultiWorldContextData
+) => {
+    const relevance = multiWorldContext
+        ? MultiWorldContextHelper.getSlotRelevance(multiWorldContext, player)
+        : SlotRelevance.other;
+    switch (relevance) {
+        case SlotRelevance.own:
+            return ap_styles.player + " " + ap_styles.ap_text;
+        case SlotRelevance.tracked:
+            return ap_styles.player_alt + " " + ap_styles.ap_text;
+        case SlotRelevance.own_group:
+            return ap_styles.group + " " + ap_styles.ap_text;
+        case SlotRelevance.tracked_group:
+            return ap_styles.group_alt + " " + ap_styles.ap_text;
+        case SlotRelevance.other_group:
+            return ap_styles.group_other + " " + ap_styles.ap_text;
+        case SlotRelevance.other: //fallthrough
+        default:
+            return ap_styles.player_other + " " + ap_styles.ap_text;
+    }
 };
 
-const getItemClass = (item: Item) => {
-    const special = item.progression
-        ? item.useful
-            ? ap_styles.item_prog_useful
-            : ap_styles.item_prog
-        : item.useful
-          ? ap_styles.item_useful
-          : item.trap
-            ? ap_styles.item_trap
-            : ap_styles.item_normal;
+const getItemClass = (itemFlags: number) => {
+    const special =
+        itemFlags & API.itemClassifications.progression
+            ? itemFlags & API.itemClassifications.useful
+                ? ap_styles.item_prog_useful
+                : ap_styles.item_prog
+            : itemFlags & API.itemClassifications.useful
+              ? ap_styles.item_useful
+              : itemFlags & API.itemClassifications.trap
+                ? ap_styles.item_trap
+                : ap_styles.item_normal;
     return special + " " + ap_styles.ap_text;
 };
 
@@ -62,15 +81,24 @@ const HintRow = forwardRef(
     ) => {
         const hint = hints[index];
         const odd = index % 2 === 1;
+        const serviceContext = useContext(ServiceContext);
         const slotContext = useContext(SlotContext);
+        const multiWorldContext = useContext(MultiWorldContext);
         const canChangeStatus =
-            hint.item.receiver.slot === slotContext.slotNumber &&
+            multiWorldContext &&
+            [SlotRelevance.own, SlotRelevance.own_group].includes(
+                MultiWorldContextHelper.getSlotRelevance(
+                    multiWorldContext,
+                    hint.receivingPlayer
+                )
+            ) &&
             hint.status !== API.HintStatus.found &&
             slotContext.liveSlot;
         const [updateInProgress, setUpdateInProgress] = useState(false);
         const finishUpdate = useCallback(() => {
             setUpdateInProgress(false);
         }, [setUpdateInProgress]);
+
         return (
             <div
                 ref={ref}
@@ -99,7 +127,7 @@ const HintRow = forwardRef(
                                 if (window.navigator.clipboard) {
                                     try {
                                         window.navigator.clipboard.writeText(
-                                            `${hint.item.receiver.alias}'s ${hint.item.name} is at ${hint.item.locationName} ${hint.entrance === "Vanilla" ? "" : `(${hint.entrance}) `}in ${hint.item.sender}'s world. (${statusToText[hint.status]})`
+                                            hintToText(multiWorldContext, hint)
                                         );
                                     } catch (e) {
                                         console.error(e);
@@ -112,19 +140,37 @@ const HintRow = forwardRef(
                     </div>
                     <div>
                         <span
-                            className={getPlayerClass(hint.item.receiver.slot)}
+                            className={getPlayerClass(
+                                hint.receivingPlayer,
+                                multiWorldContext
+                            )}
                         >
-                            {hint.item.receiver.alias}
+                            {MultiWorldContextHelper.getSlotName(
+                                multiWorldContext,
+                                hint.receivingPlayer
+                            )}
                         </span>
                         {"'s"}
                         <br />
-                        <span className={getItemClass(hint.item)}>
-                            {hint.item.name}
+                        <span className={getItemClass(hint.itemFlags)}>
+                            {MultiWorldContextHelper.getItemName(
+                                multiWorldContext,
+                                hint.receivingPlayer,
+                                hint.itemId
+                            )}
                         </span>
                     </div>
                     <div>
-                        <span className={getPlayerClass(hint.item.sender.slot)}>
-                            {hint.item.sender.alias}
+                        <span
+                            className={getPlayerClass(
+                                hint.findingPlayer,
+                                multiWorldContext
+                            )}
+                        >
+                            {MultiWorldContextHelper.getSlotName(
+                                multiWorldContext,
+                                hint.findingPlayer
+                            )}
                         </span>
                         <br />
                         <span
@@ -132,7 +178,11 @@ const HintRow = forwardRef(
                                 ap_styles.location + " " + ap_styles.ap_text
                             }
                         >
-                            {hint.item.locationName}
+                            {MultiWorldContextHelper.getLocationName(
+                                multiWorldContext,
+                                hint.findingPlayer,
+                                hint.locationId
+                            )}
                         </span>
                         {hint.entrance !== "Vanilla" && (
                             <>
@@ -162,11 +212,11 @@ const HintRow = forwardRef(
                             disabled={updateInProgress}
                             onChange={(e) => {
                                 if (
-                                    slotContext.hintManager &&
-                                    slotContext.hintManager.canUpdate
+                                    serviceContext.hintManager &&
+                                    serviceContext.hintManager.canUpdate
                                 ) {
                                     setUpdateInProgress(true);
-                                    slotContext.hintManager
+                                    serviceContext.hintManager
                                         .updateHintStatus(
                                             hint,
                                             parseInt(e.target.value)

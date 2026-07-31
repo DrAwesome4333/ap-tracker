@@ -37,6 +37,27 @@ const colorOptionsDef: HierarchicalOption = {
         },
         {
             type: OptionType.color,
+            default: "#ff00c7",
+            display: "Item Link Group (current slot)",
+            name: "--ap-group",
+            apClasses: ["ap_text", "group"],
+        },
+        {
+            type: OptionType.color,
+            default: "#ffd400",
+            display: "Item Link Group (my other slot)",
+            name: "--ap-group-alt",
+            apClasses: ["ap_text", "group_alt"],
+        },
+        {
+            type: OptionType.color,
+            default: "#ede091",
+            display: "Item Link Group (other)",
+            name: "--ap-group-other",
+            apClasses: ["ap_text", "group_other"],
+        },
+        {
+            type: OptionType.color,
             default: "#cc57ff",
             display: "Item (Progression)",
             name: "--ap-item-prog",

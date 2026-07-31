@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import HintManager from "../services/HintManager";
-import { Hint } from "archipelago.js";
+import { Hint } from "../services/HintManager";
 
 const useHints = (hintManager?: HintManager) => {
     const [hints, setHints] = useState<Hint[]>([]);

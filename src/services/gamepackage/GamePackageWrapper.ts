@@ -32,11 +32,14 @@ class GamePackageWrapper {
     }
 
     getItemName = (itemId: number) => {
-        return this.#item_id_to_name[itemId];
+        return this.#item_id_to_name[itemId] ?? `Unknown item ${itemId}`;
     };
 
     getLocationName = (locationId: number) => {
-        return this.#location_id_to_name[locationId];
+        return (
+            this.#location_id_to_name[locationId] ??
+            `Unknown location ${locationId}`
+        );
     };
 
     getItemId = (itemName: string) => {
@@ -68,6 +71,12 @@ class GamePackageWrapper {
     };
     getLocationGroups = () => {
         return this.#package.location_groups;
+    };
+
+    exportPackage = (): GamePackage => {
+        return {
+            ...this.#package,
+        };
     };
 }
 

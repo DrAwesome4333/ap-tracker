@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import CollectionContainer from "./CollectionContainer";
 import InventoryItemView from "./InventoryItemView";
 import { TextButton } from "../shared/buttons";

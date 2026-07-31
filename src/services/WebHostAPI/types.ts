@@ -6,16 +6,17 @@ type APIGamePackage = {
     location_name_to_id: Record<string, number>;
 };
 
-type APIDataPackage = {
-    games: Record<string, APIGamePackage>;
-};
-
 type APISlotDownload = {
     download: string;
     slot: number;
 };
 type SlotName = string;
 type GameName = string;
+
+enum APIOffsets_Player {
+    slotName = 0,
+    gameName = 1,
+}
 
 type APIRoomStatus = {
     downloads: APISlotDownload[];
@@ -43,6 +44,16 @@ type FindingPlayer = number;
 type HintFound = number;
 type Entrance = string;
 type HintStatus = number; // TODO replace with enum
+enum APIOffsets_Hint {
+    receivingPlayer = 0,
+    findingPlayer = 1,
+    locationId = 2,
+    itemId = 3,
+    hintFound = 4,
+    entrance = 5,
+    itemFlags = 6,
+    status = 7,
+}
 type APIHint = [
     ReceivingPlayer,
     FindingPlayer,
@@ -133,4 +144,4 @@ export type {
     RoomInfo,
 };
 
-export { APIOffsets_Item };
+export { APIOffsets_Item, APIOffsets_Hint, APIOffsets_Player };

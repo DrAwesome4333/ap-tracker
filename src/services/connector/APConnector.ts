@@ -1,4 +1,4 @@
-import { API, Client } from "archipelago.js";
+import { API, Client, slotTypes } from "archipelago.js";
 import { Item, ItemSource, ItemUpdateCallback } from "../items/itemSource";
 import {
     LocationStatus,
@@ -21,6 +21,11 @@ import NotificationManager, {
     MessageType,
     StatusNotificationHandle,
 } from "../notifications/notifications";
+import {
+    MultiWorldContextData,
+    MultiWorldGroup,
+    MultiWorldPlayer,
+} from "../MultiInfo/MultiWorldContextData";
 
 interface ConnectionConfiguration {
     host?: string;
@@ -46,6 +51,7 @@ type ConnectedEventParams = {
     slotAlias: string;
     slotNumber: number;
     multiWorldId: string;
+    multiWorldContext: MultiWorldContextData;
 };
 
 const clientUuidStore = new LocalStorageDataStore("ap-checklist-client-uuid");
@@ -270,7 +276,7 @@ class APConnector implements LocationSource, ItemSource {
                 slotData: false,
                 uuid: this.#clientUuid,
             })
-            .then(async (_packet) => {
+            .then(async (packet) => {
                 this.#setStatus(ConnectionStatus.connected);
                 const seedName = this.client.room.seedName;
                 let seedMatchesSave = false;
@@ -334,6 +340,26 @@ class APConnector implements LocationSource, ItemSource {
                 });
 
                 const dataPackage = this.client.package.exportPackage();
+                const gamePackages: Record<string, GamePackageWrapper> =
+                    Object.entries(dataPackage.games).reduce(
+                        (packs, [game, gamePackage]) => {
+                            packs[game] = new GamePackageWrapper(
+                                {
+                                    checksum: gamePackage.checksum,
+                                    item_groups: {},
+                                    location_groups: {},
+                                    location_name_to_id:
+                                        gamePackage.location_name_to_id,
+                                    item_name_to_id:
+                                        gamePackage.item_name_to_id,
+                                },
+                                game
+                            );
+                            return packs;
+                        },
+                        {}
+                    );
+
                 const getGroups = async (): Promise<{
                     item: { [name: string]: string[] };
                     location: { [name: string]: string[] };
@@ -370,7 +396,6 @@ class APConnector implements LocationSource, ItemSource {
                     );
                 }
                 enableDataSync(this.client);
-                let wrappedGamePackage: GamePackageWrapper = null;
                 connectionStatusHandle.update({
                     message: "Loading data packages...",
                 });
@@ -403,18 +428,62 @@ class APConnector implements LocationSource, ItemSource {
                         return gamePackage;
                     })
                     .then((gamePackage) => {
-                        wrappedGamePackage = new GamePackageWrapper(
+                        gamePackages[game] = new GamePackageWrapper(
                             gamePackage,
                             game
                         );
                     })
                     .catch((e) => console.error(e));
+                const players: Record<number, MultiWorldPlayer> = {};
+                const groups: Record<number, MultiWorldGroup> = {};
+                Object.entries(this.client.players.slots).forEach(
+                    ([slotNumber, slot]) => {
+                        if (slot.type === slotTypes.player) {
+                            players[parseInt(slotNumber)] = {
+                                name: slot.name,
+                                slot: parseInt(slotNumber),
+                                game: slot.game,
+                                groups: new Set(),
+                                alias: this.client.players.findPlayer(
+                                    parseInt(slotNumber)
+                                ).alias,
+                            };
+                        }
+
+                        if (slot.type === slotTypes.group) {
+                            groups[parseInt(slotNumber)] = {
+                                name: slot.name,
+                                slot: parseInt(slotNumber),
+                                game: slot.game,
+                                players: new Set(slot.group_members),
+                            };
+                        }
+                    }
+                );
+
+                Object.entries(groups).forEach(([slotNumber, group]) => {
+                    group.players.forEach((player) =>
+                        players[player].groups.add(parseInt(slotNumber))
+                    );
+                });
+
                 const result: ConnectedEventParams = {
-                    gamePackage: wrappedGamePackage,
                     slotName,
+                    gamePackage: gamePackages[game],
                     slotAlias: this.client.players.self.alias,
                     slotNumber: this.client.players.self.slot,
                     multiWorldId: multiSlot.multi_save_id,
+                    multiWorldContext: {
+                        players,
+                        groups,
+                        gamePackages,
+                        multiSaveId: multiSlot.multi_save_id,
+                        trackedSlot: this.client.players.self.slot,
+                        trackedSlots:
+                            MultiWorldService.findAllSlotsForMultiWorld(
+                                multiSlot.multi_save_id
+                            ).map((slot) => slot.slot_number),
+                    },
                 };
                 this.#connectedCallbacks.forEach((callback) =>
                     callback(result)

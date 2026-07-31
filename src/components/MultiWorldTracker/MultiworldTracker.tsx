@@ -1,11 +1,9 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useCurrentActivity } from "../../hooks/activityHook";
-import { GamePackageWrapper } from "../../services/gamepackage/GamePackageWrapper";
 import MultiWorldService, {
     SavedSlotDetails,
 } from "../../services/MultiInfo/MultiWorldService";
 import WebHostSlotSource from "../../services/WebHostConnector/WebHostSlotSource";
-import DataPackageHelper from "../../services/MultiInfo/DatapackageHelper";
 import WebHostAPIHandler from "../../services/WebHostAPI";
 import SlotTracker from "./SlotTracker";
 import Spinner from "../icons/spinner";
@@ -13,15 +11,18 @@ import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import Tabs, { Tab } from "../LayoutUtilities/Tabs";
+import { MultiWorldContextData } from "../../services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext, {
+    MultiWorldConnectionMode,
+} from "../../contexts/multiWorldContext";
 
 const useWebHostSlots = (multiSaveId: string) => {
     const initialized = useRef(false);
     const loaded = useRef(false);
     const [refreshing, setRefreshing] = useState(false);
     const apiHandlerRef = useRef<WebHostAPIHandler>(null);
-    const [gamePackages, setGamePackages] = useState<
-        Record<string, GamePackageWrapper>
-    >({});
+    const [multiWorldContextData, setMultiWorldContextData] =
+        useState<MultiWorldContextData>(null);
     const [slotDetails, setSlotDetails] = useState<SavedSlotDetails[]>([]);
     const [hostSources, setHostSources] = useState<WebHostSlotSource[]>([]);
 
@@ -60,37 +61,22 @@ const useWebHostSlots = (multiSaveId: string) => {
         }
 
         apiHandlerRef.current = new WebHostAPIHandler(multiWorld.room_details);
-
-        const packageResults: Record<string, GamePackageWrapper> = {};
-        if (multiWorld.data_package_details) {
-            const tasks = Object.entries(multiWorld.data_package_details).map(
-                async ([game, hash]) => {
-                    // TODO add error handling, use web API if needed
-                    packageResults[game] = new GamePackageWrapper(
-                        await DataPackageHelper.getCachedPackage(game, hash),
-                        game
-                    );
-                }
-            );
-            await Promise.all(tasks);
-            setGamePackages(packageResults);
-        } else {
-            throw new Error("Missing data package details?");
-        }
-
+        // TODO parallelize
         const roomStatus = await apiHandlerRef.current.getRoomStatus();
-        const players = WebHostSlotSource.buildPlayersForRoom(roomStatus);
+        const staticTracker = await apiHandlerRef.current.getStaticTracker();
+        const contextData = await WebHostAPIHandler.buildMultiWorldContext(
+            roomStatus,
+            staticTracker,
+            multiWorld.room_details.origin
+        );
 
         const slots = MultiWorldService.findAllSlotsForMultiWorld(multiSaveId);
         setSlotDetails(slots);
+        contextData.trackedSlots = slots.map((x) => x.slot_number);
+        setMultiWorldContextData(contextData);
         const sources = slots.map(
             (slot) =>
-                new WebHostSlotSource(
-                    packageResults,
-                    slot.game,
-                    players,
-                    slot.slot_number
-                )
+                new WebHostSlotSource(contextData, slot.game, slot.slot_number)
         );
         setHostSources(sources);
         loaded.current = true;
@@ -111,13 +97,13 @@ const useWebHostSlots = (multiSaveId: string) => {
     const context = useMemo(
         () => ({
             refreshing,
-            gamePackages,
+            multiWorldContextData,
             contexts: slotDetails.map((slot, index) => ({
                 slot,
                 webHostSource: hostSources[index],
             })),
         }),
-        [slotDetails, hostSources, refreshing]
+        [slotDetails, hostSources, refreshing, multiWorldContextData]
     );
 
     return context;
@@ -128,6 +114,16 @@ const MultiWorldTracker = () => {
     const multiWorldId = currentActivityName?.split(".")[1];
     const contexts = useWebHostSlots(multiWorldId);
     const multiWorld = MultiWorldService.getMultiWorld(multiWorldId);
+    const multiWorldContext = useMemo<
+        MultiWorldContextData & { connectionMode: MultiWorldConnectionMode }
+    >(
+        () => ({
+            ...contexts.multiWorldContextData,
+            multiSaveId: multiWorldId,
+            connectionMode: MultiWorldConnectionMode.WebAPI,
+        }),
+        [contexts, multiWorldId]
+    );
 
     const inventoryTab = useMemo(
         () =>
@@ -154,10 +150,7 @@ const MultiWorldTracker = () => {
                                 }}
                                 key={`${c.slot.multi_save_id}_${c.slot.slot_number}`}
                             >
-                                <SlotTracker
-                                    gamePackages={contexts.gamePackages}
-                                    {...c}
-                                />
+                                <SlotTracker {...c} />
                             </div>
                         ))}
                     </div>
@@ -179,15 +172,16 @@ const MultiWorldTracker = () => {
             {contexts.refreshing && (
                 <Spinner style={{ width: "1rem" }} size={28} />
             )}
-            {/* {multiWorld.title} */}
-            <Tabs
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    overflow: "auto",
-                }}
-                tabs={[inventoryTab, hintTab]}
-            />
+            <MultiWorldContext.Provider value={multiWorldContext}>
+                <Tabs
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        overflow: "auto",
+                    }}
+                    tabs={[inventoryTab, hintTab]}
+                />
+            </MultiWorldContext.Provider>
         </div>
     );
 };

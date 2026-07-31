@@ -18,6 +18,7 @@ interface CachedGamePackage {
 }
 
 const DataPackageHelper: DataPackageCache & {
+    cacheGamePackage: (gamePackage: CachedGamePackage) => Promise<void>;
     cachePackage: (
         dataPackage: API.DataPackage,
         groups: {
@@ -61,6 +62,9 @@ const DataPackageHelper: DataPackageCache & {
             checksum,
         ])) as CachedGamePackage;
         return cache;
+    },
+    cacheGamePackage: async (gamePackage: CachedGamePackage) => {
+        await SaveData.storeItem(DB_STORE_KEYS.dataPackageCache, gamePackage);
     },
     cachePackage: async (
         dataPackage: API.DataPackage,

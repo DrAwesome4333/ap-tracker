@@ -1,5 +1,4 @@
 import {
-    useCallback,
     useContext,
     useEffect,
     useEffectEvent,
@@ -9,7 +8,6 @@ import {
 } from "react";
 import SlotContext, { SlotContextData } from "../../contexts/slotContext";
 import { useCurrentGameTracker } from "../../hooks/trackerHooks";
-import { GamePackageWrapper } from "../../services/gamepackage/GamePackageWrapper";
 import HintManager from "../../services/HintManager";
 import ItemRepository from "../../services/items/itemRepository";
 import LocationRepository from "../../services/locations/locationRepository";
@@ -23,13 +21,18 @@ import { LocationTracker } from "../../services/tracker/locationTrackers/locatio
 import { ItemTracker } from "../../services/tracker/itemTrackers/itemTrackers";
 import ServiceContext from "../../contexts/serviceContext";
 import InventoryView from "../inventoryComponents/InventoryView";
+import MultiWorldContext, {
+    MultiWorldConnectionMode,
+} from "../../contexts/multiWorldContext";
+import EmptyGamePackageWrapper from "../../services/gamepackage/EmptyGamePackageWrapper";
+import { MultiWorldContextData } from "../../services/MultiInfo/MultiWorldContextData";
 
 const useSlotContext = (
     slot: SavedSlotDetails,
-    webHostSource: WebHostSlotSource,
-    gamePackages: Record<string, GamePackageWrapper>
+    webHostSource: WebHostSlotSource
 ) => {
     const serviceContext = useContext(ServiceContext);
+    const multiWorldContext = useContext(MultiWorldContext);
     const optionManger = serviceContext.optionManager;
     const trackerManager = serviceContext.trackerManager;
     const game = slot.game;
@@ -45,7 +48,12 @@ const useSlotContext = (
         ResourceType.itemTracker
     );
 
-    const gamePackage = gamePackages[game];
+    const gamePackage = useMemo(
+        () =>
+            multiWorldContext?.gamePackages?.[game] ??
+            new EmptyGamePackageWrapper(),
+        [multiWorldContext?.gamePackages, game]
+    );
     const [locationRepository] = useState(() => new LocationRepository());
     const [itemRepository] = useState(() => new ItemRepository());
     const [tagManager] = useState(() => new TagManager());
@@ -145,19 +153,23 @@ const useSlotContext = (
 type SlotTrackerParams = {
     slot: SavedSlotDetails;
     webHostSource: WebHostSlotSource;
-    gamePackages: Record<string, GamePackageWrapper>;
 };
 
-const SlotTracker = ({
-    slot,
-    webHostSource,
-    gamePackages,
-}: SlotTrackerParams) => {
-    const context = useSlotContext(slot, webHostSource, gamePackages);
+const SlotTracker = ({ slot, webHostSource }: SlotTrackerParams) => {
+    const context = useSlotContext(slot, webHostSource);
+    const multiWorldContext = useContext(MultiWorldContext);
+    const adjustedContext = useMemo<
+        MultiWorldContextData & { connectionMode: MultiWorldConnectionMode }
+    >(
+        () => ({ ...multiWorldContext, trackedSlot: context.slotNumber }),
+        [multiWorldContext, SlotContext]
+    );
     return (
-        <SlotContext.Provider value={context}>
-            <InventoryView title={`${slot.slot_alias ?? slot.slot_name}`} />
-        </SlotContext.Provider>
+        <MultiWorldContext.Provider value={adjustedContext}>
+            <SlotContext.Provider value={context}>
+                <InventoryView title={`${slot.slot_alias ?? slot.slot_name}`} />
+            </SlotContext.Provider>
+        </MultiWorldContext.Provider>
     );
 };
 
