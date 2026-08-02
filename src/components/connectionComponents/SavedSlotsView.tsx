@@ -12,8 +12,10 @@ import SavedSlotView from "./SavedSlotView";
 import styles from "./SavedSlots.module.css";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
-import { PrimaryButton } from "../shared/buttons";
+import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import ActivityContext from "../../contexts/activityContext";
+import MultiWorldDetails from "./MultiWorldDetails";
+import Icon from "../icons/icons";
 
 const SavedSlotsView = ({
     connectToServer,
@@ -23,6 +25,7 @@ const SavedSlotsView = ({
 }) => {
     const activityContext = useContext(ActivityContext);
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
+    const [editorMultiWorldId, setEditorMultiWorldId] = useState<string>(null);
     const connectionStatus = useAPConnectionStatus();
     const disabled = !connectionStatus.disconnected;
 
@@ -70,24 +73,38 @@ const SavedSlotsView = ({
                     >
                         <div className={styles.multi_title}>
                             <div>{multiWorld.title}</div>
-                            {multiWorld.room_details?.tracker_suuid && (
-                                <PrimaryButton
+                            <div>
+                                {multiWorld.room_details?.tracker_suuid && (
+                                    <PrimaryButton
+                                        small
+                                        onClick={() =>
+                                            openMultiWorldTracker(
+                                                multiWorld.multi_save_id
+                                            )
+                                        }
+                                    >
+                                        Track
+                                    </PrimaryButton>
+                                )}
+                                <SecondaryButton
                                     small
                                     onClick={() =>
-                                        openMultiWorldTracker(
+                                        setEditorMultiWorldId(
                                             multiWorld.multi_save_id
                                         )
                                     }
                                 >
-                                    View
-                                </PrimaryButton>
-                            )}
+                                    <Icon
+                                        type="edit"
+                                        iconParams={{ fill: 0 }}
+                                    />
+                                </SecondaryButton>
+                            </div>
                         </div>
                         {multiWorld.slots.map((slot) => (
                             <SavedSlotView
                                 key={`${slot.multi_save_id}_${slot.slot_number}`}
                                 slot={slot}
-                                multiWorld={multiWorld}
                                 connect={() => onConnect({ slot })}
                                 edit={() => {
                                     setEditorSlot(slot);
@@ -111,9 +128,15 @@ const SavedSlotsView = ({
             </div>
             <SlotDetails
                 slot={editorSlot}
-                onClose={() => {
+                onClose={() => setEditorSlot(null)}
+                onEditMultiWorld={(saveId) => {
                     setEditorSlot(null);
+                    setEditorMultiWorldId(saveId);
                 }}
+            />
+            <MultiWorldDetails
+                multiSaveId={editorMultiWorldId}
+                onClose={() => setEditorMultiWorldId(null)}
             />
         </div>
     );

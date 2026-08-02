@@ -325,6 +325,11 @@ class MultiWorldService {
         }
     };
 
+    static deleteMultiWorld = (multiSaveId: string) => {
+        const slots = MultiWorldService.findAllSlotsForMultiWorld(multiSaveId);
+        slots.forEach(MultiWorldService.deleteSlot);
+    };
+
     static updateSlot = (
         multi_save_id: string,
         slot_number: number,

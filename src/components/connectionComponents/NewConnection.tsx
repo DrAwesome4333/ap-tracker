@@ -77,6 +77,7 @@ const NewConnection = ({
                     onChange={defaultChangeHandler}
                     onKeyUpCapture={submitOnEnter}
                     label="Port"
+                    placeholder="38281"
                     disabled={disabled}
                 />
                 <Input
