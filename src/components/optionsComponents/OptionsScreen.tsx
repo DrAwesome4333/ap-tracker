@@ -65,6 +65,7 @@ const OptionsScreen = () => {
                 <p>Note: colors are muted in light mode</p>
                 <OptionView option={colorOptionsDef} />
                 <SecondaryButton
+                    style={{ marginTop: "1rem" }}
                     onClick={() => {
                         optionManager.setOptionValue(
                             "APColors",

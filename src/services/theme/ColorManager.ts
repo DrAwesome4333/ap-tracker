@@ -10,9 +10,10 @@ import {
 //color to display name
 const colorOptionsDef: HierarchicalOption = {
     type: OptionType.hierarchical,
-    display: "Colors",
+    display: "Text Styles",
     name: "APColors",
     format: "column",
+    spacing: "0.75rem",
     children: [
         {
             type: OptionType.color,
@@ -146,6 +147,30 @@ const colorOptionsDef: HierarchicalOption = {
             display: "Hint (Avoid)",
             name: "--ap-hint-avoid",
             apClasses: ["ap_text", "hint_avoid"],
+        },
+        {
+            type: OptionType.select,
+            display: "Player Underline",
+            name: "--ap-player-underline",
+            default: "none",
+            choices: [
+                { name: "none", display: "None" },
+                { name: "wavy underline", display: "Wavy" },
+                { name: "underline", display: "Line" },
+                { name: "dotted underline", display: "Dotted" },
+            ],
+        },
+        {
+            type: OptionType.select,
+            display: "Item Link Underline",
+            name: "--ap-group-underline",
+            default: "none",
+            choices: [
+                { name: "none", display: "None" },
+                { name: "wavy underline", display: "Wavy" },
+                { name: "underline", display: "Line" },
+                { name: "dotted underline", display: "Dotted" },
+            ],
         },
     ],
 };

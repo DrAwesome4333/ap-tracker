@@ -14,6 +14,7 @@ import {
 } from "../../services/MultiInfo/MultiWorldContextData";
 import MultiWorldContext from "../../contexts/multiWorldContext";
 import ServiceContext from "../../contexts/serviceContext";
+import { copyToClipboard } from "../../utility/clipboard";
 
 const statusSelections = [
     API.HintStatus.priority,
@@ -123,17 +124,11 @@ const HintRow = forwardRef(
                 >
                     <div>
                         <TextButton
-                            onClick={() => {
-                                if (window.navigator.clipboard) {
-                                    try {
-                                        window.navigator.clipboard.writeText(
-                                            hintToText(multiWorldContext, hint)
-                                        );
-                                    } catch (e) {
-                                        console.error(e);
-                                    }
-                                }
-                            }}
+                            onClick={() =>
+                                copyToClipboard(
+                                    hintToText(multiWorldContext, hint)
+                                )
+                            }
                         >
                             <Icon type={"content_copy"} />
                         </TextButton>

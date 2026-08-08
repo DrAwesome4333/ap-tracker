@@ -21,7 +21,7 @@ import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
 import ApStyles from "./components/sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "./services/theme/ColorManager";
-import { useActivityContext, useCurrentActivity } from "./hooks/activityHook";
+import { useActivityContext } from "./hooks/activityHook";
 import ActivityContext from "./contexts/activityContext";
 import SlotContext from "./contexts/slotContext";
 import LocationRepository from "./services/locations/locationRepository";

@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { API, MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
 import { EchoMessageNode } from "../../services/textClientManager";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
+import MultiWorldContext from "../../contexts/multiWorldContext";
+import {
+    MultiWorldContextHelper,
+    SlotRelevance,
+} from "../../services/MultiInfo/MultiWorldContextData";
 const hintStatusToClassMap: { [status: number]: string } = {
     [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
     [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
@@ -13,6 +17,7 @@ const hintStatusToClassMap: { [status: number]: string } = {
 };
 
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
+    const multiWorldContext = useContext(MultiWorldContext);
     let textColor = null;
     let backgroundColor = undefined;
     let className = "";
@@ -42,14 +47,20 @@ const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {
     } else if (part.type === "location") {
         className = ap_styles.location;
     } else if (part.type === "player") {
-        if (part.player.slot === MultiWorldService.loadedSlot?.slot_number) {
+        const playerRelevance = MultiWorldContextHelper.getSlotRelevance(
+            multiWorldContext,
+            part.player.slot
+        );
+        if (playerRelevance === SlotRelevance.own) {
             className = ap_styles.player;
-        } else if (
-            MultiWorldService.loadedMultiWorld?.slots
-                .map((slot) => slot.slot_number)
-                .includes(part.player.slot)
-        ) {
+        } else if (playerRelevance === SlotRelevance.own_group) {
+            className = ap_styles.group;
+        } else if (playerRelevance === SlotRelevance.tracked) {
             className = ap_styles.player_alt;
+        } else if (playerRelevance === SlotRelevance.tracked_group) {
+            className = ap_styles.group_alt;
+        } else if (playerRelevance === SlotRelevance.other_group) {
+            className = ap_styles.group_other;
         } else {
             className = ap_styles.player_other;
         }
