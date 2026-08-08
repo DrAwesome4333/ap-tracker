@@ -224,65 +224,78 @@ const OptionsScreen = () => {
                     connection.
                 </p>
                 <p>
-                    Enabling the static id option will make your identifier
-                    static, allowing for the multi-world server to recognize you
-                    again if you reconnect.
+                    Enabling the static identifier option will make your
+                    identifier static, allowing for the multi-world server to
+                    recognize you when you reconnect. Other wise a random
+                    identifier will be sent.
                 </p>
                 <p>
                     Treat this as you would a password. You can share it with
                     your other devices if desired.
                 </p>
-                <OptionView
-                    option={baseTrackerOptions["Connection:StaticUUID"]}
-                />
-                <div>
-                    <PrimaryButton
-                        small
-                        onClick={() => setShowClientId((old) => !old)}
-                    >
-                        {showClientId ? "Hide Identifier" : "Show Identifier"}
-                    </PrimaryButton>
-                    {showClientId && (
-                        <p>
-                            Id:{" "}
-                            <TextButton
-                                onClick={() => copyToClipboard(clientId)}
-                            >
-                                {clientId} <Icon type="content_copy" />
-                            </TextButton>
-                        </p>
-                    )}
-                </div>
-                <div>
-                    <Input
-                        type="text"
-                        value={editorClientId}
-                        onChange={(e) => setEditorClientId(e.target.value)}
-                        label="New Identifier"
-                        maxLength={50}
-                    />
-                    <SecondaryButton
-                        small
-                        disabled={!editorClientId}
-                        onClick={() => {
-                            const newId = editorClientId;
-                            setClientId(newId);
-                            clientUuidStore.write(newId, "uuid");
-                        }}
-                    >
-                        Use Identifier
-                    </SecondaryButton>
-                </div>
-                <DangerButton
-                    small
-                    onClick={() => {
-                        const newId = randomUUID();
-                        setClientId(newId);
-                        clientUuidStore.write(newId, "uuid");
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "1rem",
                     }}
                 >
-                    Generate New Identifier
-                </DangerButton>
+                    <OptionView
+                        option={baseTrackerOptions["Connection:StaticUUID"]}
+                    />
+                    <div>
+                        <PrimaryButton
+                            small
+                            onClick={() => setShowClientId((old) => !old)}
+                        >
+                            {showClientId
+                                ? "Hide Identifier"
+                                : "Show Identifier"}
+                        </PrimaryButton>
+                        {showClientId && (
+                            <p>
+                                Id:{" "}
+                                <TextButton
+                                    onClick={() => copyToClipboard(clientId)}
+                                >
+                                    {clientId} <Icon type="content_copy" />
+                                </TextButton>
+                            </p>
+                        )}
+                    </div>
+                    <div>
+                        <Input
+                            type="text"
+                            value={editorClientId}
+                            onChange={(e) => setEditorClientId(e.target.value)}
+                            label="Change Identifier"
+                            maxLength={50}
+                        />
+                        <SecondaryButton
+                            small
+                            disabled={!editorClientId}
+                            onClick={() => {
+                                const newId = editorClientId;
+                                setClientId(newId);
+                                clientUuidStore.write(newId, "uuid");
+                            }}
+                        >
+                            Change Identifier
+                        </SecondaryButton>
+                    </div>
+                    <div>
+                        <DangerButton
+                            small
+                            onClick={() => {
+                                const newId = randomUUID();
+                                setClientId(newId);
+                                clientUuidStore.write(newId, "uuid");
+                            }}
+                        >
+                            Generate New Identifier
+                        </DangerButton>
+                    </div>
+                </div>
             </OptionBlock>
 
             <OptionBlock title="Attributions">
