@@ -29,13 +29,6 @@ const MainHeader = ({
         : null;
     const onMultiTrackerScreen = currentPage?.startsWith("multi-world-tracker");
 
-    // if (
-    //     trackerState.connectionStatus !== CONNECTION_STATUS.connected &&
-    //     connectionModalOpen
-    // ) {
-    //     setConnectionModalOpen(false);
-    // }
-
     return (
         <div
             style={{
@@ -76,7 +69,9 @@ const MainHeader = ({
                                   : "purple",
                     }}
                 ></Icon>{" "}
-                {(slot?.slot_alias || onMultiTrackerScreen) && (
+                {(slot?.slot_alias ||
+                    slot?.slot_name ||
+                    onMultiTrackerScreen) && (
                     <TextButton
                         style={{
                             textOverflow: "ellipsis",
@@ -87,7 +82,7 @@ const MainHeader = ({
                     >
                         {onMultiTrackerScreen
                             ? multiWorld?.title
-                            : slot.slot_alias}
+                            : (slot.slot_alias ?? slot.slot_name)}
                     </TextButton>
                 )}
                 <ConnectionOptions

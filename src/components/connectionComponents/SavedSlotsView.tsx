@@ -16,6 +16,7 @@ import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import ActivityContext from "../../contexts/activityContext";
 import MultiWorldDetails from "./MultiWorldDetails";
 import Icon from "../icons/icons";
+import AddMoreSlotsModal from "./AddMoreSlotsModal";
 
 const SavedSlotsView = ({
     connectToServer,
@@ -26,6 +27,8 @@ const SavedSlotsView = ({
     const activityContext = useContext(ActivityContext);
     const [editorSlot, setEditorSlot] = useState<SavedSlotDetails>(null);
     const [editorMultiWorldId, setEditorMultiWorldId] = useState<string>(null);
+    const [addSlotMultiWorldId, setAddSlotMultiWorldId] =
+        useState<string>(null);
     const connectionStatus = useAPConnectionStatus();
     const disabled = !connectionStatus.disconnected;
 
@@ -112,6 +115,17 @@ const SavedSlotsView = ({
                                 disabled={disabled}
                             />
                         ))}
+                        {multiWorld.player_details && (
+                            <PrimaryButton
+                                onClick={() =>
+                                    setAddSlotMultiWorldId(
+                                        multiWorld.multi_save_id
+                                    )
+                                }
+                            >
+                                Add Slots
+                            </PrimaryButton>
+                        )}
                     </div>
                 ))}
                 {slots.length === 0 && (
@@ -137,6 +151,11 @@ const SavedSlotsView = ({
             <MultiWorldDetails
                 multiSaveId={editorMultiWorldId}
                 onClose={() => setEditorMultiWorldId(null)}
+            />
+            <AddMoreSlotsModal
+                multiSaveId={addSlotMultiWorldId}
+                onClose={() => setAddSlotMultiWorldId(null)}
+                key={addSlotMultiWorldId}
             />
         </div>
     );

@@ -253,6 +253,9 @@ const CreateCustomTrackerModal = ({
                                             LocationGroupCategoryGenerator.generateSectionDef(
                                                 cachedPackage.location_groups
                                             );
+                                        if (!trackerJSON) {
+                                            return;
+                                        }
                                         trackerJSON.manifest.game = slot.game;
                                         trackerJSON.manifest.name = `${slot.game} (${trackerJSON.manifest.uuid.substring(0, 8)})`;
 

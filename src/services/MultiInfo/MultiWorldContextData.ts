@@ -37,16 +37,16 @@ enum SlotRelevance {
 const MultiWorldContextHelper = {
     getSlotName(context: MultiWorldContextData, slotNumber: number) {
         return (
-            context.players[slotNumber]?.alias ??
-            context.players[slotNumber]?.name ??
-            context.groups[slotNumber]?.name ??
+            context?.players[slotNumber]?.alias ??
+            context?.players[slotNumber]?.name ??
+            context?.groups[slotNumber]?.name ??
             `Unknown Player ${slotNumber}`
         );
     },
     getSlotGame(context: MultiWorldContextData, slotNumber: number) {
         return (
-            context.players[slotNumber]?.game ??
-            context.groups[slotNumber]?.game ??
+            context?.players[slotNumber]?.game ??
+            context?.groups[slotNumber]?.game ??
             null
         );
     },
@@ -55,20 +55,27 @@ const MultiWorldContextHelper = {
         slotNumber: number,
         itemId: number
     ) {
-        return context.gamePackages[
-            this.getSlotGame(context, slotNumber)
-        ].getItemName(itemId);
+        return (
+            context?.gamePackages[
+                this.getSlotGame(context, slotNumber)
+            ]?.getItemName(itemId) ?? `Unknown Item ${itemId}`
+        );
     },
     getLocationName(
         context: MultiWorldContextData,
         slotNumber: number,
         locationId: number
     ) {
-        return context.gamePackages[
-            this.getSlotGame(context, slotNumber)
-        ].getLocationName(locationId);
+        return (
+            context?.gamePackages[
+                this.getSlotGame(context, slotNumber)
+            ]?.getLocationName(locationId) ?? `Unknown Location ${locationId}`
+        );
     },
     getSlotRelevance(context: MultiWorldContextData, slotNumber: number) {
+        if (!context || !context.players) {
+            return SlotRelevance.other;
+        }
         if (slotNumber === context.trackedSlot) return SlotRelevance.own;
 
         if (context.trackedSlots?.includes(slotNumber))

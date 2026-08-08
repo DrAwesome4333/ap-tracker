@@ -26,6 +26,7 @@ import {
     MultiWorldGroup,
     MultiWorldPlayer,
 } from "../MultiInfo/MultiWorldContextData";
+import { globalOptionManager } from "../options/optionManager";
 
 interface ConnectionConfiguration {
     host?: string;
@@ -96,6 +97,14 @@ class APConnector implements LocationSource, ItemSource {
         if (!uuid) {
             uuid = randomUUID();
             clientUuidStore.write(uuid, "uuid");
+        }
+        if (
+            !globalOptionManager.getOptionValue(
+                "Connection:StaticUUID",
+                "global"
+            )
+        ) {
+            uuid = randomUUID();
         }
         this.#clientUuid = uuid;
         this.client.package.setCache(DataPackageHelper);
@@ -466,6 +475,26 @@ class APConnector implements LocationSource, ItemSource {
                         players[player].groups.add(parseInt(slotNumber))
                     );
                 });
+
+                if (!MultiWorldService.loadedMultiWorld.player_details) {
+                    const playerDetails: Record<
+                        number,
+                        { slot: number; name: string; game: string }
+                    > = Object.values(players).reduce((result, player) => {
+                        result[player.slot] = {
+                            slot: player.slot,
+                            name: player.name,
+                            game: player.game,
+                        };
+                        return result;
+                    }, {});
+                    MultiWorldService.updateMultiWorld(
+                        multiSlot.multi_save_id,
+                        {
+                            player_details: playerDetails,
+                        }
+                    );
+                }
 
                 const result: ConnectedEventParams = {
                     slotName,

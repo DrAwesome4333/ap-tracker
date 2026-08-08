@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 const DataDebug = false;
 const DB_STORE_KEYS = {
     dataPackageCache: "data_package_cache",
@@ -263,11 +265,82 @@ const getAllItems = (storeName: string): Promise<unknown> => {
     });
 };
 
+const clearAllItems = (storeName: string) => {
+    return new Promise<void>((resolve, reject) => {
+        let hasFailed = false;
+        const attemptLoad = () => {
+            try {
+                const db = database_request.result;
+                const transaction = db.transaction([storeName], "readwrite");
+                const objectStore = transaction.objectStore(storeName);
+                transaction.onerror = () => {
+                    reject();
+                };
+                transaction.oncomplete = () => {
+                    resolve();
+                };
+                objectStore.clear();
+            } catch {
+                if (hasFailed) {
+                    resolve(null);
+                } else {
+                    hasFailed = true;
+                    setTimeout(attemptLoad, 500);
+                }
+            }
+        };
+
+        if (database_open) {
+            attemptLoad();
+        } else {
+            queuedEvents.push(attemptLoad);
+        }
+    });
+};
+
+const getAllKeys = (storeName: string): Promise<unknown> => {
+    return new Promise((resolve, _reject) => {
+        let hasFailed = false;
+        const attemptLoad = () => {
+            try {
+                const db = database_request.result;
+                const transaction = db.transaction([storeName], "readonly");
+                const objectStore = transaction.objectStore(storeName);
+                const request = objectStore.getAllKeys();
+                request.onerror = () => {
+                    if (DataDebug) console.log(`Failed to load ${storeName}`);
+                    resolve(null);
+                };
+                request.onsuccess = () => {
+                    if (DataDebug)
+                        console.log(`Retrieved ${storeName}`, request.result);
+                    resolve(request.result ?? null);
+                };
+            } catch {
+                if (hasFailed) {
+                    if (DataDebug) console.log(`Failed to load ${storeName}`);
+                    resolve(null);
+                } else {
+                    hasFailed = true;
+                    setTimeout(attemptLoad, 500);
+                }
+            }
+        };
+        if (database_open) {
+            attemptLoad();
+        } else {
+            queuedEvents.push(attemptLoad);
+        }
+    });
+};
+
 const SaveData = {
     getItem,
     storeItem,
     deleteItem,
     getAllItems,
+    getAllKeys,
+    clearAllItems,
 };
 
 export { SaveData, DB_STORE_KEYS };

@@ -22,6 +22,15 @@ interface SavedMultiWorldDetails {
         room_suuid: string;
         tracker_suuid: string;
     };
+    /** Information on all players */
+    player_details?: Record<
+        number,
+        {
+            name: string;
+            game: string;
+            slot: number;
+        }
+    >;
     /** Maps games to their respective checksums in the multi-world */
     data_package_details?: { [game_name: string]: string };
     /** Color to use for multi-world theme */
@@ -48,6 +57,15 @@ interface SavedMultiWorldUpdate {
         room_suuid: string;
         tracker_suuid: string;
     };
+    /** Information on all players */
+    player_details?: Record<
+        number,
+        {
+            name: string;
+            game: string;
+            slot: number;
+        }
+    >;
     /** Maps games to their respective checksums in the multi-world */
     data_package_details?: { [game_name: string]: string };
     options?: {

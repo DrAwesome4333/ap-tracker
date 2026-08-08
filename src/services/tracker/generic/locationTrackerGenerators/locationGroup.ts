@@ -11,6 +11,9 @@ const DEBUG_PARENT_GROUP_ORGANIZATION = GROUP_DEBUG;
 const DEBUG_GROUP_CLASSIFICATION = GROUP_DEBUG;
 
 const generateSectionDef = (groups: { [s: string]: string[] }) => {
+    if (!groups) {
+        return null;
+    }
     const unclassifiedLocations = new Set(groups["Everywhere"]);
     if (GROUP_DEBUG) {
         console.log("Location groups provided:", groups);

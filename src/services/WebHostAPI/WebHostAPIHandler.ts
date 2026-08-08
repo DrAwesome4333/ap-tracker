@@ -168,7 +168,11 @@ class WebHostAPIHandler {
                 game,
                 checksum
             );
-            if (localPackage) {
+            if (
+                localPackage &&
+                localPackage.item_groups &&
+                localPackage.location_groups
+            ) {
                 return [game, new GamePackageWrapper(localPackage, game)] as [
                     string,
                     GamePackageWrapper,
@@ -183,8 +187,8 @@ class WebHostAPIHandler {
                     game,
                     checksum,
                     last_used: Date.now(),
-                    location_groups: remotePackage.item_name_groups,
-                    item_groups: remotePackage.location_name_groups,
+                    location_groups: remotePackage.location_name_groups,
+                    item_groups: remotePackage.item_name_groups,
                     location_name_to_id: remotePackage.location_name_to_id,
                     item_name_to_id: remotePackage.item_name_to_id,
                 });
@@ -192,8 +196,8 @@ class WebHostAPIHandler {
                     game,
                     new GamePackageWrapper(
                         {
-                            location_groups: remotePackage.item_name_groups,
-                            item_groups: remotePackage.location_name_groups,
+                            location_groups: remotePackage.location_name_groups,
+                            item_groups: remotePackage.item_name_groups,
                             location_name_to_id:
                                 remotePackage.location_name_to_id,
                             item_name_to_id: remotePackage.item_name_to_id,
