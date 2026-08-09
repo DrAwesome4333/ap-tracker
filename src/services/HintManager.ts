@@ -3,7 +3,6 @@ import HintTagger from "./tags/HintTagger";
 import {
     MultiWorldContextData,
     MultiWorldContextHelper,
-    MultiWorldPlayer,
 } from "./MultiInfo/MultiWorldContextData";
 import { APIHint, APIOffsets_Hint, APITracker } from "./WebHostAPI/types";
 
@@ -18,7 +17,9 @@ const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
     }
 
     const entranceString =
-        hint.entrance !== "Vanilla" ? `(${hint.entrance})` : "";
+        hint.entrance !== "Vanilla" && hint.entrance
+            ? `(${hint.entrance})`
+            : "";
     const priorityString =
         hint.status === API.HintStatus.unspecified
             ? "Unspecified"

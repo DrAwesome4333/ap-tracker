@@ -39,14 +39,16 @@ const ConnectionOptions = ({
         slotContext.multiWorldId;
     const activityContext = useContext(ActivityContext);
 
-    const onMultiTracker = currentPage?.startsWith("multi-world-tracker");
+    const onMultiTracker = !!activityContext.stack?.find((act) =>
+        act.startsWith("multi-world-tracker")
+    );
     const onSlotTracker = currentPage === "slot-tracker";
     const multiWorld = multiWorldContext?.multiSaveId
         ? MultiWorldService.getMultiWorld(multiWorldContext.multiSaveId)
         : null;
 
     const disconnect = () => {
-        activityContext.drop();
+        activityContext.drop("slot-tracker");
         connector.disconnect();
     };
 
@@ -65,7 +67,11 @@ const ConnectionOptions = ({
             {onMultiTracker ? (
                 <SecondaryButton
                     onClick={() => {
-                        activityContext.drop();
+                        activityContext.drop(
+                            activityContext.stack.find((act) =>
+                                act.startsWith("multi-world-tracker")
+                            )
+                        );
                         onClose();
                     }}
                 >
@@ -78,7 +84,7 @@ const ConnectionOptions = ({
                     {connectionStatus.disconnected && onSlotTracker && (
                         <SecondaryButton
                             onClick={() => {
-                                activityContext.drop();
+                                activityContext.drop("slot-tracker");
                                 onClose();
                             }}
                         >

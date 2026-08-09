@@ -5,9 +5,13 @@ import NotePad from "../NotePad/NotePad";
 import ConnectionOptions from "./ConnectionOptions";
 import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
 import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
-import { useCurrentActivity } from "../../hooks/activityHook";
+import {
+    useActivityContext,
+    useCurrentActivity,
+} from "../../hooks/activityHook";
 import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 import SlotContext from "../../contexts/slotContext";
+import ActivityContext from "../../contexts/activityContext";
 
 const MainHeader = ({
     optionsCallback,
@@ -21,13 +25,16 @@ const MainHeader = ({
     const slot = useCurrentMultiworldSlot();
 
     const currentPage = useCurrentActivity();
+    const activityContext = useContext(ActivityContext);
     const slotContext = useContext(SlotContext);
     const multiWorldId =
         currentPage?.split(".")[1] ?? slotContext.multiWorldId ?? null;
     const multiWorld = multiWorldId
         ? MultiWorldService.getMultiWorld(multiWorldId)
         : null;
-    const onMultiTrackerScreen = currentPage?.startsWith("multi-world-tracker");
+    const onMultiTrackerScreen = !!activityContext.stack?.find((act) =>
+        act.startsWith("multi-world-tracker")
+    );
 
     return (
         <div
@@ -61,7 +68,7 @@ const MainHeader = ({
                         color: onMultiTrackerScreen
                             ? "blue"
                             : connectionStatus.connected
-                              ? "chartreuse"
+                              ? "green"
                               : connectionStatus.connecting
                                 ? "gold"
                                 : connectionStatus.disconnected
