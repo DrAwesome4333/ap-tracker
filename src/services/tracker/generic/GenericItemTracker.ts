@@ -24,8 +24,9 @@ class GenericItemTracker extends CustomItemTracker {
             },
             groups: groupsUpdated,
         };
-        super(optionManager, itemGroupDef);
-        this.discriminator = `-${gamePackage.game}`;
+        super(optionManager, itemGroupDef, {
+            discriminator: `-${gamePackage.game}`,
+        });
     }
 }
 

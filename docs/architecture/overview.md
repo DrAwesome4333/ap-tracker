@@ -1,5 +1,7 @@
 # Project Architecture Overview
 
+> \*_Note_: These Docs are out of date. The structure has been re-written, but I have not bothered to update these docs yet.
+
 This project primarily uses these libraries to function:
 
 - ReactJS: For creating the UI

@@ -1,4 +1,4 @@
-# Getting Started AP Tracker
+# Getting Started Checklist Tracker
 
 This project is for use with the Multi-world Multi-game randomizer [Archipelago](https://archipelago.gg). The app provides a way to organize the locations that contain items within a game via dropdowns to hopefully make larger games easier to manage.
 
@@ -13,8 +13,8 @@ There is a version of this tracker hosted at [https://drawesome4333.github.io/ap
 
 ### Keep track of the importance of locations
 
-- Mark locations as ignored or star them as important so you know if you need to come back later for a check.
-- Locations with hints have a flag automatically placed on them.
+- Mark locations as ignored or tag them as important so you know if you need to come back later for a check.
+- Locations with hints have a flag automatically placed on them and which hints show up can be changed in the settings.
 - A short memo can be saved using the built-in note pad, can be accessed any time from any device logged into that slot.
 
 ### See what you have and where you got it
@@ -22,6 +22,7 @@ There is a version of this tracker hosted at [https://drawesome4333.github.io/ap
 - Easily see where items have come from, and mark any local ones of interest on the checklist. Should be useful for games that treat local items differently.
 - Filter the view based on item class (e.g. only progression and useful items), you can view this in the settings.
 - Sort your inventory by time received, alphabetically, or the number of items of that type.
+- You can track your inventory for multiple slots in a multi-world at a time.
 
 ### Use the built-in text client to see activity in the multi-world
 
@@ -82,15 +83,21 @@ $ npm run dev
 
 7. The app should start compiling (it may take a minute). When it is finished you should see something saying the development server has started and ready to go. Navigate to [http://localhost:3000](http://localhost:3000) to use the app.
 
-**Note:** To enable hot reloading you need to comment out the `assetPrefix` portion of the `next.config.js` file. Remember to return it back when creating dedicated build or certain resources, such as images and manifest files, may not be accessible.
-
 ### Want to contribute to the project?
 
 See [contributing.md](./docs/CONTRIBUTING.md) for details
 
 ## Found a bug?
 
-Checkout the issues page of this GitHub repository and report it there or report it to me directly in the Archipelago Discord (invite link on Archipelago's website) in the Archipelago Checklist thread in the future-game-design thread.
+Checkout the issues page of this GitHub repository and report it there or report it to me directly in the Archipelago Discord (invite link on Archipelago's website) in the Checklist Tracker thread in the community-tools thread.
+
+# AI Disclosure
+
+The stance on future contributions and AI is described in [contributing.md](./docs/CONTRIBUTING.md).
+
+No code was directly contributed by AI.
+
+This App does not contain any AI generated assets but does contain some AI generated text, which will be replaced in a future update.
 
 # Attributions
 
@@ -99,5 +106,7 @@ Checkout the issues page of this GitHub repository and report it there or report
 Checkout `package-lock.json` to see a complete list of code libraries used for this project.
 
 ## Archipelago Logo
+
+The Archipelago Logo, and its use, do not follow the same MIT license as the rest of the application an instead are distributed under the below license:
 
 The Archipelago Logos used by this app are the modified works of Krista Corkos and Christopher Wilson (© 2022) and is licensed under Attribution-NonCommercial 4.0 International. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/
