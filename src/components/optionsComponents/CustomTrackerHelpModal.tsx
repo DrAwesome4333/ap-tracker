@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "../shared/Modal";
 import { GhostButton } from "../shared/buttons";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 const CustomTrackerHelpModal = ({
     open,
@@ -10,16 +11,22 @@ const CustomTrackerHelpModal = ({
     onClose: () => void;
 }) => {
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Custom Tracker Information</h3>}
+            footer={
+                <ButtonRow>
+                    {" "}
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div
                 className="documentation"
                 style={{
                     width: "90vw",
-                    maxHeight: "80vh",
-                    overflow: "auto",
                 }}
             >
-                <h2>Custom Tracker Information</h2>
                 <p>
                     Custom Trackers are a way to customize your checklists to
                     your liking.
@@ -98,16 +105,6 @@ const CustomTrackerHelpModal = ({
                         split characters count as tokens.
                     </li>
                 </ul>
-            </div>
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    width: "100%",
-                    marginTop: "1em",
-                }}
-            >
-                <GhostButton onClick={onClose}>Close</GhostButton>
             </div>
         </Modal>
     );

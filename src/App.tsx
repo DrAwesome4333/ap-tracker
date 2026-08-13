@@ -1,21 +1,15 @@
-import React, { useState, useSyncExternalStore } from "react";
-import MainHeader from "./components/MainHeader";
+import React, { useCallback, useEffect, useState } from "react";
+import MainHeader from "./components/header/MainHeader";
 import StartScreen from "./components/StartScreen/StartScreen";
-import { TrackerStateContext } from "./contexts/contexts";
-import { createConnector } from "./services/connector/connector";
-import { CONNECTION_STATUS } from "./services/connector/connector";
 import OptionsScreen from "./components/optionsComponents/OptionsScreen";
-import { LocationManager } from "./services/locations/locationManager";
 import ServiceContext from "./contexts/serviceContext";
 import { TagManager } from "./services/tags/tagManager";
 import { LocationTagger } from "./services/tags/LocationTagger";
-import { InventoryManager } from "./services/inventory/inventoryManager";
 import { globalOptionManager } from "./services/options/optionManager";
 import NotificationContainer from "./components/notifications/notificationContainer";
 import useOption from "./hooks/optionHook";
 import { readThemeValue } from "./services/theme/theme";
 import TrackerScreen from "./components/TrackerScreen";
-import { TrackerManager } from "./services/tracker/TrackerManager";
 import { CustomTrackerRepository } from "./services/tracker/customTrackerRepository";
 import TextClientManager from "./services/textClientManager";
 import GenericTrackerRepository from "./services/tracker/generic/genericTrackerRepository";
@@ -27,85 +21,162 @@ import HintTagger from "./services/tags/HintTagger";
 import HintManager from "./services/HintManager";
 import ApStyles from "./components/sharedStyles/archipelago.module.css";
 import { useAPColorStyles } from "./services/theme/ColorManager";
+import { useActivityContext } from "./hooks/activityHook";
+import ActivityContext from "./contexts/activityContext";
+import SlotContext from "./contexts/slotContext";
+import LocationRepository from "./services/locations/locationRepository";
+import ItemRepository from "./services/items/itemRepository";
+import APConnector, {
+    ConnectedEventParams,
+} from "./services/connector/APConnector";
+import { TrackerManager } from "./services/tracker/TrackerManager";
+import { useCurrentGameTracker } from "./hooks/trackerHooks";
+import { GamePackageWrapper } from "./services/gamepackage/GamePackageWrapper";
+import MultiWorldTracker from "./components/MultiWorldTracker/MultiworldTracker";
+import { MultiWorldContextData } from "./services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext, {
+    MultiWorldConnectionMode,
+} from "./contexts/multiWorldContext";
 
-const locationManager = new LocationManager();
-const inventoryManager = new InventoryManager();
 const optionManager = globalOptionManager;
-
-const tagManager = new TagManager();
-tagManager.enableLocationEffects(locationManager);
-const locationTagger = new LocationTagger();
-const hintTagger = new HintTagger(optionManager);
-tagManager.addSource(locationTagger);
-tagManager.addSource(hintTagger);
-const hintManager = new HintManager(hintTagger);
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+    : "";
 const mainTrackerManagerStore = new LocalStorageDataStore(
-    "AP_ChecklistTracker_TrackerChoices"
+    `AP_ChecklistTracker_TrackerChoices${environment}`
 );
 const trackerManager = new TrackerManager(mainTrackerManagerStore);
-const customTrackerRepository = new CustomTrackerRepository(
-    optionManager,
-    locationManager,
-    inventoryManager
-);
-const genericTrackerRepository = new GenericTrackerRepository(
-    optionManager,
-    locationManager,
-    inventoryManager
-);
+const customTrackerRepository = new CustomTrackerRepository(optionManager);
+const genericTrackerRepository = new GenericTrackerRepository(optionManager);
 trackerManager.addRepository(customTrackerRepository);
 trackerManager.addRepository(genericTrackerRepository);
 const textClientManager = new TextClientManager();
 
-const connector = createConnector(
-    locationManager,
-    inventoryManager,
-    tagManager,
-    hintManager,
-    trackerManager,
-    textClientManager,
-    genericTrackerRepository,
-    locationTagger
-);
+const hintTagger = new HintTagger(optionManager);
+const hintManager = new HintManager(hintTagger);
 
-const connection = connector.connection;
+const connector = new APConnector({
+    textClientManager,
+    hintManager,
+});
+hintManager.initializeListeners(connector.client);
 
 const App = (): React.ReactNode => {
-    const trackerConnectionState = useSyncExternalStore(
-        connection.subscribe,
-        () => connection.status,
-        () => connection.status
-    );
-    const trackerSlotData = useSyncExternalStore(
-        connection.subscribe,
-        () => connection.slotInfo,
-        () => connection.slotInfo
-    );
-    const [optionWindowOpen, setOptionWindowOpen] = useState(false);
+    const activityContext = useActivityContext();
+    const currentActivityName =
+        activityContext.stack.length > 0
+            ? activityContext.stack[activityContext.stack.length - 1]
+            : null;
+    const optionWindowOpen = activityContext.stack.includes("options");
     const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
         | "system"
         | null;
 
-    const locationTracker = useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(
-            ResourceType.locationTracker
-        ),
-        () => trackerManager.getCurrentTracker(ResourceType.locationTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.locationTracker)
-    ) as LocationTracker;
-    const itemTracker = useSyncExternalStore(
-        trackerManager.getTrackerSubscriberCallback(ResourceType.itemTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.itemTracker),
-        () => trackerManager.getCurrentTracker(ResourceType.itemTracker)
-    ) as ItemTracker;
-    const titleParts = ["AP Checklist Tracker"];
-    if (connector.connection?.slotInfo.alias) {
-        titleParts.unshift(connector.connection?.slotInfo.alias);
+    const apColors = useAPColorStyles(optionManager, "global");
+    const [game, setGame] = useState<string>("");
+    const locationTrackerId = useCurrentGameTracker(
+        game,
+        trackerManager,
+        ResourceType.locationTracker
+    );
+    const itemTrackerId = useCurrentGameTracker(
+        game,
+        trackerManager,
+        ResourceType.itemTracker
+    );
+
+    const [locationTracker, setLocationTracker] =
+        useState<LocationTracker>(null);
+    const [itemTracker, setItemTracker] = useState<ItemTracker>(null);
+    const [slotName, setSlotName] = useState<string>("");
+    const [slotNumber, setSlotNumber] = useState(0);
+    const [slotAlias, setSlotAlias] = useState<string>("");
+    const [multiWorldId, setMultiWorldId] = useState<string>("");
+    const [locationRepository, setLocationRepository] =
+        useState<LocationRepository>(null);
+    const [itemRepository, setItemRepository] = useState<ItemRepository>(null);
+    const [tagManager, setTagManager] = useState<TagManager>(null);
+    const [locationTagger, setLocationTagger] = useState<LocationTagger>(null);
+    const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
+    const [multiWorldContextData, setMultiWorldContextData] = useState<
+        MultiWorldContextData & { connectionMode: MultiWorldConnectionMode }
+    >(null);
+
+    const titleParts = ["Checklist Tracker"];
+    if (slotAlias) {
+        titleParts.unshift(slotAlias);
     }
 
-    const apColors = useAPColorStyles(optionManager, "global");
+    const processSlotConnection = useCallback(
+        async ({
+            slotName: slot_name,
+            slotAlias: slot_alias,
+            multiWorldId: multi_id,
+            slotNumber: slot_number,
+            gamePackage,
+            multiWorldContext,
+        }: ConnectedEventParams) => {
+            setSlotName(slot_name);
+            setSlotAlias(slot_alias);
+            setSlotNumber(slot_number);
+            setMultiWorldId(multi_id);
+            const newItemRepository = new ItemRepository();
+            const newLocationRepository = new LocationRepository();
+            const newTagManager = new TagManager();
+            const newLocationTagger = new LocationTagger(multi_id, slot_number);
+
+            newTagManager.addSource(newLocationTagger);
+            newTagManager.addSource(hintTagger);
+            newTagManager.enableLocationEffects(newLocationRepository);
+            newItemRepository.addSource(connector);
+            newLocationRepository.addSource(connector);
+            hintManager.setMultiWorldContext(multiWorldContext);
+            setItemRepository(newItemRepository);
+            setLocationRepository(newLocationRepository);
+            setGame(gamePackage.game);
+            setGamePackage(gamePackage);
+            setTagManager(newTagManager);
+            setLocationTagger(newLocationTagger);
+            setMultiWorldContextData({
+                ...multiWorldContext,
+                connectionMode: MultiWorldConnectionMode.Server,
+            });
+        },
+        []
+    );
+
+    useEffect(() => {
+        if (locationTrackerId && gamePackage) {
+            trackerManager
+                ?.loadTracker(locationTrackerId, gamePackage)
+                .then((tracker: LocationTracker) => {
+                    setLocationTracker(tracker);
+                });
+        } else {
+            setLocationTracker(null);
+        }
+    }, [locationTrackerId, gamePackage]);
+
+    useEffect(() => {
+        if (itemTrackerId && gamePackage) {
+            trackerManager
+                ?.loadTracker(itemTrackerId, gamePackage)
+                .then((tracker: ItemTracker) => {
+                    setItemTracker(tracker);
+                });
+        } else {
+            setItemTracker(null);
+        }
+    }, [itemTrackerId, gamePackage]);
+
+    useEffect(() => {
+        const cleanUp = connector.connectedHook(processSlotConnection);
+        return () => {
+            cleanUp();
+        };
+    }, [processSlotConnection]);
 
     return (
         <div
@@ -119,55 +190,59 @@ const App = (): React.ReactNode => {
             style={{ colorScheme: readThemeValue(themeValue), ...apColors }}
         >
             <title>{titleParts.join(" | ")}</title>
-            <TrackerStateContext.Provider
-                value={{
-                    connectionStatus: trackerConnectionState,
-                    slotData: trackerSlotData,
-                }}
-            >
-                <ServiceContext.Provider
-                    value={{
-                        locationManager,
-                        locationTracker,
-                        inventoryTracker: itemTracker,
-                        connector,
-                        tagManager,
-                        optionManager,
-                        inventoryManager,
-                        trackerManager,
-                        textClientManager,
-                        customTrackerRepository,
-                        genericTrackerRepository,
-                        locationTagger,
-                        hintTagger,
-                        hintManager,
-                    }}
-                >
-                    <NotificationContainer />
-                    <MainHeader
-                        optionsCallback={() => {
-                            setOptionWindowOpen(!optionWindowOpen);
+            <ActivityContext.Provider value={activityContext}>
+                <MultiWorldContext.Provider value={multiWorldContextData}>
+                    <SlotContext.Provider
+                        value={{
+                            game,
+                            slotName,
+                            slotNumber,
+                            slotAlias,
+                            multiWorldId,
+                            locationRepository,
+                            itemRepository,
+                            hintManager,
+                            tagManager,
+                            locationTagger,
+                            locationTracker,
+                            itemTracker,
+                            liveSlot: true,
                         }}
-                    />
-                    {optionWindowOpen && <OptionsScreen />}
-                    {!optionWindowOpen && (
-                        <div
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                overflow: "auto",
+                    >
+                        <ServiceContext.Provider
+                            value={{
+                                connector,
+                                optionManager,
+                                trackerManager,
+                                textClientManager,
+                                customTrackerRepository,
+                                hintManager,
                             }}
                         >
-                            {new Set([
-                                CONNECTION_STATUS.disconnected,
-                                CONNECTION_STATUS.connecting,
-                            ]).has(trackerConnectionState) && <StartScreen />}
-                            {CONNECTION_STATUS.connected ===
-                                trackerConnectionState && <TrackerScreen />}
-                        </div>
-                    )}
-                </ServiceContext.Provider>
-            </TrackerStateContext.Provider>
+                            <NotificationContainer />
+                            <MainHeader
+                                optionsCallback={() => {
+                                    if (optionWindowOpen) {
+                                        activityContext.drop("options");
+                                    } else {
+                                        activityContext.add("options");
+                                    }
+                                }}
+                            />
+                            {optionWindowOpen && <OptionsScreen />}
+                            {activityContext.stack.length === 0 && (
+                                <StartScreen />
+                            )}
+                            {currentActivityName === "slot-tracker" && (
+                                <TrackerScreen />
+                            )}
+                            {currentActivityName?.startsWith(
+                                "multi-world-tracker"
+                            ) && <MultiWorldTracker />}
+                        </ServiceContext.Provider>
+                    </SlotContext.Provider>
+                </MultiWorldContext.Provider>
+            </ActivityContext.Provider>
         </div>
     );
 };

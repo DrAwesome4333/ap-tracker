@@ -42,7 +42,7 @@ const Spinner = ({
             <circle
                 stroke={color}
                 strokeDasharray={`${radius * arc} ${7 * radius}`}
-                strokeOpacity={0.25}
+                strokeOpacity={0.9}
                 strokeWidth={5}
                 r={radius}
                 fill="none"

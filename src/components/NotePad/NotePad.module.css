@@ -1,12 +1,9 @@
 .note_grid {
     display: grid;
-    width: 80vw;
     height: 80vh;
     grid:
         "title" 8em
-        "note" 1fr
-        "." 1em
-        "buttons" 3em / 100%;
+        "note" 1fr;
 }
 
 .note_header {
@@ -21,11 +18,4 @@
     color: var(--text-color-primary);
     resize: none;
     box-shadow: inset var(--box-shadow-small);
-}
-
-.note_footer {
-    display: grid;
-    grid-area: "buttons";
-    width: 100%;
-    grid-template-columns: "1fr 1fr";
 }

@@ -1,9 +1,14 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import ServiceContext from "../../contexts/serviceContext";
 import { useHints } from "../../hooks/hintHook";
 import HintRow from "./HintRow";
 import { naturalSort } from "../../utility/comparisons";
 import { HintFilter } from "./HintOptionDef";
+import {
+    MultiWorldContextHelper,
+    SlotRelevance,
+} from "../../services/MultiInfo/MultiWorldContextData";
+import MultiWorldContext from "../../contexts/multiWorldContext";
 
 import { List, useDynamicRowHeight } from "react-window";
 
@@ -16,58 +21,88 @@ const HintTable = ({
     searchKey: string;
     searchFilterMode: string;
 }) => {
-    const services = useContext(ServiceContext);
-    const hints = useHints(services.hintManager);
+    const multiWorldContext = useContext(MultiWorldContext);
+    const serviceContext = useContext(ServiceContext);
+    const hints = useHints(serviceContext.hintManager);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 66 });
-    const playerSlot =
-        services.connector?.connection.client.players.self.slot ?? -1;
     const lowerSearchKey = searchKey.toLowerCase().trim();
+    const trackSingleSlot = multiWorldContext.trackedSlot !== undefined;
+    const filteredHints =
+        hints?.filter((hint) => {
+            let passesPlayerFilter = false;
+            let passesStatusFilter = false;
+            let passesSearchKeyFilter = false;
 
-    const filteredHints = hints.filter((hint) => {
-        let passesPlayerFilter = false;
-        let passesStatusFilter = false;
-        let passesSearchKeyFilter = false;
-        if (
-            filters.own.includes("items") &&
-            hint.item.receiver.slot === playerSlot
-        ) {
-            passesPlayerFilter = true;
-        }
+            const adequateRelevance = trackSingleSlot
+                ? [SlotRelevance.own, SlotRelevance.own_group]
+                : [
+                      SlotRelevance.own,
+                      SlotRelevance.own_group,
+                      SlotRelevance.tracked,
+                      SlotRelevance.tracked_group,
+                  ];
+            const itemRelevance = MultiWorldContextHelper.getSlotRelevance(
+                multiWorldContext,
+                hint.receivingPlayer
+            );
+            const locationRelevance = MultiWorldContextHelper.getSlotRelevance(
+                multiWorldContext,
+                hint.findingPlayer
+            );
+            if (
+                filters.own.includes("items") &&
+                adequateRelevance.includes(itemRelevance)
+            ) {
+                passesPlayerFilter = true;
+            }
 
-        if (
-            filters.own.includes("locations") &&
-            hint.item.sender.slot === playerSlot
-        ) {
-            passesPlayerFilter = true;
-        }
+            if (
+                filters.own.includes("locations") &&
+                adequateRelevance.includes(locationRelevance)
+            ) {
+                passesPlayerFilter = true;
+            }
 
-        if (filters.status.includes(hint.status.toString())) {
-            passesStatusFilter = true;
-        }
+            if (filters.status.includes(hint.status.toString())) {
+                passesStatusFilter = true;
+            }
 
-        if (
-            !lowerSearchKey ||
-            (searchFilterMode === "item" &&
-                hint.item.name.toLowerCase().includes(lowerSearchKey)) ||
-            (searchFilterMode === "location" &&
-                hint.item.locationName.toLowerCase().includes(lowerSearchKey))
-        ) {
-            passesSearchKeyFilter = true;
-        }
+            if (
+                !lowerSearchKey ||
+                (searchFilterMode === "item" &&
+                    MultiWorldContextHelper.getItemName(
+                        multiWorldContext,
+                        hint.receivingPlayer,
+                        hint.itemId
+                    )
+                        .toLowerCase()
+                        .includes(lowerSearchKey)) ||
+                (searchFilterMode === "location" &&
+                    MultiWorldContextHelper.getLocationName(
+                        multiWorldContext,
+                        hint.findingPlayer,
+                        hint.locationId
+                    )
+                        .toLowerCase()
+                        .includes(lowerSearchKey))
+            ) {
+                passesSearchKeyFilter = true;
+            }
 
-        return (
-            passesPlayerFilter && passesStatusFilter && passesSearchKeyFilter
-        );
-    });
-
+            return (
+                passesPlayerFilter &&
+                passesStatusFilter &&
+                passesSearchKeyFilter
+            );
+        }) ?? [];
     filteredHints.sort((a, b) => {
         let sortValue = 0;
         switch (filters.sort) {
             case "sender":
-                sortValue = b.item.sender.slot - a.item.sender.slot;
+                sortValue = b.findingPlayer - a.findingPlayer;
                 break;
             case "receiver":
-                sortValue = b.item.receiver.slot - a.item.receiver.slot;
+                sortValue = b.receivingPlayer - a.receivingPlayer;
                 break;
             default:
             case "status":
@@ -75,7 +110,18 @@ const HintTable = ({
                 break;
         }
         if (sortValue === 0) {
-            sortValue = naturalSort(a.item.name, b.item.name);
+            sortValue = naturalSort(
+                MultiWorldContextHelper.getItemName(
+                    multiWorldContext,
+                    a.receivingPlayer,
+                    a.itemId
+                ),
+                MultiWorldContextHelper.getItemName(
+                    multiWorldContext,
+                    b.receivingPlayer,
+                    b.itemId
+                )
+            );
         }
         return sortValue;
     });

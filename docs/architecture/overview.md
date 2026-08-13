@@ -1,5 +1,7 @@
 # Project Architecture Overview
 
+> \*_Note_: These Docs are out of date. The structure has been re-written, but I have not bothered to update these docs yet.
+
 This project primarily uses these libraries to function:
 
 - ReactJS: For creating the UI
@@ -216,7 +218,7 @@ Manages messages sent from archipelago.js and processes user input for the Text 
 
 Related hooks: [useTextClientMessages, useTextClientHistory](../../src/hooks/textClientHook.ts)
 
-#### [TrackerManager](../../src/games/TrackerManager.ts):
+#### [TrackerManager\_](../../src/games/TrackerManager_.ts):
 
 Manages the loading and creation of trackers.
 

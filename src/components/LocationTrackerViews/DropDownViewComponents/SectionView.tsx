@@ -10,6 +10,12 @@ import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
 import { TagEntityType } from "../../../services/tags/tagManager";
 import { useTagCounters } from "../../../hooks/tagHook";
 import { List, useDynamicRowHeight } from "react-window";
+import SlotContext from "../../../contexts/slotContext";
+import { useSlotLocations } from "../../../hooks/locationHook";
+import {
+    LocationId,
+    LocationStatus,
+} from "../../../services/locations/locationSource";
 
 /**
  *
@@ -27,8 +33,8 @@ const SectionView = ({
 }: {
     name: string;
     startOpen?: boolean;
-    selectedLocation?: string;
-    onLocationSelect?: (locationName: string) => void;
+    selectedLocation?: LocationId;
+    onLocationSelect?: (locationId: LocationId) => void;
 }) => {
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 22 });
     const isClosable = name !== "root";
@@ -36,9 +42,10 @@ const SectionView = ({
         isClosable ? (startOpen ?? false) : true
     );
     const serviceContext = useContext(ServiceContext);
-    const locationTracker = serviceContext.locationTracker;
-    const locationManager = serviceContext.locationManager;
-    const tagManager = serviceContext.tagManager;
+    const slotContext = useContext(SlotContext);
+    const locationTracker = slotContext.locationTracker;
+
+    const tagManager = slotContext.tagManager;
     const optionManager = serviceContext.optionManager;
     if (!optionManager) {
         throw new Error("No option manager provided");
@@ -53,10 +60,13 @@ const SectionView = ({
         minWidth: "10em",
     };
 
-    const clearedLocationCount =
-        (section?.locationReport.checked.size ?? 0) +
-        (section?.locationReport.ignored.size ?? 0);
-    const totalLocationCount = section?.locationReport.existing.size ?? 0;
+    const trackedLocations = useSlotLocations(section?.trackedLocations);
+    const clearedLocationCount = trackedLocations.reduce(
+        (count, status) =>
+            status.checked || status.ignored ? count + 1 : count,
+        0
+    );
+    const totalLocationCount = trackedLocations.length;
     const checkedLocationBehavior = useOption(
         optionManager,
         "LocationTracker:cleared_location_behavior",
@@ -92,26 +102,21 @@ const SectionView = ({
     /**
      * Compares two locations to determine their relative order
      * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @param a Location name a
-     * @param b Location name b
+     * @param a Location status a
+     * @param b Location status b
      * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
      */
-    const locationCompare = (a: string, b: string): number => {
-        const statusA = locationManager.getLocationStatus(a);
-        const statusB = locationManager.getLocationStatus(b);
-        if (
-            checkedLocationBehavior === "separate" &&
-            statusA.checked !== statusB.checked
-        ) {
-            return statusA.checked ? 1 : -1;
+    const locationCompare = (a: LocationStatus, b: LocationStatus): number => {
+        if (checkedLocationBehavior === "separate" && a.checked !== b.checked) {
+            return a.checked ? 1 : -1;
         }
 
         if (locationOrder === "natural") {
-            return naturalSort(a, b);
+            return naturalSort(a.name, b.name);
         } else if (locationOrder === "id") {
-            return statusA.id - statusB.id;
+            return a.locationId - b.locationId;
         } else if (locationOrder === "lexical") {
-            return a < b ? -1 : 1;
+            return a.name < b.name ? -1 : 1;
         }
         // leave ordering as listed
         return -1;
@@ -119,73 +124,33 @@ const SectionView = ({
 
     /**
      * Filter that removes any locations that do not exist or are hidden by settings.
-     * @param locationName
+     * @param locationStatus
      * @returns
      */
-    const locationFilter = (locationName: string): boolean => {
-        const locationStatus = locationManager.getLocationStatus(locationName);
-        return (
-            locationStatus.exists &&
-            (checkedLocationBehavior !== "hide" || !locationStatus.checked)
-        );
+    const locationFilter = (locationStatus: LocationStatus): boolean => {
+        return checkedLocationBehavior !== "hide" || !locationStatus.checked;
     };
 
-    const locations: string[] = useMemo(() => {
-        const locationNames = [...(section?.locations ?? [])].filter(
-            locationFilter
-        );
+    const localLocations = useSlotLocations(section?.locations ?? []);
+    const locations: LocationStatus[] = useMemo(() => {
+        const locationNames = localLocations.filter(locationFilter);
         locationNames.sort(locationCompare);
         return locationNames;
-    }, [
-        locationOrder,
-        checkedLocationBehavior,
-        section?.locations,
-        locationManager,
-        section?.locationReport,
-    ]);
+    }, [locationOrder, checkedLocationBehavior, localLocations]);
 
-    /**
-     * Compares two sections to determine their relative order
-     * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-     * @param a section name a
-     * @param b section name b
-     * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
-     */
-    const sectionCompare = (a: string, b: string): number => {
-        const sectionA = locationTracker.getSection(a);
-        const sectionB = locationTracker.getSection(b);
-        const indexA = section.children.indexOf(a);
-        const indexB = section.children.indexOf(b);
-        const sectionAClear =
-            sectionA.locationReport.checked.size ===
-            sectionA.locationReport.existing.size;
-        const sectionBClear =
-            sectionB.locationReport.checked.size ===
-            sectionB.locationReport.existing.size;
-
-        if (
-            clearedSectionBehavior === "separate" &&
-            sectionAClear !== sectionBClear
-        ) {
-            return sectionAClear ? 1 : -1;
-        }
-        // maintain original order;
-        return indexA - indexB;
-    };
-
-    const locationNames = section?.locationReport
-        ? [...section.locationReport.existing.values()]
-        : [];
-    const locationStatuses = locationNames.map((locationName) =>
-        locationManager.getLocationStatus(locationName)
+    const locationCounterStatuses = useMemo(
+        () =>
+            trackedLocations.map((status) => ({
+                checked: status.checked,
+                ignored: status.ignored,
+            })),
+        [trackedLocations]
     );
 
-    const locationIds = locationStatuses.map((status) => status.id ?? 0);
-    const locationCounterStatuses = locationStatuses.map((status) => ({
-        checked: status.checked,
-        ignored: status.ignored,
-        exists: status.exists,
-    }));
+    const locationIds = useMemo(
+        () => trackedLocations.map((l) => l.locationId),
+        [trackedLocations]
+    );
 
     const tagCounts = useTagCounters(
         tagManager,
@@ -194,6 +159,45 @@ const SectionView = ({
         locationCounterStatuses
     );
 
+    const sectionClearCache: Record<string, boolean> = {};
+    /**
+     * Compares two sections to determine their relative order
+     * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+     * @param a section name a
+     * @param b section name b
+     * @returns negative if a is before b, positive if a is after b, 0 if they are equivalent
+     */
+    const sectionCompare = (a: string, b: string): number => {
+        let sectionAClear = sectionClearCache[a];
+        let sectionBClear = sectionClearCache[b];
+        if (sectionAClear === undefined) {
+            const sectionA = locationTracker.getSection(a);
+            const sectionALocations = new Set(sectionA.trackedLocations);
+            sectionAClear = trackedLocations
+                .filter((l) => sectionALocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[a] = sectionAClear;
+        }
+
+        if (sectionBClear === undefined) {
+            const sectionB = locationTracker.getSection(b);
+            const sectionBLocations = new Set(sectionB.trackedLocations);
+            sectionBClear = trackedLocations
+                .filter((l) => sectionBLocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[b] = sectionBClear;
+        }
+
+        if (
+            clearedSectionBehavior === "separate" &&
+            sectionAClear !== sectionBClear
+        ) {
+            return sectionAClear ? 1 : -1;
+        }
+        // maintain original order;
+        return 0;
+    };
+
     /**
      * Removes any section that should be hidden by settings such as empty and cleared sections
      * @param sectionName The name of the section being filtered
@@ -201,28 +205,38 @@ const SectionView = ({
      */
     const sectionFilter = (sectionName: string) => {
         const sectionInQuestion = locationTracker.getSection(sectionName);
+        let sectionCleared = sectionClearCache[sectionName];
+        if (sectionCleared === undefined) {
+            const sectionLocations = new Set(
+                sectionInQuestion?.trackedLocations ?? []
+            );
+            sectionCleared = trackedLocations
+                .filter((l) => sectionLocations.has(l.locationId))
+                .every((l) => l.checked);
+            sectionClearCache[sectionName] = sectionCleared;
+        }
         return (
-            sectionInQuestion?.locationReport.existing.size > 0 &&
-            (clearedSectionBehavior !== "hide" ||
-                sectionInQuestion.locationReport.checked.size <
-                    sectionInQuestion.locationReport.existing.size)
+            sectionInQuestion?.trackedLocations.length > 0 &&
+            (clearedSectionBehavior !== "hide" || !sectionCleared)
         );
     };
 
-    const childSections = section?.children.filter(sectionFilter) ?? [];
-    childSections.sort(sectionCompare);
+    const childSections = useMemo(() => {
+        const result = section?.children.filter(sectionFilter) ?? [];
+        result.sort(sectionCompare);
+        return result;
+    }, [section?.children, trackedLocations, clearedSectionBehavior]);
 
     return (
         <>
-            {section?.locationReport.existing.size === 0 &&
-            section?.id !== "root" ? (
+            {totalLocationCount === 0 && section?.id !== "root" ? (
                 <></> // Hide empty sections
             ) : (
                 <div style={style}>
                     <TextButton
                         onClick={() => {
                             if (isClosable) {
-                                setIsOpen(!isOpen);
+                                setIsOpen((x) => !x);
                             }
                         }}
                     >
@@ -233,8 +247,7 @@ const SectionView = ({
                                 marginBottom: "0.25em",
                             }}
                             className={`section_title ${
-                                section?.locationReport.checked.size ===
-                                section?.locationReport.existing.size
+                                clearedLocationCount === totalLocationCount
                                     ? "checked"
                                     : ""
                             }`}

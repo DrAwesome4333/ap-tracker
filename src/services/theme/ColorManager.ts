@@ -10,9 +10,10 @@ import {
 //color to display name
 const colorOptionsDef: HierarchicalOption = {
     type: OptionType.hierarchical,
-    display: "Colors",
+    display: "Text Styles",
     name: "APColors",
     format: "column",
+    spacing: "0.75rem",
     children: [
         {
             type: OptionType.color,
@@ -34,6 +35,27 @@ const colorOptionsDef: HierarchicalOption = {
             display: "Player (other)",
             name: "--ap-player-other",
             apClasses: ["ap_text", "player_other"],
+        },
+        {
+            type: OptionType.color,
+            default: "#ff00c7",
+            display: "Item Link Group (current slot)",
+            name: "--ap-group",
+            apClasses: ["ap_text", "group"],
+        },
+        {
+            type: OptionType.color,
+            default: "#ffd400",
+            display: "Item Link Group (my other slot)",
+            name: "--ap-group-alt",
+            apClasses: ["ap_text", "group_alt"],
+        },
+        {
+            type: OptionType.color,
+            default: "#ede091",
+            display: "Item Link Group (other)",
+            name: "--ap-group-other",
+            apClasses: ["ap_text", "group_other"],
         },
         {
             type: OptionType.color,
@@ -125,6 +147,30 @@ const colorOptionsDef: HierarchicalOption = {
             display: "Hint (Avoid)",
             name: "--ap-hint-avoid",
             apClasses: ["ap_text", "hint_avoid"],
+        },
+        {
+            type: OptionType.select,
+            display: "Player Underline",
+            name: "--ap-player-underline",
+            default: "none",
+            choices: [
+                { name: "none", display: "None" },
+                { name: "wavy underline", display: "Wavy" },
+                { name: "underline", display: "Line" },
+                { name: "dotted underline", display: "Dotted" },
+            ],
+        },
+        {
+            type: OptionType.select,
+            display: "Item Link Underline",
+            name: "--ap-group-underline",
+            default: "none",
+            choices: [
+                { name: "none", display: "None" },
+                { name: "wavy underline", display: "Wavy" },
+                { name: "underline", display: "Line" },
+                { name: "dotted underline", display: "Dotted" },
+            ],
         },
     ],
 };

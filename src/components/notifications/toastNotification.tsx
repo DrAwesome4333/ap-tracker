@@ -1,6 +1,7 @@
 import React from "react";
 import { MessageType } from "../../services/notifications/notifications";
 import { filledTextPrimary, secondary } from "../../constants/colors";
+import Icon from "../icons/icons";
 const TOAST_HEIGHT_PX = 85;
 const Toast = ({
     message,
@@ -24,32 +25,37 @@ const Toast = ({
     click?: (e: React.MouseEvent) => void;
 }) => {
     let boxColor = "grey";
-    let icon = "ⓘ";
+    let iconColor = "grey";
+    let icon = "info";
     switch (type) {
         case MessageType.error: {
             boxColor = "red";
-            icon = "❌";
+            icon = "bomb";
+            iconColor = "var(--danger-accent)";
             break;
         }
         case MessageType.info: {
             boxColor = "blue";
-            icon = "ⓘ";
+            icon = "info";
+            iconColor = "#FFFFFF";
             break;
         }
         case MessageType.success: {
             boxColor = "green";
-            icon = "✅";
+            icon = "check_small";
+            iconColor = "#00AA00";
             break;
         }
         case MessageType.warning: {
             boxColor = "orange";
-            icon = "⚠️";
+            icon = "warning";
+            iconColor = "orange";
             break;
         }
 
         default: {
             boxColor = "grey";
-            icon = "ⓘ";
+            icon = "info";
             break;
         }
     }
@@ -103,18 +109,20 @@ const Toast = ({
                     transform="rotate(-90)"
                 />
             </svg>
-            <div
+
+            <Icon
+                type={icon}
                 style={{
                     gridColumn: "1 / span 1",
                     gridRow: "1 /span 1",
                     justifySelf: "center",
                     alignSelf: "center",
                     textAlign: "center",
-                    fontSize: "XX-large",
+                    color: iconColor,
                 }}
-            >
-                {icon}
-            </div>
+                fontSize="XX-large"
+            />
+
             <div
                 style={{
                     gridColumn: "2 / span 1",

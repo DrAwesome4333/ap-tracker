@@ -1,6 +1,12 @@
 "use client";
 import React from "react";
-import { CONNECTION_STATUS } from "../../services/connector/connector";
+// import { CONNECTION_STATUS } from "../../services/connector/connector";
+const CONNECTION_STATUS = {
+    connecting: "0",
+    error: "1",
+    connected: "2",
+    disconnected: "3",
+};
 import styled from "styled-components";
 
 const baseColors = [

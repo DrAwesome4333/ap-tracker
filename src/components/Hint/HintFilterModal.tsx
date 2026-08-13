@@ -1,6 +1,5 @@
 import * as HintOptionDef from "./HintOptionDef";
 import Modal from "../shared/Modal";
-import React from "react";
 import OptionView from "../optionsComponents/OptionView";
 import { globalOptionManager } from "../../services/options/optionManager";
 import { GhostButton } from "../shared/buttons";
@@ -14,9 +13,18 @@ const HintFilterModal = ({
     onClose: () => void;
 }) => {
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Hint Filters</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <OptionView
                 option={HintOptionDef.optionDef}
+                hideTitle
                 onUpdate={(name, value) => {
                     globalOptionManager.setOptionValue(
                         name,
@@ -25,9 +33,6 @@ const HintFilterModal = ({
                     );
                 }}
             />
-            <ButtonRow>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

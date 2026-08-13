@@ -1,11 +1,5 @@
 import { createPortal } from "react-dom";
-import React, {
-    useEffect,
-    useState,
-    useRef,
-    useContext,
-    useReducer,
-} from "react";
+import { useEffect, useState, useRef, useContext, useReducer } from "react";
 import NotificationManager, {
     MessageType,
     StatusNotification,
@@ -13,12 +7,13 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import Toast from "./toastNotification";
 import styles from "./notification.module.css";
-import { SecondaryButton } from "../shared/buttons";
+import { PrimaryButton, SecondaryButton } from "../shared/buttons";
 import Modal from "../shared/Modal";
 import ServiceContext from "../../contexts/serviceContext";
 import useOption from "../../hooks/optionHook";
 import { readThemeValue } from "../../services/theme/theme";
 import StatusNotificationView from "./statusNotification";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 interface ToastNotificationData {
     notification: ToastNotification;
@@ -28,6 +23,8 @@ interface ToastNotificationData {
     remainingTime: number;
     duration: number;
     details?: string;
+    actionName?: string;
+    action?: () => void;
     timed?: boolean;
 }
 
@@ -82,6 +79,8 @@ const toastNotificationReducer = (
                     remainingTime: action.data.notification.duration,
                     duration: action.data.notification.duration,
                     details: action.data.notification.details,
+                    action: action.data.notification.action,
+                    actionName: action.data.notification.actionName,
                 });
             } else {
                 // update an older one
@@ -245,30 +244,43 @@ const NotificationContainer = () => {
                     data-theme={readThemeValue(themeValue)}
                 >
                     {detailModalOpen && toastNotifications[detailIndex] && (
-                        <Modal open={detailModalOpen}>
+                        <Modal
+                            open={detailModalOpen}
+                            header={
+                                <h3>
+                                    {toastNotifications[detailIndex].message}
+                                </h3>
+                            }
+                            footer={
+                                <ButtonRow>
+                                    {toastNotifications[detailIndex].action && (
+                                        <PrimaryButton
+                                            onClick={
+                                                toastNotifications[detailIndex]
+                                                    .action
+                                            }
+                                        >
+                                            {toastNotifications[detailIndex]
+                                                .actionName ??
+                                                "<No Action Name>"}
+                                        </PrimaryButton>
+                                    )}
+
+                                    <SecondaryButton
+                                        small
+                                        onClick={() => {
+                                            setDetailModalOpen(false);
+                                        }}
+                                    >
+                                        Close
+                                    </SecondaryButton>
+                                </ButtonRow>
+                            }
+                        >
                             <div
                                 className={styles.notification_modal_container}
                             >
-                                <h3 style={{ gridArea: "message" }}>
-                                    {toastNotifications[detailIndex].message}
-                                </h3>
-                                <div
-                                    style={{
-                                        gridArea: "details",
-                                        whiteSpace: "pre-wrap",
-                                    }}
-                                >
-                                    {toastNotifications[detailIndex].details}
-                                </div>
-                                <SecondaryButton
-                                    style={{ gridArea: "close" }}
-                                    small
-                                    onClick={() => {
-                                        setDetailModalOpen(false);
-                                    }}
-                                >
-                                    Close
-                                </SecondaryButton>
+                                {toastNotifications[detailIndex].details}
                             </div>
                         </Modal>
                     )}
@@ -286,7 +298,7 @@ const NotificationContainer = () => {
                             click={() => {
                                 openDetailModal(index);
                             }}
-                        ></Toast>
+                        />
                     ))}
 
                     {statusNotifications.map((notification, index) => (
@@ -300,7 +312,7 @@ const NotificationContainer = () => {
                                 notification.remainingTime < 0
                             }
                             progress={notification.notification.progress}
-                        ></StatusNotificationView>
+                        />
                     ))}
                 </div>,
                 document.body

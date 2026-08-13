@@ -1,13 +1,13 @@
 import { randomNumericId } from "../../utility/uuid";
-import MultiWorldContext from "../MultiInfo/MultiWorldContext";
+import MultiWorldService from "../MultiInfo/MultiWorldService";
 import { DB_STORE_KEYS, SaveData } from "../saveData";
 import {
     TagCounterV2,
     TagDataV2,
     TagEntityType,
     TagSource,
-    TagTypeV2,
     TagId,
+    TagTypeV2Data,
 } from "./tagManager";
 
 const uniqueTagInfo = [
@@ -56,7 +56,7 @@ const counters: TagCounterV2[] = uniqueTagInfo.map((info) => ({
     count_filter: [["checked"]],
 }));
 
-const types: TagTypeV2[] = [
+const types: TagTypeV2Data[] = [
     ...uniqueTagInfo.map((info) => ({
         ...info,
         priority: 100,
@@ -98,8 +98,28 @@ class LocationTagger implements TagSource {
         (tagUpdates: { updated?: TagDataV2[]; removed?: TagId[] }) => void
     > = new Set();
 
-    constructor() {
-        MultiWorldContext.addDeleteCallback(this.deleteTags);
+    constructor(multiWorldSaveId: string, slot: number) {
+        this.#multiWorldSaveId = multiWorldSaveId;
+        this.#slot = slot;
+        const removedTags = [...this.#tags.entries()].map(([id, _]) => id);
+        this.#tags.clear();
+        this.#callUpdateCallbacks({ removed: removedTags });
+
+        SaveData.getItem(DB_STORE_KEYS.tags, [multiWorldSaveId, slot]).then(
+            (value: {
+                multi_save_id: string;
+                slot: number;
+                tags: TagDataV2[];
+            }) => {
+                if (!value?.tags) {
+                    return;
+                }
+                value.tags.forEach((tag) => {
+                    this.#tags.set(tag.tag_id, tag);
+                });
+                this.#callUpdateCallbacks({ updated: value.tags });
+            }
+        );
     }
 
     #callUpdateCallbacks = (updates: {
@@ -150,7 +170,7 @@ class LocationTagger implements TagSource {
         Object.freeze(newTag);
         this.#tags.set(tagId, newTag);
         this.#callUpdateCallbacks({ updated: [newTag] });
-        this.saveTags();
+        this.#saveTags();
     };
 
     addTag = (type: string, locationId: number, text?: string) => {
@@ -168,41 +188,17 @@ class LocationTagger implements TagSource {
         Object.freeze(tag);
         this.#tags.set(tag.tag_id, tag);
         this.#callUpdateCallbacks({ updated: [tag] });
-        this.saveTags();
+        this.#saveTags();
         return tag.tag_id;
     };
 
     removeTag = (tagId: TagId) => {
         this.#tags.delete(tagId);
         this.#callUpdateCallbacks({ removed: [tagId] });
-        this.saveTags();
+        this.#saveTags();
     };
 
-    loadTags = (multiWorldSaveId: string, slot: number) => {
-        this.#multiWorldSaveId = multiWorldSaveId;
-        this.#slot = slot;
-        const removedTags = [...this.#tags.entries()].map(([id, _]) => id);
-        this.#tags.clear();
-        this.#callUpdateCallbacks({ removed: removedTags });
-
-        SaveData.getItem(DB_STORE_KEYS.tags, [multiWorldSaveId, slot]).then(
-            (value: {
-                multi_save_id: string;
-                slot: number;
-                tags: TagDataV2[];
-            }) => {
-                if (!value?.tags) {
-                    return;
-                }
-                value.tags.forEach((tag) => {
-                    this.#tags.set(tag.tag_id, tag);
-                });
-                this.#callUpdateCallbacks({ updated: value.tags });
-            }
-        );
-    };
-
-    saveTags = async () => {
+    #saveTags = async () => {
         const result = await SaveData.storeItem(DB_STORE_KEYS.tags, {
             multi_save_id: this.#multiWorldSaveId,
             slot_number: this.#slot,
@@ -211,7 +207,7 @@ class LocationTagger implements TagSource {
         return result;
     };
 
-    deleteTags = async (multi_save_id: string, slot_number?: number) => {
+    static async deleteTags(multi_save_id: string, slot_number?: number) {
         if (slot_number !== undefined) {
             await SaveData.deleteItem(DB_STORE_KEYS.tags, [
                 multi_save_id,
@@ -219,7 +215,9 @@ class LocationTagger implements TagSource {
             ]);
             return;
         }
-    };
+    }
 }
+
+MultiWorldService.addDeleteCallback(LocationTagger.deleteTags);
 
 export { LocationTagger };

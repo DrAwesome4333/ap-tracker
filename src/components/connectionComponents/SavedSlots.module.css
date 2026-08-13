@@ -3,12 +3,21 @@
     width: 95%;
     justify-self: center;
     background-color: var(--background-level-2);
-    margin: 0.5rem 0.75rem;
+    margin: 0.5rem 0.5rem;
     padding: 0.5rem;
     box-shadow: var(--box-shadow);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    border-left: solid 0.25em var(--slot-color);
+}
+
+.saved_multi {
+    border-left: solid 0.25em var(--multi-world-color);
+    background-color: var(--background-level-1);
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.125rem 0.5rem 0.5rem;
+    box-shadow: var(--box-shadow);
 }
 
 .slot_actions {
@@ -38,23 +47,35 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 5em;
+    box-sizing: border-box;
     height: 100%;
     width: 100%;
     padding: 0 0.5em;
     margin: 0 0.5em;
     scrollbar-gutter: stable;
     background-color: var(--background-level-0);
-    box-shadow: inset var(--box-shadow-small);
+    box-shadow: inset var(--box-shadow);
+    --multi-world-color: #888888;
+    --slot-color: #888888;
+}
+
+@container body (width < 500px) {
+    .slots {
+        width: 100%;
+    }
+    .slot_list {
+        margin: 0;
+    }
 }
 
 .new_slot_panel {
-    display: grid;
-    align-items: end;
-    justify-items: center;
-    justify-self: center;
-    margin: auto 0;
+    display: flex;
+    flex-direction: column;
     row-gap: 0.25em;
-    width: fit-content;
-    padding: 1em 2em;
-    grid-template-rows: repeat(5, 2.5em) 4em;
+}
+
+.multi_title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }

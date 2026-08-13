@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import InventoryView from "./inventoryComponents/InventoryView";
 import ServiceContext from "../contexts/serviceContext";
 import useOption from "../hooks/optionHook";
@@ -64,16 +64,29 @@ const TrackerScreen = () => {
     }, [showTextClient]);
 
     if (useTabLayout) {
-        return <Tabs tabs={tabs} style={{ width: "100%", height: "100%" }} />;
+        return (
+            <Tabs
+                tabs={tabs}
+                style={{ width: "100%", height: "100%", overflow: "scroll" }}
+            />
+        );
     }
     return (
-        <Flex
-            direction="row"
-            style={{ width: "100%", height: "100%" }}
-            startRatio={0.25}
-            child1={inventory}
-            child2={clientAndList}
-        />
+        <div
+            style={{
+                width: "100%",
+                height: "100%",
+                overflow: "auto",
+            }}
+        >
+            <Flex
+                direction="row"
+                style={{ width: "100%", height: "100%" }}
+                startRatio={0.25}
+                child1={inventory}
+                child2={clientAndList}
+            />
+        </div>
     );
 };
 

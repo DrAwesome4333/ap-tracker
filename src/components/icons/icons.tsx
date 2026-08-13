@@ -19,6 +19,7 @@ const IconContainer = styled.span.attrs({
         "GRAD" ${(props) => props.$.grade ?? 0},
         "opsz" ${(props) => props.$.opticalSize ?? 24};
 `;
+// uncomment to generate new style sheet
 // const supportedIcons = [
 //     "add",
 //     "add_circle",

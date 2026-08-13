@@ -7,7 +7,7 @@ import {
 } from "archipelago.js";
 import { globalOptionManager } from "./options/optionManager";
 import { randomUUID } from "../utility/uuid";
-import MultiWorldContext from "./MultiInfo/MultiWorldContext";
+import MultiWorldService from "./MultiInfo/MultiWorldService";
 interface APMessage {
     parts: (MessageNode | EchoMessageNode)[];
     key: string;
@@ -120,10 +120,10 @@ class TextClientManager {
 
         if (simplifiedType === "item" && item) {
             const mySlots = includeOtherSlots
-                ? MultiWorldContext.loadedMultiWorld.slots.map(
+                ? MultiWorldService.loadedMultiWorld?.slots.map(
                       (slot) => slot.slot_number
                   )
-                : [MultiWorldContext.loadedSlot.slot_number];
+                : [MultiWorldService.loadedSlot?.slot_number];
             const team = client.players.self.team;
             let matches = false;
             if (

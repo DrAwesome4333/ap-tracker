@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import ServiceContext from "../../../contexts/serviceContext";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useTag } from "../../../hooks/tagHook";
 import { textPrimary } from "../../../constants/colors";
 import Icon from "../../icons/icons";
-import { LocationStatus } from "../../../services/locations/locationManager";
+import { LocationStatus } from "../../../services/locations/locationSource";
 import { Input } from "../../inputs";
 import {
     DangerButton,
@@ -11,6 +10,7 @@ import {
     SecondaryButton,
 } from "../../shared/buttons";
 import { TagId } from "../../../services/tags/tagManager";
+import SlotContext from "../../../contexts/slotContext";
 
 const LocationTagView = ({
     tagId,
@@ -25,23 +25,23 @@ const LocationTagView = ({
     onText: (tagId: TagId, text: string) => void;
     shouldFocus: (tagId: TagId) => boolean;
 }) => {
-    const services = useContext(ServiceContext);
-    const tagManager = services.tagManager;
+    const slot = useContext(SlotContext);
+    const tagManager = slot.tagManager;
     const tag = useTag(tagManager, tagId);
-    const tagType = tagManager.getTagType(tag.type_id, {
-        checked: locationStatus.checked,
-        ignored: locationStatus.ignored,
+    const tagType = tagManager?.getTagType(tag?.type_id, {
+        checked: locationStatus?.checked,
+        ignored: locationStatus?.ignored,
     });
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const [text, setText] = useState(tag.data ?? tagType.display_name);
+    const storedText = tag?.data ?? tagType?.display_name ?? "";
+    const [textField, setTextField] = useState("");
     const [editMode, setEditMode] = useState(false);
-    const canClear = tagType.user_managed && true;
-    const canEdit = tagType.allows_text && true;
+    const canClear = tagType?.user_managed && true;
+    const canEdit = tagType?.allows_text && true;
 
     useEffect(() => {
         if (editMode) {
-            setText(tag.data ?? "");
             inputRef.current?.focus();
         }
     }, [editMode]);
@@ -55,38 +55,38 @@ const LocationTagView = ({
         <div
             style={{
                 marginLeft: "1rem",
-                color: tagType.text_color ?? textPrimary,
+                color: tagType?.text_color ?? textPrimary,
                 textDecoration: "none",
                 // display: "inline-block",
             }}
         >
             <Icon
                 fontSize="14px"
-                type={tagType.icon_id}
+                type={tagType?.icon_id ?? "fmd_bad"}
                 style={{
-                    color: tagType.icon_color ?? textPrimary,
+                    color: tagType?.icon_color ?? textPrimary,
                 }}
-                iconParams={tagType.icon_spec}
+                iconParams={tagType?.icon_spec}
             />{" "}
             {editMode ? (
                 <Input
                     ref={inputRef}
                     type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    value={textField}
+                    onChange={(e) => setTextField(e.target.value)}
                     onKeyUp={(e) => {
                         if (e.key === "Enter") {
-                            onText(tagId, text.toString());
+                            onText(tagId, textField);
                             setEditMode(false);
                         }
                         if (e.key === "Escape") {
-                            setText(tag.data ?? tagType.display_name);
+                            setTextField(storedText.toString());
                             setEditMode(false);
                         }
                     }}
                 />
             ) : (
-                text
+                storedText
             )}
             {editMode ? (
                 <>
@@ -96,7 +96,7 @@ const LocationTagView = ({
                             margin: "1em",
                         }}
                         onClick={() => {
-                            onText(tagId, text.toString());
+                            onText(tagId, textField);
                             setEditMode(false);
                         }}
                     >
@@ -110,7 +110,7 @@ const LocationTagView = ({
                         }}
                         onClick={() => {
                             setEditMode(false);
-                            setText(tag.data ?? tagType.display_name);
+                            setTextField(storedText.toString());
                         }}
                     >
                         {" "}
@@ -123,7 +123,10 @@ const LocationTagView = ({
                         margin: "1em",
                     }}
                     tiny
-                    onClick={() => setEditMode(true)}
+                    onClick={() => {
+                        setEditMode(true);
+                        setTextField(storedText.toString());
+                    }}
                 >
                     {" "}
                     <Icon type="edit" fontSize="14px" />{" "}

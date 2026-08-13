@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import Modal from "../../shared/Modal";
 import ChecklistSettings from "../../optionsComponents/ChecklistSettings";
 import ServiceContext from "../../../contexts/serviceContext";
@@ -7,6 +7,7 @@ import { GhostButton } from "../../shared/buttons";
 import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import HintSettings from "../../optionsComponents/HintTagSettings";
+import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 
 const DropdownFilterModal = ({
     open,
@@ -16,13 +17,21 @@ const DropdownFilterModal = ({
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
+    const slot = useCurrentMultiworldSlot();
 
     return (
-        <Modal open={open}>
-            <h2>Location Dropdown Settings</h2>
+        <Modal
+            open={open}
+            header={<h3>Location Dropdown Settings</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             Tracker: &nbsp;
             <TrackerDropdown
-                game={services.connector?.connection.slotInfo.game}
+                game={slot.game}
                 type={ResourceType.locationTracker}
             />
             <br />
@@ -31,9 +40,6 @@ const DropdownFilterModal = ({
             <br />
             <br />
             <HintSettings />
-            <ButtonRow>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

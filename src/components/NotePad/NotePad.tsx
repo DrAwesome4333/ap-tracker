@@ -7,6 +7,7 @@ import NotificationManager, {
 } from "../../services/notifications/notifications";
 import Spinner from "../icons/spinner";
 import Modal from "../shared/Modal";
+import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 const MAX_NOTE_LENGTH = 1024;
 
@@ -104,34 +105,64 @@ const NotePad = ({
     }, [loading, noteContent]);
 
     useEffect(() => {
-        if (noteContent === "" && !disabled && !loading && !initialLoad) {
+        if (
+            noteContent === "" &&
+            !disabled &&
+            !loading &&
+            !initialLoad &&
+            open
+        ) {
             setInitialLoad(true);
             retrieveNote();
         }
-    }, [disabled, noteContent, retrieveNote, loading, initialLoad]);
+    }, [disabled, noteContent, retrieveNote, loading, initialLoad, open]);
     return (
-        <Modal open={open}>
-            <div className={styles.note_grid}>
-                <div style={{ gridArea: "title" }}>
-                    <div className={styles.note_header}>
-                        <h3>AP Notepad (experimental)</h3>
-                        <span>
-                            {loading ? (
-                                <Spinner />
-                            ) : unsavedChanges ? (
-                                " Not saved"
-                            ) : (
-                                ""
-                            )}
-                        </span>
-                    </div>
-                    <span>
-                        Save notes in server storage. This note can be seen and
-                        modified by anyone with access to the Archipelago
-                        server.
-                    </span>
+        <Modal
+            open={open}
+            header={
+                <div className={styles.note_header}>
+                    <h3 style={{ display: "inline-block" }}>Notepad</h3>
+                    {loading ? (
+                        <Spinner />
+                    ) : unsavedChanges ? (
+                        "\tNot saved"
+                    ) : (
+                        ""
+                    )}
                 </div>
-
+            }
+            footer={
+                <ButtonRow>
+                    {" "}
+                    <PrimaryButton
+                        small
+                        onClick={storeNote}
+                        disabled={
+                            disabled ||
+                            loading ||
+                            noteContent.length > MAX_NOTE_LENGTH
+                        }
+                    >
+                        Save to Server
+                    </PrimaryButton>
+                    <SecondaryButton
+                        small
+                        onClick={retrieveNote}
+                        disabled={disabled || loading}
+                    >
+                        Load from Server
+                    </SecondaryButton>
+                    <GhostButton small onClick={onClose}>
+                        Close
+                    </GhostButton>
+                </ButtonRow>
+            }
+        >
+            <div className={styles.note_grid}>
+                <p style={{ gridArea: "title" }}>
+                    Save notes in server storage. This note can be seen and
+                    modified by anyone with access to the Archipelago server.
+                </p>
                 <textarea
                     className={styles.note_text_area}
                     disabled={disabled || loading}
@@ -175,29 +206,7 @@ const NotePad = ({
                             display: "flex",
                             justifyContent: "right",
                         }}
-                    >
-                        <PrimaryButton
-                            small
-                            onClick={storeNote}
-                            disabled={
-                                disabled ||
-                                loading ||
-                                noteContent.length > MAX_NOTE_LENGTH
-                            }
-                        >
-                            Save to Server
-                        </PrimaryButton>
-                        <SecondaryButton
-                            small
-                            onClick={retrieveNote}
-                            disabled={disabled || loading}
-                        >
-                            Load from Server
-                        </SecondaryButton>
-                        <GhostButton small onClick={onClose}>
-                            Close
-                        </GhostButton>
-                    </div>
+                    ></div>
                 </div>
             </div>
         </Modal>

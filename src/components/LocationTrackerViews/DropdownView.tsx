@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useCallback, useState } from "react";
 import PanelHeader from "../shared/PanelHeader";
 import SectionView from "./DropDownViewComponents/SectionView";
 import StickySpacer from "../shared/StickySpacer";
@@ -10,7 +10,10 @@ import styles from "./LocationTracker.module.css";
 
 const LocationTrackerDropdownView = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [focusedLocation, setFocusedLocation] = useState("");
+    const [focusedLocation, setFocusedLocation] = useState<number>(0);
+    const locationSelect = useCallback((locationId: number) => {
+        setFocusedLocation(locationId);
+    }, []);
     return (
         <>
             <div className={styles.dropdown_view}>
@@ -44,18 +47,16 @@ const LocationTrackerDropdownView = () => {
                     >
                         <SectionView
                             name="root"
-                            onLocationSelect={(locationName) => {
-                                setFocusedLocation(locationName);
-                            }}
+                            onLocationSelect={locationSelect}
                             selectedLocation={focusedLocation}
                         />
                         <StickySpacer />
                     </div>
-                    {focusedLocation && (
+                    {focusedLocation > 0 && (
                         <div style={{ minWidth: 0, minHeight: 0 }}>
                             <LocationDetails
-                                locationName={focusedLocation}
-                                onClose={() => setFocusedLocation("")}
+                                locationId={focusedLocation}
+                                onClose={() => setFocusedLocation(0)}
                             />
                         </div>
                     )}

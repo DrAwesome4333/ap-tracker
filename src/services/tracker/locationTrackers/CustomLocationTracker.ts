@@ -1,5 +1,3 @@
-import { LocationManager } from "../../locations/locationManager";
-import LocationReport from "./LocationReport";
 import { convertLocationTrackerV1toV2 } from "./upgradePathV1V2";
 import { LocationTrackerType, ResourceType } from "../resourceEnums";
 import {
@@ -11,28 +9,30 @@ import {
     CustomLocationTrackerDef_V2,
     SectionDef_V2,
 } from "./formatDefinitions/CustomLocationTrackerFormat_V2";
+import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
+import { LocationId } from "../../locations/locationSource";
 
 class CustomLocationTracker implements DropdownLocationTracker {
     manifest: LocationTrackerManifest;
     type: LocationTrackerType.dropdown;
-    locationManager: LocationManager;
     optionOverrides?: {
         locationOrder?: "natural" | "id" | "lexical" | "listed";
     } = {};
     protected listeners: Set<() => void> = new Set();
     protected cleanupCalls: Set<() => void> = new Set();
-    protected locations: Set<string> = new Set();
+    protected locations: Set<number> = new Set();
     protected sections: Map<string, Section> = new Map();
     protected errors: string[] = [];
     protected cachedErrors: string[] = [];
+    protected gamePackage: GamePackageWrapper;
 
     #data: CustomLocationTrackerDef_V2;
 
     constructor(
-        locationManager: LocationManager,
+        gamePackage?: GamePackageWrapper,
         data?: CustomLocationTrackerDef_V1 | CustomLocationTrackerDef_V2
     ) {
-        this.locationManager = locationManager;
+        this.gamePackage = gamePackage;
         if (data && "customTrackerVersion" in data) {
             if (data.customTrackerVersion === 1) {
                 data = convertLocationTrackerV1toV2(data);
@@ -117,26 +117,6 @@ class CustomLocationTracker implements DropdownLocationTracker {
                     );
                 }
             }
-
-            const section: Section = {
-                title: sectionDef.title,
-                id: sectionName,
-                children: !Array.isArray(sectionDef.children)
-                    ? [...Object.keys(sectionDef.children ?? {})]
-                    : [...sectionDef.children],
-                parents: [],
-                locationReport: new LocationReport(),
-                locations: [
-                    ...groupNames
-                        .map((groupName) => groups[groupName]?.locations ?? [])
-                        .flat(),
-                    ...(sectionDef.locations ?? []),
-                ],
-                theme: { color: "#888888", ...themes[sectionDef.theme] },
-            };
-
-            this.sections.set(sectionName, section);
-
             const childParents = [...parents, sectionName];
             const children = !sectionDef.children
                 ? []
@@ -152,27 +132,43 @@ class CustomLocationTracker implements DropdownLocationTracker {
                                 childParents
                             )
                     );
+            let trackedLocations: Set<LocationId> = new Set();
             children.forEach((child) => {
-                if (child && !child.parents.includes(sectionName)) {
-                    child.parents.push(sectionName);
-                }
+                trackedLocations = trackedLocations.union(
+                    new Set(child.trackedLocations)
+                );
             });
 
-            section.locations.forEach((value) => this.locations.add(value));
-            const subscriber = this.locationManager.getSubscriberCallback(
+            const section: Section = {
+                title: sectionDef.title,
+                id: sectionName,
+                children: !Array.isArray(sectionDef.children)
+                    ? [...Object.keys(sectionDef.children ?? {})]
+                    : [...sectionDef.children],
+                locations: [
+                    ...groupNames
+                        .map((groupName) => groups[groupName]?.locations ?? [])
+                        .flat()
+                        .map((x) => this.gamePackage.getLocationId(x)),
+                    ...(sectionDef.locations?.map((x) =>
+                        this.gamePackage.getLocationId(x)
+                    ) ?? []),
+                ],
+                trackedLocations: [],
+                theme: { color: "#888888", ...themes[sectionDef.theme] },
+            };
+
+            trackedLocations = trackedLocations.union(
                 new Set(section.locations)
             );
-            const cleanup = subscriber((_updatedLocations) => {
-                this.updateSection(sectionName);
-            });
+            section.trackedLocations = [...trackedLocations];
+            this.sections.set(sectionName, section);
             this.updateSection(sectionName);
-            this.cleanupCalls.add(cleanup);
 
             return section;
         };
 
         parseSection_string("root");
-
         // extra validation
         const remainingGroups = new Set(Object.keys(groups));
         Object.entries(sections).forEach(([name, section]) => {
@@ -192,9 +188,9 @@ class CustomLocationTracker implements DropdownLocationTracker {
         [...this.sections.values()].forEach((section) => {
             Object.freeze(section);
             Object.freeze(section.locations);
-            Object.freeze(section.parents);
             Object.freeze(section.children);
         });
+        this.locations = new Set(this.sections.get("root")?.trackedLocations);
         this.callListeners();
     };
 
@@ -207,28 +203,15 @@ class CustomLocationTracker implements DropdownLocationTracker {
             return;
         }
         const section = this.sections.get(sectionName);
-        const locationReport = new LocationReport();
-        section.locations.forEach((location) => {
-            locationReport.addLocation(this.locationManager, location);
-        });
-        section.children.forEach((childName) => {
-            const child = this.sections.get(childName);
-            if (child) {
-                locationReport.addReport(child.locationReport);
-            }
-        });
+
         processedSections.add(sectionName);
         const newSection = {
             ...section,
         };
-        newSection.locationReport = locationReport;
 
         Object.freeze(newSection);
 
         this.sections.set(sectionName, newSection);
-        section.parents.forEach((parentName) =>
-            this.updateSection(parentName, processedSections, false)
-        );
 
         if (callListeners) {
             this.callListeners(sectionName);
@@ -239,12 +222,10 @@ class CustomLocationTracker implements DropdownLocationTracker {
         this.listeners.forEach((listener) => listener());
     };
 
-    getUpdateSubscriber = (_name?: string) => {
-        return (listener: () => void) => {
-            this.listeners.add(listener);
-            return () => {
-                this.listeners.delete(listener);
-            };
+    addSectionUpdateCallBack = (_name: string, callback: () => void) => {
+        this.listeners.add(callback);
+        return () => {
+            this.listeners.delete(callback);
         };
     };
 
@@ -254,11 +235,14 @@ class CustomLocationTracker implements DropdownLocationTracker {
 
     validateLocations = (locations?: Set<string>) => {
         const missingLocations = (
-            locations ??
-            this.locationManager.getMatchingLocations(
-                LocationManager.filters.exist
+            locations ?? new Set(this.gamePackage.getAllLocationNames())
+        ).difference(
+            new Set(
+                [...this.locations.values()].map((id) =>
+                    this.gamePackage.getLocationName(id)
+                )
             )
-        ).difference(this.locations);
+        );
         if (missingLocations.size > 0) {
             this.errors.push(
                 `The following locations are missing from the custom location tracker:\n\t${[...missingLocations.values()].join("\n\t")}`

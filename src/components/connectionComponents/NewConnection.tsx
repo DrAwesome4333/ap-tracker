@@ -1,15 +1,22 @@
-import React, { useContext, useState } from "react";
+import { KeyboardEventHandler, useState } from "react";
 import { GhostButton, PrimaryButton } from "../shared/buttons";
 import styles from "./SavedSlots.module.css";
 import { Input } from "../inputs";
-import ServiceContext from "../../contexts/serviceContext";
-import NotificationManager, {
-    MessageType,
-} from "../../services/notifications/notifications";
-import { CONNECTION_STATUS } from "../../services/connector/connector";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
+import { ConnectionConfiguration } from "../../services/connector/APConnector";
+import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
+import Modal from "../shared/Modal";
 
-const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
+const NewConnection = ({
+    onClose,
+    connectToServer,
+    modalOpen,
+    ...props
+}: {
+    onClose: () => void;
+    connectToServer: (info: ConnectionConfiguration) => void;
+    modalOpen: boolean;
+}) => {
     const [connectionInfo, setConnectionInfo] = useState({
         host: "archipelago.gg",
         port: "",
@@ -23,79 +30,76 @@ const NewConnection = ({ onClose, ...props }: { onClose: () => void }) => {
             [event.target.name]: event.target.value,
         });
     };
-    const serviceContext = useContext(ServiceContext);
-    const connector = serviceContext.connector;
-    let disabled = false;
-    if (
-        !connector ||
-        connector.connection.status !== CONNECTION_STATUS.disconnected
-    ) {
-        disabled = true;
-    }
+
+    const submitOnEnter: KeyboardEventHandler = (event) => {
+        if (event.key === "Enter") {
+            connectToServer(connectionInfo);
+        }
+    };
+
+    const connectionStatus = useAPConnectionStatus();
+    const disabled = !connectionStatus.disconnected;
 
     return (
-        <div className={styles.new_slot_panel} {...props}>
-            <h2>New Slot</h2>
-            <Input
-                type="text"
-                name="host"
-                value={connectionInfo.host}
-                onChange={defaultChangeHandler}
-                label="Host"
-                disabled={disabled}
-            />
-            <Input
-                type="text"
-                name="port"
-                value={connectionInfo.port}
-                onChange={defaultChangeHandler}
-                label="Port"
-                disabled={disabled}
-            />
-            <Input
-                type="text"
-                name="slot_name"
-                value={connectionInfo.slot_name}
-                onChange={defaultChangeHandler}
-                label="Slot"
-                disabled={disabled}
-            />
-            <Input
-                type="password"
-                name="password"
-                value={connectionInfo.password}
-                onChange={defaultChangeHandler}
-                label="Password"
-                disabled={disabled}
-            />
-            <ButtonRow>
-                <PrimaryButton
-                    onClick={() => {
-                        connector
-                            ?.connectToAP(connectionInfo)
-                            .catch((result) => {
-                                if (result instanceof Error) {
-                                    console.error(result);
-                                    NotificationManager.createToast({
-                                        type: MessageType.error,
-                                        message: `An unexpected error occurred: ${result.name}`,
-                                        details: `${result.message}\n${result.stack}`,
-                                        duration: 30,
-                                    });
-                                } else {
-                                    NotificationManager.createToast({
-                                        ...result,
-                                    });
-                                }
-                            });
-                    }}
+        <Modal
+            open={modalOpen}
+            header={<h3>New Slot</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton
+                        onClick={() => {
+                            connectToServer(connectionInfo);
+                        }}
+                        disabled={disabled}
+                    >
+                        Connect
+                    </PrimaryButton>
+                    {onClose && (
+                        <GhostButton onClick={onClose}>Close</GhostButton>
+                    )}
+                </ButtonRow>
+            }
+        >
+            <div className={styles.new_slot_panel} {...props}>
+                <Input
+                    type="text"
+                    name="host"
+                    value={connectionInfo.host}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Host"
                     disabled={disabled}
-                >
-                    Connect
-                </PrimaryButton>
-                {onClose && <GhostButton onClick={onClose}>Close</GhostButton>}
-            </ButtonRow>
-        </div>
+                />
+                <Input
+                    type="text"
+                    name="port"
+                    value={connectionInfo.port}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Port"
+                    placeholder="38281"
+                    disabled={disabled}
+                />
+                <Input
+                    type="text"
+                    name="slot_name"
+                    value={connectionInfo.slot_name}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Slot"
+                    disabled={disabled}
+                />
+                <Input
+                    type="password"
+                    name="password"
+                    value={connectionInfo.password}
+                    onChange={defaultChangeHandler}
+                    onKeyUpCapture={submitOnEnter}
+                    label="Password"
+                    disabled={disabled}
+                />
+            </div>
+        </Modal>
     );
 };
 

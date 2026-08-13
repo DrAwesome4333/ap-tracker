@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import CollectionContainer from "./CollectionContainer";
 import InventoryItemView from "./InventoryItemView";
 import { TextButton } from "../shared/buttons";
-import { InventoryItem } from "../../services/inventory/inventoryManager";
+import { Item } from "../../services/items/itemSource";
 import Icon from "../icons/icons";
 import { List, useDynamicRowHeight } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
-const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
+const InventoryItemListView = ({ items }: { items: Item[] }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const count = items.length;
     const flags = {
@@ -17,13 +17,10 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
     };
     const name = items[0]?.name ?? "Empty Collection";
     items.forEach((item) => {
-        flags.progression ||= item.progression;
-        flags.useful ||= item.useful;
-        flags.trap ||= item.trap;
+        flags.progression ||= item.flags.progression;
+        flags.useful ||= item.flags.useful;
+        flags.trap ||= item.flags.trap;
         flags.server ||= item.sender === "Archipelago";
-        if (item.name !== name) {
-            console.warn("");
-        }
     });
 
     let itemClass = ap_styles.item_normal;
@@ -74,9 +71,10 @@ const InventoryItemListView = ({ items }: { items: InventoryItem[] }) => {
                 >
                     <List
                         style={{
-                            overflow: "hidden",
+                            overflow: "auto",
                             maxHeight: "75vh",
                             boxShadow: "inset var(--box-shadow-small)",
+                            backgroundColor: "var(--background-level-0)",
                         }}
                         rowComponent={InventoryItemView}
                         rowCount={items.length}

@@ -1,91 +1,43 @@
-import React, { useEffect, useState } from "react";
-import MultiWorldContext, {
+import { useEffect, useState } from "react";
+import MultiWorldService, {
     SavedMultiWorldDetails,
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldContext";
+} from "../../services/MultiInfo/MultiWorldService";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
-import SavedConnectionManager, {
-    SavedConnection,
-} from "../../services/savedConnections/savedConnectionManager";
 import { Input } from "../inputs";
-import Icon from "../icons/icons";
-import { DB_STORE_KEYS, SaveData } from "../../services/saveData";
 
 /** Shows information about the slot */
 const SlotDetails = ({
     slot,
-    connectionId,
     onClose,
+    onEditMultiWorld,
 }: {
     slot?: SavedSlotDetails;
-    connectionId?: string;
     onClose: () => void;
+    onEditMultiWorld: (saveId: string) => void;
 }) => {
-    const open = (slot || connectionId) && true;
-    const isLegacyConnection = connectionId && !slot;
-    let legacyDetails: SavedConnection = null;
+    const open = slot && true;
     let multiWorld: SavedMultiWorldDetails = null;
 
-    if (connectionId) {
-        legacyDetails =
-            SavedConnectionManager.loadSavedConnectionData().connections[
-                connectionId
-            ];
-    }
-
     if (slot) {
-        multiWorld = MultiWorldContext.getMultiWorld(slot.multi_save_id);
+        multiWorld = MultiWorldService.getMultiWorld(slot.multi_save_id);
     }
 
-    const [title, setTitle] = useState(
-        slot?.title ?? legacyDetails?.name ?? ""
-    );
-    const [host, setHost] = useState(
-        multiWorld?.connection_details.host ?? legacyDetails?.host ?? ""
-    );
-    const [port, setPort] = useState(
-        multiWorld?.connection_details.port ?? legacyDetails?.port ?? ""
-    );
-    const [password, setPassword] = useState(
-        multiWorld?.connection_details.password ?? legacyDetails?.password ?? ""
-    );
+    const [title, setTitle] = useState(slot?.title ?? "");
+    const [color, setColor] = useState(slot?.color ?? "#888888");
 
     useEffect(() => {
-        setTitle(slot?.title ?? legacyDetails?.name ?? "");
-        setHost(
-            multiWorld?.connection_details.host ?? legacyDetails?.host ?? ""
-        );
-        setPort(
-            multiWorld?.connection_details.port ?? legacyDetails?.port ?? ""
-        );
-        setPassword(
-            multiWorld?.connection_details.password ??
-                legacyDetails?.password ??
-                ""
-        );
-    }, [slot, connectionId]);
+        setTitle(slot?.title ?? "");
+        setColor(slot?.color ?? "#888888");
+    }, [slot, multiWorld]);
 
     const save = () => {
-        if (isLegacyConnection) {
-            SavedConnectionManager.saveConnectionData({
-                ...legacyDetails,
-                name: title,
-                password,
-                host,
-                port,
-            });
-        } else if (slot) {
-            MultiWorldContext.updateSlot(slot.multi_save_id, slot.slot_number, {
+        if (slot) {
+            MultiWorldService.updateSlot(slot.multi_save_id, slot.slot_number, {
+                color: color,
                 title,
-            });
-            MultiWorldContext.updateMultiWorld(multiWorld.multi_save_id, {
-                connection_details: {
-                    host,
-                    port,
-                    password,
-                },
             });
         }
         onClose();
@@ -93,28 +45,43 @@ const SlotDetails = ({
 
     const deleteSlot = () => {
         const result = window.confirm(
-            `Are you sure you want to delete ${slot?.title ?? legacyDetails?.name}?`
+            `Are you sure you want to delete ${slot?.title ?? "<unknown slot name>"}?`
         );
         if (result) {
-            if (legacyDetails) {
-                SavedConnectionManager.deleteConnection(connectionId);
-            }
             if (slot) {
-                MultiWorldContext.deleteSlot(slot);
-                SaveData.deleteItem(DB_STORE_KEYS.groupCache, [
-                    slot.multi_save_id,
-                    slot.slot_number,
-                ]);
+                MultiWorldService.deleteSlot(slot);
             }
         }
         onClose();
     };
+
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Slot Details:</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton onClick={save}>Save</PrimaryButton>
+                    <DangerButton onClick={deleteSlot}>Delete</DangerButton>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div>
-                {slot && !isLegacyConnection && (
-                    <>
-                        <h4>Slot Info:</h4>
+                {slot && (
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "1rem",
+                        }}
+                    >
+                        <div>
+                            Slot Name:{" "}
+                            <span style={{ fontStyle: "italic" }}>
+                                {slot.slot_name}
+                            </span>
+                        </div>
                         <div>
                             <Input
                                 type="text"
@@ -125,115 +92,43 @@ const SlotDetails = ({
                         </div>
                         <div>
                             <Input
-                                type="text"
-                                label="Slot Name"
-                                value={slot.slot_name}
-                                disabled
-                            />
-                        </div>
-                        <h4>Multi-world Info</h4>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Seed Name"
-                                value={multiWorld.seed_name}
-                                disabled
+                                type="color"
+                                label="Color"
+                                value={color}
+                                onChange={(e) => setColor(e.target.value)}
                             />
                         </div>
                         <div>
-                            <Input
-                                type="text"
-                                label="Host"
-                                value={host}
-                                onChange={(e) => setHost(e.target.value)}
-                            />
+                            Last used:{" "}
+                            <span style={{ fontStyle: "italic" }}>
+                                {new Date(
+                                    slot.last_used_timestamp
+                                ).toLocaleTimeString([], {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </span>
                         </div>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Port"
-                                value={port}
-                                onChange={(e) => setPort(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="password"
-                                label="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </>
-                )}
-                {isLegacyConnection && (
-                    <>
-                        <div>
-                            <Icon
-                                type="warning"
-                                style={{ color: "orange" }}
-                                iconParams={{ fill: 0 }}
-                            />{" "}
-                            Please connect this slot to the Multi-world server
-                            to update it.{" "}
-                        </div>
-                        <h4>Slot Info:</h4>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Title"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Slot Name"
-                                value={legacyDetails.slot}
-                                disabled
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Seed Name"
-                                value={legacyDetails.seed}
-                                disabled
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Host"
-                                value={host}
-                                onChange={(e) => setHost(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="text"
-                                label="Port"
-                                value={port}
-                                onChange={(e) => setPort(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <Input
-                                type="password"
-                                label="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </>
+                        <p>
+                            To modify the port or room, edit the multi-world
+                            details.
+                        </p>
+                        <ButtonRow>
+                            <PrimaryButton
+                                onClick={() => {
+                                    save();
+                                    onEditMultiWorld(slot?.multi_save_id);
+                                }}
+                            >
+                                Save and Edit Multi-World
+                            </PrimaryButton>
+                        </ButtonRow>
+                    </div>
                 )}
             </div>
-            <ButtonRow>
-                <PrimaryButton onClick={save}>Save</PrimaryButton>
-                <DangerButton onClick={deleteSlot}>Delete</DangerButton>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

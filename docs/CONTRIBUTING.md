@@ -24,3 +24,10 @@ Please review the [coding style](./codingStyle.md) and [accessibility](./accessi
 ## Have a question about something or need to discuss something?
 
 Feel free to message me on the Archipelago discord server or send me a DM (Discord Tag: dr.awesome4333). Alternatively you can create a post on the [GitHub discussion board](https://github.com/DrAwesome4333/ap-tracker/discussions), though response times may vary.
+
+## AI Usage in this app
+
+The topic of AI is very polarizing within the Archipelago Community.
+As such the use of AI generated code or assets is discouraged should you choose to contribute.
+
+Currently this app has some AI generated text that is slated for removal in the near future.

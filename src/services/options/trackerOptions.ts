@@ -197,6 +197,12 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
             },
         ],
     },
+    "Connection:StaticUUID": {
+        name: "Connection:StaticUUID",
+        display: "Use Static Device Identifier",
+        type: OptionType.boolean,
+        default: false,
+    },
 };
 
 export { baseTrackerOptions };

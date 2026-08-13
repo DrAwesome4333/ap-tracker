@@ -1,9 +1,12 @@
+import { resolve } from "path";
+
+const DataDebug = false;
 const DB_STORE_KEYS = {
     dataPackageCache: "data_package_cache",
-    groupCache: "cached_groups_v2.1",
     customTrackers: "custom_trackers_v2",
     customTrackersDirectory: "custom_tracker_manifests_v2",
     tags: "tag_data",
+    locationListCache: "location_list_cache",
 };
 
 const retiredKeys = [
@@ -12,9 +15,15 @@ const retiredKeys = [
     "cached_groups",
     "custom_trackers",
     "cached_groups_v2",
+    "cached_groups_v2.1",
 ];
-
-const database_request = window.indexedDB.open("checklist_db", 13);
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
+    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+    : "";
+const database_request = window.indexedDB.open(
+    `checklist_db${environment}`,
+    14
+);
 let database_open = false;
 let queuedEvents: (() => void)[] = [];
 
@@ -51,15 +60,6 @@ database_request.onupgradeneeded = (_event) => {
         });
     }
 
-    if (!db.objectStoreNames.contains(DB_STORE_KEYS.groupCache)) {
-        const store = db.createObjectStore(DB_STORE_KEYS.groupCache, {
-            keyPath: ["multi_save_id", "slot_number"],
-        });
-        store.createIndex("multi-slot", ["multi_save_id", "slot_number"], {
-            unique: true,
-        });
-    }
-
     if (!db.objectStoreNames.contains(DB_STORE_KEYS.customTrackers)) {
         const store = db.createObjectStore(DB_STORE_KEYS.customTrackers, {
             keyPath: ["uuid", "version", "type"],
@@ -83,6 +83,9 @@ database_request.onupgradeneeded = (_event) => {
             unique: true,
         });
     }
+
+    if (!db.objectStoreNames.contains(DB_STORE_KEYS.locationListCache)) {
+    }
 };
 
 /**
@@ -104,13 +107,23 @@ const getItem = (
                 const objectStore = transaction.objectStore(storeName);
                 const request = objectStore.get(key);
                 request.onerror = () => {
+                    if (DataDebug)
+                        console.log(`Failed to load ${storeName}`, key);
                     resolve(null);
                 };
                 request.onsuccess = () => {
+                    if (DataDebug)
+                        console.log(
+                            `Retrieved ${storeName}`,
+                            key,
+                            request.result
+                        );
                     resolve(request.result ?? null);
                 };
             } catch {
                 if (hasFailed) {
+                    if (DataDebug)
+                        console.log(`Failed to load ${storeName}`, key);
                     resolve(null);
                 } else {
                     hasFailed = true;
@@ -146,15 +159,25 @@ const storeItem = (storeName: string, item: unknown): Promise<boolean> => {
                 const objectStore = transaction.objectStore(storeName);
                 const request = objectStore.put(item);
                 request.onerror = () => {
+                    if (DataDebug)
+                        console.log(`Failed to save ${storeName}`, item);
                     resolve(false);
                 };
                 request.onsuccess = () => {
+                    if (DataDebug) console.log(`Saved ${storeName}`, item);
                     resolve(true);
                 };
             } catch {
                 if (hasFailed) {
+                    if (DataDebug)
+                        console.log(`Failed to save ${storeName}`, item);
                     resolve(false);
                 } else {
+                    if (DataDebug)
+                        console.log(
+                            `Failed to save ${storeName}, retry in 0.5s`,
+                            item
+                        );
                     hasFailed = true;
                     setTimeout(attemptSave, 500);
                 }
@@ -242,11 +265,82 @@ const getAllItems = (storeName: string): Promise<unknown> => {
     });
 };
 
+const clearAllItems = (storeName: string) => {
+    return new Promise<void>((resolve, reject) => {
+        let hasFailed = false;
+        const attemptLoad = () => {
+            try {
+                const db = database_request.result;
+                const transaction = db.transaction([storeName], "readwrite");
+                const objectStore = transaction.objectStore(storeName);
+                transaction.onerror = () => {
+                    reject();
+                };
+                transaction.oncomplete = () => {
+                    resolve();
+                };
+                objectStore.clear();
+            } catch {
+                if (hasFailed) {
+                    resolve(null);
+                } else {
+                    hasFailed = true;
+                    setTimeout(attemptLoad, 500);
+                }
+            }
+        };
+
+        if (database_open) {
+            attemptLoad();
+        } else {
+            queuedEvents.push(attemptLoad);
+        }
+    });
+};
+
+const getAllKeys = (storeName: string): Promise<unknown> => {
+    return new Promise((resolve, _reject) => {
+        let hasFailed = false;
+        const attemptLoad = () => {
+            try {
+                const db = database_request.result;
+                const transaction = db.transaction([storeName], "readonly");
+                const objectStore = transaction.objectStore(storeName);
+                const request = objectStore.getAllKeys();
+                request.onerror = () => {
+                    if (DataDebug) console.log(`Failed to load ${storeName}`);
+                    resolve(null);
+                };
+                request.onsuccess = () => {
+                    if (DataDebug)
+                        console.log(`Retrieved ${storeName}`, request.result);
+                    resolve(request.result ?? null);
+                };
+            } catch {
+                if (hasFailed) {
+                    if (DataDebug) console.log(`Failed to load ${storeName}`);
+                    resolve(null);
+                } else {
+                    hasFailed = true;
+                    setTimeout(attemptLoad, 500);
+                }
+            }
+        };
+        if (database_open) {
+            attemptLoad();
+        } else {
+            queuedEvents.push(attemptLoad);
+        }
+    });
+};
+
 const SaveData = {
     getItem,
     storeItem,
     deleteItem,
     getAllItems,
+    getAllKeys,
+    clearAllItems,
 };
 
 export { SaveData, DB_STORE_KEYS };

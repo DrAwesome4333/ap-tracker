@@ -33,6 +33,7 @@ type HierarchicalOption = {
     type: OptionType.hierarchical;
     children: TrackerOption[];
     format?: "column";
+    spacing?: string;
 } & BaseOption;
 
 interface BaseOption {

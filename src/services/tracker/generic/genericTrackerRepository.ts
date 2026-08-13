@@ -1,38 +1,45 @@
-import { LocationManager } from "../../locations/locationManager";
-import { ResourceType } from "../resourceEnums";
-import { InventoryManager } from "../../inventory/inventoryManager";
+import {
+    ItemTrackerType,
+    LocationTrackerType,
+    ResourceType,
+} from "../resourceEnums";
 import GenericLocationTracker from "./GenericLocationTracker";
 import GenericItemTracker from "./GenericItemTracker";
 import { OptionManager } from "../../options/optionManager";
 import { ResourceManifest, ResourceRepository } from "../resource";
+import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
 
 const genericGameRepositoryUuid = "22b6c601-6f35-4264-b90e-1c83389c4a86";
-// const genericGameItemTrackerUuid = '46995402-c311-4992-9c35-8bf9a9c8427e';
 
 class GenericTrackerRepository implements ResourceRepository {
     static readonly uuid = genericGameRepositoryUuid;
     readonly uuid = GenericTrackerRepository.uuid;
-    resources: ResourceManifest[] = [];
+    resources: ResourceManifest[] = [
+        {
+            type: ResourceType.itemTracker,
+            itemTrackerType: ItemTrackerType.group,
+            uuid: GenericItemTracker.uuid,
+            name: "Generic Item Tracker",
+            formatVersion: 1,
+            version: "0.0.0",
+            game: null,
+        },
+        {
+            type: ResourceType.locationTracker,
+            locationTrackerType: LocationTrackerType.dropdown,
+            uuid: GenericLocationTracker.uuid,
+            name: "Generic Location Tracker",
+            formatVersion: 2,
+            version: "0.0.0",
+            game: null,
+        },
+    ];
     #listeners: Set<{ listener: () => void; types: ResourceType[] }> =
         new Set();
-    #locationTracker: GenericLocationTracker;
-    #itemTracker: GenericItemTracker;
-    // #locationManager: LocationManager;
-    // #inventoryManager: InventoryManager;
+    #optionManager: OptionManager;
 
-    constructor(
-        optionManager: OptionManager,
-        locationManager: LocationManager,
-        _inventoryManager: InventoryManager
-    ) {
-        // this.#locationManager = locationManager;
-        // this.#inventoryManager = inventoryManager;
-        this.#locationTracker = new GenericLocationTracker(locationManager);
-        this.#itemTracker = new GenericItemTracker(optionManager);
-        this.resources = [
-            this.#locationTracker.manifest,
-            this.#itemTracker.manifest,
-        ];
+    constructor(optionManager: OptionManager) {
+        this.#optionManager = optionManager;
     }
 
     getUpdateSubscriber = (types?: ResourceType[]) => {
@@ -46,48 +53,17 @@ class GenericTrackerRepository implements ResourceRepository {
         };
     };
 
-    #callListeners = (types: ResourceType[]) => {
-        const typesSet = new Set(types);
-        this.#listeners.forEach((listenerObj) => {
-            if (
-                !listenerObj.types ||
-                !new Set(listenerObj.types).isDisjointFrom(typesSet)
-            ) {
-                listenerObj.listener();
-            }
-        });
-    };
-
-    configureGenericTrackers = (
-        gameName: string,
-        groups: {
-            location: { [name: string]: string[] };
-            item: { [name: string]: string[] };
-        }
+    loadResource = async (
+        uuid: string,
+        _version: string,
+        _type: string,
+        gamePackage: GamePackageWrapper
     ) => {
-        this.#locationTracker.configure(groups);
-        this.#itemTracker.configure(groups, gameName);
-        this.#callListeners([ResourceType.locationTracker]);
-        return {
-            [ResourceType.locationTracker]: {
-                uuid: this.#locationTracker.manifest.uuid,
-                version: this.#locationTracker.manifest.version,
-                type: ResourceType.locationTracker,
-            },
-            [ResourceType.itemTracker]: {
-                uuid: this.#itemTracker.manifest.uuid,
-                version: this.#itemTracker.manifest.version,
-                type: ResourceType.locationTracker,
-            },
-        };
-    };
-
-    loadResource = async (uuid: string, _version: string, _type: string) => {
-        if (uuid === this.#itemTracker?.manifest.uuid) {
-            return this.#itemTracker;
-        }
-        if (uuid === this.#locationTracker?.manifest.uuid) {
-            return this.#locationTracker;
+        switch (uuid) {
+            case GenericLocationTracker.uuid:
+                return new GenericLocationTracker(gamePackage);
+            case GenericItemTracker.uuid:
+                return new GenericItemTracker(this.#optionManager, gamePackage);
         }
         return null;
     };

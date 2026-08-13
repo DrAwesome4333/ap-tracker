@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, {
+    useContext,
+    useEffect,
+    useEffectEvent,
+    useRef,
+    useState,
+} from "react";
 import Modal from "../../shared/Modal";
 import styles from "./NameAnalysis.module.css";
 import ButtonRow from "../../LayoutUtilities/ButtonRow";
@@ -8,7 +14,6 @@ import {
     SecondaryButton,
 } from "../../shared/buttons";
 import Icon from "../../icons/icons";
-import { LocationManager } from "../../../services/locations/locationManager";
 import ServiceContext from "../../../contexts/serviceContext";
 import { NameTokenizationOptions } from "../../../services/tracker/generic/locationTrackerGenerators/locationName";
 import { Checkbox, Input } from "../../inputs";
@@ -19,10 +24,17 @@ import NotificationManager, {
     MessageType,
 } from "../../../services/notifications/notifications";
 import { exportJSONFile } from "../../../utility/jsonExport";
-import { InventoryManager } from "../../../services/inventory/inventoryManager";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import TemplateLocationTracker from "../../../services/tracker/generic/templateTracker";
 import { randomUUID } from "../../../utility/uuid";
+import ItemRepository from "../../../services/items/itemRepository";
+import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
+import LocationRepository from "../../../services/locations/locationRepository";
+import SlotContext from "../../../contexts/slotContext";
+import MultiWorldService from "../../../services/MultiInfo/MultiWorldService";
+import DataPackageHelper from "../../../services/MultiInfo/DatapackageHelper";
+import { GamePackageWrapper } from "../../../services/gamepackage/GamePackageWrapper";
+import TemplateLocationSource from "../../../services/tracker/generic/locationTrackerGenerators/templateLocationSource";
 
 interface AdditionalParams {
     minChecksPerGroup?: number;
@@ -30,13 +42,6 @@ interface AdditionalParams {
     maxDepth?: number;
 }
 
-const previewLocationManager = new LocationManager();
-const previewSourceId = "preview_source";
-previewLocationManager.registerSourcePriority(previewSourceId, 1);
-const previewInventoryManager = new InventoryManager();
-const templateLocationTracker = new TemplateLocationTracker(
-    previewLocationManager
-);
 const previewTagManager = new TagManager();
 
 const NameAnalysisModal = ({
@@ -48,8 +53,71 @@ const NameAnalysisModal = ({
 }) => {
     const services = useContext(ServiceContext);
     const mainTrackerManager = services.trackerManager;
-    const connection = services.connector.connection;
+    const slot = useCurrentMultiworldSlot();
     const customTrackerRepository = services.customTrackerRepository;
+
+    const [locationRepository, setLocationRepository] =
+        useState<LocationRepository>(null);
+    const [templateLocationTracker, setTemplateLocationTracker] =
+        useState<TemplateLocationTracker>(null);
+    const [gamePackage, setGamePackage] = useState<GamePackageWrapper>(null);
+
+    const loadDataPackage = async () => {
+        if (!slot || !slot.game || !slot.multi_save_id) {
+            return null;
+        }
+        const multiworld = MultiWorldService.getMultiWorld(slot.multi_save_id);
+        const dataPackageHash = multiworld?.data_package_details[slot.game];
+        const cachedPackage = await DataPackageHelper.getCachedPackage(
+            slot.game,
+            dataPackageHash
+        );
+        if (!cachedPackage) {
+            NotificationManager.createToast({
+                message: "Failed to load game's data package",
+                details:
+                    "Could not find the current game's data package to generate tracker file. Please reload the page and try again.",
+                type: MessageType.error,
+                duration: 5,
+            });
+            return null;
+        }
+        return cachedPackage;
+    };
+
+    const resetTemplateRepository = useEffectEvent(async () => {
+        const dataPackage = await loadDataPackage();
+        const newLocationRepository = new LocationRepository();
+        const packageWrapper = dataPackage
+            ? new GamePackageWrapper(dataPackage, slot.game)
+            : null;
+        if (packageWrapper) {
+            const locationSource = new TemplateLocationSource(packageWrapper);
+            newLocationRepository.addSource(locationSource);
+        }
+        setLocationRepository(newLocationRepository);
+        setGamePackage(packageWrapper);
+    });
+
+    const resetTemplate = useEffectEvent(() => {
+        if (open && gamePackage) {
+            const newTemplateLocationTracker = new TemplateLocationTracker(
+                gamePackage
+            );
+            newTemplateLocationTracker.configure(
+                GenericGameMethod.nameAnalysis,
+                {
+                    tokenOptions,
+                    groupRequirements: {
+                        minGroupSize: otherOptions.minChecksPerGroup,
+                        maxDepth: otherOptions.maxDepth,
+                        minTokenCount: otherOptions.minTokenCount,
+                    },
+                }
+            );
+            setTemplateLocationTracker(newTemplateLocationTracker);
+        }
+    });
 
     const [tokenOptions, setTokenOptions]: [
         NameTokenizationOptions,
@@ -96,41 +164,80 @@ const NameAnalysisModal = ({
     };
 
     useEffect(() => {
-        if (connection.slotInfo.game && open) {
-            previewLocationManager.pauseUpdateBroadcast();
-            previewLocationManager.deleteAllLocations();
-            connection.slotInfo.groups.location["Everywhere"].forEach(
-                (location) => {
-                    previewLocationManager.updateLocationStatus(
-                        previewSourceId,
-                        location,
-                        {
-                            exists: true,
-                        }
-                    );
-                }
-            );
-            previewLocationManager.resumeUpdateBroadcast();
-        }
-        if (open) {
-            templateLocationTracker.configure(
-                connection.slotInfo.groups,
-                GenericGameMethod.nameAnalysis,
-                {
-                    tokenOptions,
-                    groupRequirements: {
-                        minGroupSize: otherOptions.minChecksPerGroup,
-                        maxDepth: otherOptions.maxDepth,
-                        minTokenCount: otherOptions.minTokenCount,
-                    },
-                }
-            );
-        }
-    }, [mainTrackerManager, tokenOptions, otherOptions, open]);
+        resetTemplateRepository();
+    }, [slot]);
+
+    useEffect(() => {
+        resetTemplate();
+    }, [mainTrackerManager, tokenOptions, otherOptions, open, gamePackage]);
 
     return (
-        <Modal open={open}>
-            <h2>Name Analysis</h2>
+        <Modal
+            open={open}
+            header={<h3>Name Analysis</h3>}
+            footer={
+                <ButtonRow>
+                    <PrimaryButton
+                        onClick={() => {
+                            const customTracker = templateLocationTracker;
+                            const customTrackerExport =
+                                customTracker.exportDropdowns(randomUUID());
+                            customTrackerExport.manifest.game = slot.game;
+                            customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                            if (!customTracker || !customTrackerExport) {
+                                NotificationManager.createToast({
+                                    message:
+                                        "Failed to export and save tracker",
+                                    type: MessageType.error,
+                                });
+                                return;
+                            }
+
+                            customTrackerRepository.addTracker(
+                                customTrackerExport
+                            );
+                            mainTrackerManager.setGameTracker(slot.game, {
+                                type: ResourceType.locationTracker,
+                                uuid: customTrackerExport.manifest.uuid,
+                                version: customTrackerExport.manifest.version,
+                            });
+                            NotificationManager.createStatus({
+                                message: "Successfully added tracker",
+                                type: MessageType.success,
+                                progress: 1,
+                                duration: 3,
+                            });
+                        }}
+                    >
+                        Save and Use
+                    </PrimaryButton>
+                    <SecondaryButton
+                        onClick={() => {
+                            const customTracker = templateLocationTracker;
+                            const customTrackerExport =
+                                customTracker.exportDropdowns(randomUUID());
+                            customTrackerExport.manifest.game = slot.game;
+                            customTrackerExport.manifest.name = `Template for ${slot.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
+                            if (!customTracker) {
+                                NotificationManager.createToast({
+                                    message: "Failed to export tracker",
+                                    type: MessageType.error,
+                                });
+                                return;
+                            }
+                            exportJSONFile(
+                                `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
+                                customTrackerExport
+                            );
+                            onClose();
+                        }}
+                    >
+                        Export <Icon type="download" fontSize="14px" />
+                    </SecondaryButton>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div className={styles.analysis_grid}>
                 <div
                     style={{
@@ -142,14 +249,21 @@ const NameAnalysisModal = ({
                     <h3>Preview</h3>
                     <ServiceContext.Provider
                         value={{
-                            locationManager: previewLocationManager,
-                            inventoryManager: previewInventoryManager,
-                            tagManager: previewTagManager,
                             optionManager: services.optionManager,
-                            locationTracker: templateLocationTracker,
                         }}
                     >
-                        <SectionView name="root" />
+                        <SlotContext.Provider
+                            value={{
+                                slotName: "Example Slot Name",
+                                slotAlias: "Example Slot Alias",
+                                tagManager: previewTagManager,
+                                locationTracker: templateLocationTracker,
+                                locationRepository: locationRepository,
+                                liveSlot: false,
+                            }}
+                        >
+                            <SectionView name="root" />
+                        </SlotContext.Provider>
                     </ServiceContext.Provider>
                 </div>
                 <div
@@ -322,67 +436,6 @@ const NameAnalysisModal = ({
                     <br />
                 </div>
             </div>
-            <ButtonRow>
-                <PrimaryButton
-                    onClick={() => {
-                        const customTracker = templateLocationTracker;
-                        const customTrackerExport =
-                            customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game =
-                            connection.slotInfo.game;
-                        customTrackerExport.manifest.name = `Template for ${connection.slotInfo.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
-                        if (!customTracker || !customTrackerExport) {
-                            NotificationManager.createToast({
-                                message: "Failed to export and save tracker",
-                                type: MessageType.error,
-                            });
-                            return;
-                        }
-
-                        customTrackerRepository.addTracker(customTrackerExport);
-                        mainTrackerManager.setGameTracker(
-                            connection.slotInfo.game,
-                            {
-                                type: ResourceType.locationTracker,
-                                uuid: customTrackerExport.manifest.uuid,
-                                version: customTrackerExport.manifest.version,
-                            }
-                        );
-                        NotificationManager.createStatus({
-                            message: "Successfully added tracker",
-                            type: MessageType.success,
-                            progress: 1,
-                            duration: 3,
-                        });
-                    }}
-                >
-                    Save and Use
-                </PrimaryButton>
-                <SecondaryButton
-                    onClick={() => {
-                        const customTracker = templateLocationTracker;
-                        const customTrackerExport =
-                            customTracker.exportDropdowns(randomUUID());
-                        customTrackerExport.manifest.game =
-                            connection.slotInfo.game;
-                        customTrackerExport.manifest.name = `Template for ${connection.slotInfo.game} (${customTrackerExport.manifest.uuid.substring(0, 8)})`;
-                        if (!customTracker) {
-                            NotificationManager.createToast({
-                                message: "Failed to export tracker",
-                                type: MessageType.error,
-                            });
-                            return;
-                        }
-                        exportJSONFile(
-                            `tracker-export-${customTrackerExport.manifest.game.replace(/\s/g, "")}-${customTrackerExport.manifest.uuid.substring(0, 8)}`,
-                            customTrackerExport
-                        );
-                    }}
-                >
-                    Export <Icon type="download" fontSize="14px" />
-                </SecondaryButton>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

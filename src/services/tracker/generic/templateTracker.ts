@@ -1,4 +1,4 @@
-import { LocationManager } from "../../locations/locationManager";
+import { GamePackageWrapper } from "../../gamepackage/GamePackageWrapper";
 import CustomLocationTracker from "../locationTrackers/CustomLocationTracker";
 import { GenericGameMethod } from "./genericGameEnums";
 import LocationGroupCategoryGenerator from "./locationTrackerGenerators/locationGroup";
@@ -11,10 +11,8 @@ const genericGameTemplateTrackerUuid = "68b69e1c-41ac-4edb-9c50-0b11f03c027e";
 class TemplateLocationTracker extends CustomLocationTracker {
     readonly uuid = genericGameTemplateTrackerUuid;
     static readonly uuid = genericGameTemplateTrackerUuid;
-    #locationManager: LocationManager;
-    constructor(locationManager: LocationManager) {
-        super(locationManager);
-        this.#locationManager = locationManager;
+    constructor(gamePackage: GamePackageWrapper) {
+        super(gamePackage);
         this.manifest.uuid = TemplateLocationTracker.uuid;
         this.manifest.name = "Template Dropdown Tracker";
         this.manifest.game = "Template";
@@ -27,7 +25,6 @@ class TemplateLocationTracker extends CustomLocationTracker {
     };
 
     configure = (
-        groups: { location: { [name: string]: string[] } },
         method: GenericGameMethod,
         params?: {
             tokenOptions: NameTokenizationOptions;
@@ -42,10 +39,10 @@ class TemplateLocationTracker extends CustomLocationTracker {
         const sectionDef =
             method === GenericGameMethod.locationGroup
                 ? LocationGroupCategoryGenerator.generateSectionDef(
-                      groups.location
+                      this.gamePackage.getLocationGroups()
                   )
                 : LocationNameCategoryGenerator.generateSectionDef(
-                      this.#locationManager.getMatchingLocations(() => true),
+                      new Set(this.gamePackage.getAllLocationNames()),
                       params.tokenOptions,
                       params.groupRequirements
                   );

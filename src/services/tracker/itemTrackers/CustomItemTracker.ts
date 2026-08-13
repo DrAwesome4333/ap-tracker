@@ -31,8 +31,13 @@ class CustomItemTracker implements GroupItemTracker {
     options: { [optionName: string]: TrackerOption } = {};
     #cachedGroups: ItemCollectionDef[] = [];
 
-    constructor(optionManager: OptionManager, data?: CustomItemTrackerDef_V1) {
+    constructor(
+        optionManager: OptionManager,
+        data?: CustomItemTrackerDef_V1,
+        { discriminator }: { discriminator?: string } = {}
+    ) {
         this.optionManager = optionManager;
+        this.discriminator = discriminator ?? "";
         this.read(data);
     }
     protected callListeners = () => {

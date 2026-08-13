@@ -11,8 +11,14 @@
     --ap-salmon: #ff8e72;
 
     --ap-player: var(--ap-magenta);
+    --ap-group: var(--ap-plum);
     --ap-player-alt: var(--ap-yellow);
+    --ap-group-alt: var(--ap-orange);
     --ap-player-other: var(--ap-light-yellow);
+    --ap-group-other: var(--ap-salmon);
+
+    --ap-player-underline: wavy underline;
+    --ap-group-underline: wavy underline;
 
     --ap-item-prog: var(--ap-plum);
     --ap-item-normal: var(--ap-cyan);
@@ -32,7 +38,7 @@
 }
 
 .ap_text {
-    --color: var(white);
+    --color: white;
     color: oklch(from var(--color) calc(l * 0.65) calc(c * 0.75) h);
     font-weight: bolder;
 }
@@ -42,7 +48,7 @@
 }
 
 .ap_text_alt {
-    --color: var(white);
+    --color: white;
     color: oklch(from var(--color) calc(l * 0.5) calc(c * 0.5) h);
 }
 
@@ -52,16 +58,30 @@
 
 .player {
     --color: var(--ap-player);
-    text-decoration: wavy underline var(--color);
+    text-decoration: var(--ap-player-underline) var(--color);
+}
+
+.group {
+    --color: var(--ap-group);
+    text-decoration: var(--ap-group-underline) var(--color);
 }
 
 .player_alt {
     --color: var(--ap-player-alt);
-    text-decoration: wavy underline var(--color);
+    text-decoration: var(--ap-player-underline) var(--color);
+}
+
+.group_alt {
+    --color: var(--ap-group-alt);
+    text-decoration: var(--ap-group-underline) var(--color);
 }
 
 .player_other {
     --color: var(--ap-player-other);
+}
+
+.group_other {
+    --color: var(--ap-group-other);
 }
 
 .item_prog {

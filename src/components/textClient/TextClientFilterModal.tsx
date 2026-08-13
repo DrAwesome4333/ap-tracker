@@ -1,4 +1,3 @@
-import React from "react";
 import Modal from "../shared/Modal";
 import ButtonRow from "../LayoutUtilities/ButtonRow";
 import { GhostButton } from "../shared/buttons";
@@ -13,7 +12,15 @@ const TextClientFilterModal = ({
     onClose: () => void;
 }) => {
     return (
-        <Modal open={open}>
+        <Modal
+            open={open}
+            header={<h3>Text Client Settings</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             <div>
                 <OptionView
                     option={baseTrackerOptions["TextClient:message_filter"]}
@@ -27,9 +34,6 @@ const TextClientFilterModal = ({
                         baseTrackerOptions["TextClient:IncludeMyOtherSlots"]
                     }
                 />
-                <ButtonRow>
-                    <GhostButton onClick={onClose}>Close</GhostButton>
-                </ButtonRow>
             </div>
         </Modal>
     );

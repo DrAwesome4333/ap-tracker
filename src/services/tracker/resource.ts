@@ -1,3 +1,4 @@
+import { GamePackageWrapper } from "../gamepackage/GamePackageWrapper";
 import { ItemTracker, ItemTrackerManifest } from "./itemTrackers/itemTrackers";
 import {
     LocationTracker,
@@ -31,7 +32,8 @@ interface ResourceRepository {
     loadResource: (
         uuid: string,
         version: string,
-        type: string
+        type: string,
+        gamePackage: GamePackageWrapper
     ) => Promise<Resource>;
     /** Does any initialization that may be needed such as fetching from a remote server, returns true on success, else false */
     initialize: () => Promise<boolean>;

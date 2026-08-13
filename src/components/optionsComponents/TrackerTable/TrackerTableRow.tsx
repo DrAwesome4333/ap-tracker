@@ -20,6 +20,7 @@ import NotificationManager, {
 import { exportJSONFile } from "../../../utility/jsonExport";
 import { DropdownLocationTracker } from "../../../services/tracker/locationTrackers/locationTrackers";
 import { GroupItemTracker } from "../../../services/tracker/itemTrackers/itemTrackers";
+import EmptyGamePackageWrapper from "../../../services/gamepackage/EmptyGamePackageWrapper";
 
 const TrackerTableRow = ({
     tracker,
@@ -55,7 +56,8 @@ const TrackerTableRow = ({
                             .loadResource(
                                 tracker.uuid,
                                 tracker.version,
-                                tracker.type
+                                tracker.type,
+                                new EmptyGamePackageWrapper()
                             )
                             .catch((e) => {
                                 NotificationManager.createToast({

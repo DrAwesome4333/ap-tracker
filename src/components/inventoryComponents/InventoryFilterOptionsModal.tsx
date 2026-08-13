@@ -8,6 +8,7 @@ import OptionView from "../optionsComponents/OptionView";
 import { JSONValue } from "../../services/dataStores";
 import TrackerDropdown from "../optionsComponents/TrackerDropdown";
 import { ResourceType } from "../../services/tracker/resourceEnums";
+import SlotContext from "../../contexts/slotContext";
 const InventoryFilterOptionsModal = ({
     open,
     onClose,
@@ -16,7 +17,8 @@ const InventoryFilterOptionsModal = ({
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
-    const itemTracker = services.inventoryTracker;
+    const slotContext = useContext(SlotContext);
+    const itemTracker = slotContext.itemTracker;
     const optionManger = services.optionManager;
     const options = useSyncExternalStore(
         itemTracker
@@ -27,17 +29,23 @@ const InventoryFilterOptionsModal = ({
         () => itemTracker?.options,
         () => itemTracker?.options
     );
-
     const optionUpdate = (optionName: string, value: JSONValue) => {
         optionManger.setOptionValue(optionName, "global", value);
     };
 
     return (
-        <Modal open={open}>
-            <h2>Inventory Settings</h2>
+        <Modal
+            open={open}
+            header={<h3>Inventory Settings</h3>}
+            footer={
+                <ButtonRow>
+                    <GhostButton onClick={onClose}>Close</GhostButton>
+                </ButtonRow>
+            }
+        >
             Tracker: &nbsp;
             <TrackerDropdown
-                game={services.connector?.connection.slotInfo.game}
+                game={slotContext.game}
                 type={ResourceType.itemTracker}
             />
             <br />
@@ -54,9 +62,6 @@ const InventoryFilterOptionsModal = ({
                         />
                     ))}
             </div>
-            <ButtonRow>
-                <GhostButton onClick={onClose}>Close</GhostButton>
-            </ButtonRow>
         </Modal>
     );
 };

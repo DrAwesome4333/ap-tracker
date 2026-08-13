@@ -1,16 +1,20 @@
-import { useMemo, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import HintManager from "../services/HintManager";
-import emptySyncCallback from "./emptyCallback";
+import { Hint } from "../services/HintManager";
 
 const useHints = (hintManager?: HintManager) => {
-    const trigger = useMemo(() => {
-        return hintManager?.getHintHook() ?? emptySyncCallback;
+    const [hints, setHints] = useState<Hint[]>([]);
+    useEffect(() => {
+        const callback = () => {
+            setHints(hintManager?.hints ?? []);
+        };
+        callback();
+        const cleanup = hintManager?.addHintListener(callback);
+        return () => {
+            cleanup?.();
+        };
     }, [hintManager]);
-    const snapshot = useMemo(() => {
-        return () => hintManager?.hints ?? null;
-    }, [hintManager]);
-
-    return useSyncExternalStore(trigger, snapshot, snapshot);
+    return hints;
 };
 
 export { useHints };
