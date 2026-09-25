@@ -101,7 +101,7 @@ The stance on future contributions and AI is described in [contributing.md](./do
 
 No code was directly contributed by AI.
 
-This App does not contain any AI generated assets but does contain some AI generated text, which will be replaced in a future update.
+This App does not contain any AI generated assets or text. AI has been minimally used in the past for text or general brain storming.
 
 # Attributions
 

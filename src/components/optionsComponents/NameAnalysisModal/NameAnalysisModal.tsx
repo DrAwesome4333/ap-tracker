@@ -1,10 +1,4 @@
-import React, {
-    useContext,
-    useEffect,
-    useEffectEvent,
-    useRef,
-    useState,
-} from "react";
+import React, { useContext, useEffect, useEffectEvent, useState } from "react";
 import Modal from "../../shared/Modal";
 import styles from "./NameAnalysis.module.css";
 import ButtonRow from "../../LayoutUtilities/ButtonRow";
@@ -27,7 +21,6 @@ import { exportJSONFile } from "../../../utility/jsonExport";
 import { ResourceType } from "../../../services/tracker/resourceEnums";
 import TemplateLocationTracker from "../../../services/tracker/generic/templateTracker";
 import { randomUUID } from "../../../utility/uuid";
-import ItemRepository from "../../../services/items/itemRepository";
 import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
 import LocationRepository from "../../../services/locations/locationRepository";
 import SlotContext from "../../../contexts/slotContext";
