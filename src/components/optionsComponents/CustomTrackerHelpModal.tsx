@@ -47,12 +47,15 @@ const CustomTrackerHelpModal = ({
                 <p>Here are some ways to get a working template:</p>
                 <h3>Location Group Templates:</h3>
                 <p>
-                    These templates use location groups defined by Archipelago
-                    world developers to populate dropdowns. While helpful for
-                    organizing locations, these groups were not intended for
-                    checklists, so the quality varies by game. In some cases,
-                    developers have not added location groups at all, making
-                    this option no better than a simple list.
+                    These templates use location groups defined by the
+                    Archipelago world developer to create the dropdowns. While
+                    useful for organizing locations in a logical manner,
+                    location groups are not intended to be used for organizing
+                    locations into lists, and as a result the quality of the
+                    grouping done by the App varies from game to game. Some
+                    world developers have not implemented location groups into
+                    their world, making this option no better than just a large
+                    list.
                 </p>
                 <p>
                     This is the same template the tracker uses by default on any
@@ -65,10 +68,12 @@ const CustomTrackerHelpModal = ({
                     grouping for those.
                 </p>
                 <p>
-                    The algorithm first splits each location name into tokens,
-                    based on the token settings below. It then groups locations
-                    that share starting tokens, following the listed grouping
-                    requirements.
+                    The algorithm that does this first tries to split up the
+                    names of each location into individual parts called tokens.
+                    How these tokens are generated are based on the settings
+                    listed below. The algorithm then tries to group locations
+                    that start with the same tokens based on a set of
+                    requirements also listed below.
                 </p>
                 <h4>Token Settings: </h4>
                 <ul>

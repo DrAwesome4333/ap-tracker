@@ -203,6 +203,13 @@ const baseTrackerOptions: { [optionName: string]: TrackerOption } = {
         type: OptionType.boolean,
         default: false,
     },
+    "Advanced:AllowSlotDetailsInUrl": {
+        name: "Advanced:AllowSlotDetailsInUrl",
+        display:
+            "Add information to the URL to automatically reconnect to a specific slot. (Experimental)",
+        default: false,
+        type: OptionType.boolean,
+    },
 };
 
 export { baseTrackerOptions };

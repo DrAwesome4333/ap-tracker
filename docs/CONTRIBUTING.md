@@ -28,6 +28,4 @@ Feel free to message me on the Archipelago discord server or send me a DM (Disco
 ## AI Usage in this app
 
 The topic of AI is very polarizing within the Archipelago Community.
-As such the use of AI generated code or assets is discouraged should you choose to contribute.
-
-Currently this app has some AI generated text that is slated for removal in the near future.
+As such the use of AI generated code or assets is heavily discouraged should you choose to contribute.

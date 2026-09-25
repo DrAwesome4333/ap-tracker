@@ -17,6 +17,7 @@ import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
 import Icon from "../icons/icons";
 import { copyToClipboard } from "../../utility/clipboard";
 import MultiWorldContext from "../../contexts/multiWorldContext";
+import useOption from "../../hooks/optionHook";
 
 const ConnectionOptions = ({
     open,
@@ -32,6 +33,11 @@ const ConnectionOptions = ({
 
     const slotContext = useContext(SlotContext);
     const multiWorldContext = useContext(MultiWorldContext);
+    const putSlotInfoInUrl = useOption(
+        services.optionManager,
+        "Advanced:AllowSlotDetailsInUrl",
+        "global"
+    );
 
     const canConnect =
         connectionStatus.disconnected &&
@@ -50,10 +56,27 @@ const ConnectionOptions = ({
     const disconnect = () => {
         activityContext.drop("slot-tracker");
         connector.disconnect();
+        const newUrl = window?.location ? new URL(window?.location.href) : null;
+        if (newUrl) {
+            newUrl.searchParams.delete("multi-slot");
+            window.history.replaceState(null, null, newUrl);
+        }
     };
 
     const reconnect = () => {
         activityContext.add("slot-tracker");
+        const newUrl = window?.location ? new URL(window?.location.href) : null;
+        if (
+            newUrl &&
+            slotContext.multiWorldId &&
+            slotContext.slotNumber &&
+            putSlotInfoInUrl
+        ) {
+            const multiSlotCode = `${slotContext.multiWorldId}-${slotContext.slotNumber}`;
+            newUrl.searchParams.set("multi-slot", multiSlotCode);
+            window.history.replaceState(null, null, newUrl);
+        }
+
         connector.connect({
             multi_slot: {
                 multi_save_id: slotContext.multiWorldId,

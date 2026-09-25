@@ -216,6 +216,19 @@ class MultiWorldService {
         return null;
     };
 
+    static findMatchingMultiWorldForRoom = (room_suuid: string) => {
+        const saveMultiWorldData = multiDataStore.read() as unknown as {
+            [save_id: string]: SavedMultiWorldDetails;
+        };
+        const matchingMultiWords = [
+            ...Object.values(saveMultiWorldData),
+        ].filter((multi) => multi.room_details?.room_suuid === room_suuid);
+        if (matchingMultiWords?.length > 0) {
+            return matchingMultiWords[0];
+        }
+        return null;
+    };
+
     static findAllSlotsForMultiWorld = (multi_world_id: string) => {
         const slotData = slotDataStore.read() as unknown as {
             [save_id: string]: SavedSlotDetails;

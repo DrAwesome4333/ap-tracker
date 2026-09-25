@@ -86,7 +86,7 @@ class WebHostAPIHandler {
         });
     };
 
-    static async parseRoomLink(roomLink: string): Promise<RoomInfo> {
+    static getRoomIdFromLink(roomLink: string): string {
         const parsedUrl = URL.parse(roomLink);
         if (parsedUrl === null) {
             throw new Error("Provided room link was not a valid URL.", {
@@ -101,6 +101,12 @@ class WebHostAPIHandler {
             );
         }
         const roomId = urlPathParts[2];
+        return roomId;
+    }
+
+    static async parseRoomLink(roomLink: string): Promise<RoomInfo> {
+        const parsedUrl = URL.parse(roomLink);
+        const roomId = this.getRoomIdFromLink(roomLink);
         const roomAPIUrl = `${parsedUrl.origin}/api/room_status/${roomId}`;
 
         return fetchAsJson(roomAPIUrl).then((data: APIRoomStatus) => {

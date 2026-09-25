@@ -22,27 +22,28 @@ const OptionView = ({
 }) => {
     return (
         <div>
-            {option.type === OptionType.select ? (
+            {option?.type === OptionType.select ? (
                 <SelectOptionView option={option} {...props} />
-            ) : option.type === OptionType.boolean ? (
+            ) : option?.type === OptionType.boolean ? (
                 <CheckboxOptionView option={option} {...props} />
-            ) : option.type === OptionType.multiselect ? (
+            ) : option?.type === OptionType.multiselect ? (
                 <MultiselectOptionView
                     option={option}
                     {...props}
                     hideTitle={hideTitle}
                 />
-            ) : option.type === OptionType.hierarchical ? (
+            ) : option?.type === OptionType.hierarchical ? (
                 <HierarchicalOptionView
                     option={option}
                     {...props}
                     hideTitle={hideTitle}
                 />
-            ) : option.type === OptionType.color ? (
+            ) : option?.type === OptionType.color ? (
                 <ColorOptionView option={option} {...props} />
             ) : (
                 <p style={{ color: "red" }}>
-                    Not Implemented Option type {option.type} for {option.name}
+                    Not Implemented Option type {option?.type ?? "<Unknown>"}{" "}
+                    for {option?.name ?? "<Missing option>"}
                 </p>
             )}
         </div>

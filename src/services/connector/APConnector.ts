@@ -27,12 +27,14 @@ import {
     MultiWorldPlayer,
 } from "../MultiInfo/MultiWorldContextData";
 import { globalOptionManager } from "../options/optionManager";
+import { APIRoomStatus, RoomInfo } from "../WebHostAPI/types";
 
 interface ConnectionConfiguration {
     host?: string;
     port?: string;
     slot_name?: string;
     password?: string;
+    room_url?: string;
     multi_slot?: { multi_save_id: string; slot_number: number };
 }
 
@@ -75,6 +77,31 @@ const validationError = (
             progress: 0,
         });
     }
+};
+
+const isRoomActive = (
+    roomStatus: APIRoomStatus,
+    apiHandler: WebHostAPIHandler,
+    statusHandle: StatusNotificationHandle
+) => {
+    const lastActivity = Date.parse(roomStatus.last_activity);
+    const isAwake = Date.now() - lastActivity < roomStatus.timeout * 1000;
+    if (!isAwake) {
+        statusHandle.update({
+            type: MessageType.warning,
+            duration: 3,
+            message: "The room is asleep",
+            progress: 0,
+        });
+        NotificationManager.createToast({
+            message: "The room is asleep",
+            type: MessageType.warning,
+            details: `Your room hasn't been active for a while, you need to open the room page to wake it up.`,
+            action: () => window?.open(apiHandler.roomLink, "_blank"),
+            actionName: "Open Room Page",
+        });
+    }
+    return isAwake;
 };
 
 class APConnector implements LocationSource, ItemSource {
@@ -166,7 +193,9 @@ class APConnector implements LocationSource, ItemSource {
         };
     };
 
-    connect = async (config: ConnectionConfiguration) => {
+    connect = async (
+        config: ConnectionConfiguration
+    ): Promise<ConnectedEventParams> => {
         if (this.status === ConnectionStatus.connected) {
             validationError("Already connected.");
             return null;
@@ -181,12 +210,44 @@ class APConnector implements LocationSource, ItemSource {
         let port = config.port;
         let password = config.password;
         let slotName = config.slot_name;
+        let roomUrl = config.room_url;
+        let roomInfo: RoomInfo = null;
 
         const connectionStatusHandle = NotificationManager.createStatus({
             message: "Validating details",
             type: MessageType.progress,
             progress: -1,
         });
+
+        // search for saved multi world by room Url
+        if (!multiSlot && roomUrl) {
+            try {
+                const roomId = WebHostAPIHandler.getRoomIdFromLink(roomUrl);
+                const multi =
+                    MultiWorldService.findMatchingMultiWorldForRoom(roomId);
+                const slotNumber = multi
+                    ? (MultiWorldService.findAllSlotsForMultiWorld(
+                          multi.multi_save_id
+                      ).find(
+                          (slotDetails) => slotDetails.slot_name === slotName
+                      )?.slot_number ?? 0)
+                    : 0;
+                if (multi && slotNumber) {
+                    multiSlot = {
+                        multi_save_id: multi.multi_save_id,
+                        slot_number: slotNumber,
+                    };
+                }
+            } catch (e) {
+                validationError(
+                    "Failed to parse room url, see dev console for details.",
+                    10,
+                    connectionStatusHandle
+                );
+                console.error(e);
+                return null;
+            }
+        }
 
         if (multiSlot) {
             const multiWorldInfo = MultiWorldService.getMultiWorld(
@@ -202,6 +263,7 @@ class APConnector implements LocationSource, ItemSource {
                     10,
                     connectionStatusHandle
                 );
+                return null;
             }
 
             ({ host, port, password } = multiWorldInfo.connection_details);
@@ -213,28 +275,16 @@ class APConnector implements LocationSource, ItemSource {
                     multiWorldInfo.room_details
                 );
                 const roomStatus = await apiHandler.getRoomStatus();
-                const newPort = roomStatus.last_port.toString();
-                const lastActivity = Date.parse(roomStatus.last_activity);
-                const isAwake =
-                    Date.now() - lastActivity < roomStatus.timeout * 1000;
-                if (!isAwake) {
-                    connectionStatusHandle.update({
-                        type: MessageType.warning,
-                        duration: 3,
-                        message: "The room is asleep",
-                        progress: 0,
-                    });
-                    NotificationManager.createToast({
-                        message: "The room is asleep",
-                        type: MessageType.warning,
-                        details: `Your room hasn't been active for a while, you need to open the room page to wake it up.`,
-                        action: () =>
-                            window?.open(apiHandler.roomLink, "_blank"),
-                        actionName: "Open Room Page",
-                    });
+                if (
+                    !isRoomActive(
+                        roomStatus,
+                        apiHandler,
+                        connectionStatusHandle
+                    )
+                )
                     return null;
-                }
 
+                const newPort = roomStatus.last_port.toString();
                 if (newPort !== port) {
                     NotificationManager.createToast({
                         message: "Your room's port has changed!",
@@ -246,6 +296,36 @@ class APConnector implements LocationSource, ItemSource {
                 }
             }
             slotName = slotInfo.slot_name;
+        } else if (roomUrl) {
+            connectionStatusHandle.update({
+                message: "Checking room status",
+            });
+            try {
+                roomInfo = await WebHostAPIHandler.parseRoomLink(roomUrl);
+                const apiHandler = new WebHostAPIHandler(roomInfo);
+                const roomStatus = await apiHandler.getRoomStatus();
+                if (
+                    !isRoomActive(
+                        roomStatus,
+                        apiHandler,
+                        connectionStatusHandle
+                    )
+                )
+                    return null;
+
+                port = roomStatus.last_port.toString();
+            } catch (e) {
+                if (e.cause === "validation") {
+                    validationError(
+                        "Room URL was invalid",
+                        10,
+                        connectionStatusHandle
+                    );
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
         }
 
         if (host.trim().length === 0) {
@@ -347,6 +427,15 @@ class APConnector implements LocationSource, ItemSource {
                 MultiWorldService.updateMultiWorld(multiSlot.multi_save_id, {
                     connection_details: { host, port, password },
                 });
+
+                if (roomInfo) {
+                    MultiWorldService.updateMultiWorld(
+                        multiSlot.multi_save_id,
+                        {
+                            room_details: roomInfo,
+                        }
+                    );
+                }
 
                 const dataPackage = this.client.package.exportPackage();
                 const gamePackages: Record<string, GamePackageWrapper> =
