@@ -1,41 +1,30 @@
 // Based on https://jsfiddle.net/6j10L3x2/1/
-import React, {
-    createContext,
-    useContext,
-    forwardRef,
-    useRef,
-    useState,
-} from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 const FlexContext: React.Context<"root" | "row" | "column"> =
     createContext("root");
 
-const FlexItem = forwardRef(
-    (
-        {
-            children,
-            ratio,
-            style,
-        }: {
-            children: React.ReactNode;
-            ratio: number;
-            style?: React.CSSProperties;
-        },
-        ref: React.ForwardedRef<HTMLDivElement>
-    ) => {
-        const myStyle: React.CSSProperties = {
-            overflow: "hidden",
-            flex: `1 1 ${Math.floor(ratio * 100)}%`,
-            ...style,
-        };
-        return (
-            <div ref={ref} style={myStyle}>
-                {children}
-            </div>
-        );
-    }
-);
-FlexItem.displayName = "FlexItem";
-
+const FlexItem = ({
+    children,
+    ratio,
+    style,
+    ref,
+}: {
+    children: React.ReactNode;
+    ratio: number;
+    style?: React.CSSProperties;
+    ref?: React.Ref<HTMLDivElement>;
+}) => {
+    const myStyle: React.CSSProperties = {
+        overflow: "hidden",
+        flex: `1 1 ${Math.floor(ratio * 100)}%`,
+        ...style,
+    };
+    return (
+        <div ref={ref} style={myStyle}>
+            {children}
+        </div>
+    );
+};
 const FlexResizer = ({
     onMouseDown,
     onTouchStart,
@@ -72,8 +61,8 @@ const Flex = ({
     style?: React.CSSProperties;
 }) => {
     const flexParent = useContext(FlexContext);
-    const child1Ref: React.ForwardedRef<HTMLDivElement> = useRef(null);
-    const child2Ref: React.ForwardedRef<HTMLDivElement> = useRef(null);
+    const child1Ref: React.Ref<HTMLDivElement> = useRef(null);
+    const child2Ref: React.Ref<HTMLDivElement> = useRef(null);
     const [childRatio, setChildRatio] = useState(startRatio ?? 0.5);
     const mousePosRef = useRef({ x: 0, y: 0 });
     const mouseDownRef = useRef(false);

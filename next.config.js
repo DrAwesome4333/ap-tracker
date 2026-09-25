@@ -5,7 +5,7 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
 const nextConfig = {
     output: "export", // Outputs a Single-Page Application (SPA)
     distDir: "build", // Changes the build output directory to `build`
-    assetPrefix: "./", //comment out for local server builds to work with hot reload
+    assetPrefix: "./",
     experimental: {
         lightningCssFeatures: {
             exclude: ["oklab-colors", "light-dark"],
