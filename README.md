@@ -87,6 +87,10 @@ $ npm run dev
 
 See [contributing.md](./docs/CONTRIBUTING.md) for details
 
+## Integrations
+
+The integrations with this app are currently very few in number, to see what external integrations we have, checkout the [integration docs](./docs/integrations.md). Make a feature request with the details for integrations you would like to see.
+
 ## Found a bug?
 
 Checkout the issues page of this GitHub repository and report it there or report it to me directly in the Archipelago Discord (invite link on Archipelago's website) in the Checklist Tracker thread in the community-tools thread.

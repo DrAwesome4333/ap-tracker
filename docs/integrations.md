@@ -4,56 +4,43 @@ This page documents interactions external applications may have with the this tr
 
 ## URL Parameters
 
-> **NOTE**: all parameters must be URI encoded to work properly, examples will show fully encoded URL's
+> **NOTE**: all parameters must be URI encoded to work properly, examples will show fully encoded URL's.
+>
+> Some parameters should be safe to encode without any additional encoding
 
-### Connect to a server with a slot name and password
-
-Use this section to connect directly to the server if you have the slot name, password, and server address.
-
-Example URL for slot name `Dr. Awesome`, no password, on `archipelago.gg:38281`: `https://drawesome4333.github.io/ap-tracker/?connect=Dr.%2520Awesome%3ANone%40archipelago.gg%3A38281`
+### Connect to a room or server with a slot name and password
 
 #### Parameters
 
-- `connect`: This component will take the following form: `<slot>:<password>@<origin>`
-    - `slot`: The slot name for the slot you wish to connect to, URI Component encoded.
-    - `password`: The password for the server you wish to connect to, URI Component encoded. (Use `None` if there is no password)
-    - `origin`: The `host:port`address of the server to connect to.
-    - Example (prior to final component encoding) for slot `Dr. Awesome`, no password, on `archipelago.gg:38281`:
-        - `Dr.%20Awesome:None@archipelago.gg:38281`
+- `host`: The hostname of the archipelago server or archipelago web host
+    - Required if `port` or `room` is provided
+    - Example: `archipelago.gg`
+- `port`: The port number of the archipelago server
+    - Required if `host` is provided but not `room`
+    - Example: `38281`
+- `room`: The url of the room on an archipelago web host to connect to
+    - Required of `host` is provided but not `port`
+    - Causes `port`field to be ignored
+    - Must be URI component encoded
+    - Example: `https://archipelago.gg/room/7nDDDDHvBBBBKHOgpaAAAA`
+- `slot`: The slot name of the slot to connect to
+    - Required if `host` is provided
+    - Must be URI component encoded
+- `password`: The password of the server
+    - Must be URI component encoded
 
 #### Construction Code Example (JavaScript)
 
 ```js
-let slot = "Dr. Awesome";
-let password = "";
+// Normally you would use only one of the the port parameter or the room parameter, but both are provided as an example
 let host = "archipelago.gg";
 let port = 38281;
 
-let connectParam = `${encodeURIComponent(slot)}:${encodeURIComponent(password || "None")}@${host}:${port}`;
-let connectURL = `https://drawesome4333.github.io/ap-tracker/?connect=${encodeURIComponent(connectParam)}`;
-console.log(connectURL); // https://drawesome4333.github.io/ap-tracker/?connect=Dr.%2520Awesome%3ANone%40archipelago.gg%3A38281
-```
-
-### Connect to a room with a slot name and password
-
-Use this option if you have the room link, slot name, and password of the room. This will link the room to the saved multi-world data to enable related features (such as automatic port updates).
-
-Example URL for the room `https://archipelago.gg/room/ABCDEFGvTvSzKHOgpaPAvQ`, slot `Dr. Awesome`, with no password: `https://drawesome4333.github.io/ap-tracker/?room=https%3A%2F%2Farchipelago.gg%2Froom%2FABCDEFGvTvSzKHOgpaPAvQ&slot=Dr.%20Awesome`
-
-#### Parameters
-
-- `room`: The URL of the room on an archipelago web host to connect to
-- `slot`: The slot name of the slot to connect to
-- `password` (optional): The password of the server
-
-#### Construction Code Example (JavaScript)
-
-```js
 let slot = "Dr. Awesome";
-let roomURL = "https://archipelago.gg/room/ABCDEFGvTvSzKHOgpaPAvQ";
+let roomURL = "https://archipelago.gg/room/7nDDDDHvBBBBKHOgpaAAAA";
 let password = "";
 
-let connectURL = `https://drawesome4333.github.io/ap-tracker/?room=${encodeURIComponent(roomURL)}&slot=${encodeURIComponent(slot)}${password && `&password=${encodeURIComponent(password)}`}`;
+let connectURL = `https://drawesome4333.github.io/ap-tracker/?host=${host}&port=${port}&room=${encodeURIComponent(roomURL)}&slot=${encodeURIComponent(slot)}${password && `&password=${encodeURIComponent(password)}`}`;
 console.log(connectURL);
-// https://drawesome4333.github.io/ap-tracker/?room=https%3A%2F%2Farchipelago.gg%2Froom%2FABCDEFGvTvSzKHOgpaPAvQ&slot=Dr.%20Awesome
+// 'https://drawesome4333.github.io/ap-tracker/?host=archipelago.gg&port=38281&room=https%3A%2F%2Farchipelago.gg%2Froom%2F7nDDDDHvBBBBKHOgpaAAAA&slot=Dr.%20Awesome'
 ```
