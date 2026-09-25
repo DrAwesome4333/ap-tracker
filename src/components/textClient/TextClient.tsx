@@ -23,7 +23,7 @@ const TextClient = () => {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [followMessages, setFollowMessages] = useState(true);
     const scrollDebounceTimer = useRef(0);
-    const listRef: React.ForwardedRef<ListImperativeAPI> = useRef(null);
+    const listRef: React.Ref<ListImperativeAPI> = useRef(null);
     const rowHeight = useDynamicRowHeight({ defaultRowHeight: 23 });
     const scrollToBottom = useCallback(() => {
         scrollDebounceTimer.current = 0;

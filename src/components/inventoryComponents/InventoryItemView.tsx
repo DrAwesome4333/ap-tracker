@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext } from "react";
+import React, { useContext } from "react";
 import { Item } from "../../services/items/itemSource";
 import { GhostButton } from "../shared/buttons";
 import Icon from "../icons/icons";
@@ -7,92 +7,89 @@ import ap_styles from "../sharedStyles/archipelago.module.css";
 import SlotContext from "../../contexts/slotContext";
 import MultiWorldContext from "../../contexts/multiWorldContext";
 
-const InventoryItemView = forwardRef(
-    (
-        { items, index, style }: RowComponentProps<{ items: Item[] }>,
-        ref: React.ForwardedRef<HTMLDivElement>
-    ) => {
-        const item = items[index];
-        const slotContext = useContext(SlotContext);
-        const tagManager = slotContext.tagManager;
-        const locationTagger = slotContext.locationTagger;
-        const multiWorldContext = useContext(MultiWorldContext);
+const InventoryItemView = ({
+    items,
+    index,
+    style,
+    ref,
+}: RowComponentProps<{ items: Item[] }> & {
+    ref?: React.Ref<HTMLDivElement>;
+}) => {
+    const item = items[index];
+    const slotContext = useContext(SlotContext);
+    const tagManager = slotContext.tagManager;
+    const locationTagger = slotContext.locationTagger;
+    const multiWorldContext = useContext(MultiWorldContext);
 
-        let itemClass = ap_styles.item_normal;
-        if (item.flags.progression) {
-            itemClass = ap_styles.item_prog;
-        } else if (item.flags.useful) {
-            itemClass = ap_styles.item_useful;
-        } else if (item.flags.trap) {
-            itemClass = ap_styles.item_trap;
-        } else if (item.sender === "Archipelago") {
-            itemClass = ap_styles.item_server;
-        }
-
-        const playerClass =
-            item.senderSlot === multiWorldContext.trackedSlot
-                ? ap_styles.player
-                : multiWorldContext?.trackedSlots?.find(
-                        (slotNumber) => slotNumber === item.senderSlot
-                    )
-                  ? ap_styles.player_alt
-                  : ap_styles.player_other;
-        return (
-            <div
-                className={ap_styles.ap_text_alt + " " + itemClass}
-                style={{
-                    ...style,
-                }}
-                ref={ref}
-            >
-                <div
-                    style={{
-                        marginLeft: "0.5em",
-                    }}
-                >
-                    <span
-                        className={[
-                            ap_styles.ap_text_alt,
-                            ap_styles.location,
-                        ].join(" ")}
-                    >
-                        {item.location}
-                    </span>{" "}
-                    <span
-                        className={[ap_styles.ap_text_alt, playerClass].join(
-                            " "
-                        )}
-                    >
-                        {item.sender}
-                    </span>
-                    {item.flags.local && tagManager && (
-                        <GhostButton
-                            onClick={(event) => {
-                                const locationId = item.locationId;
-                                const existingTags = locationTagger
-                                    .queryTags("star", locationId)
-                                    .filter((tag) => tag.type_id === "star");
-                                event.stopPropagation();
-                                const found = existingTags.length > 0;
-                                if (!found) {
-                                    locationTagger.addTag("star", locationId);
-                                } else if (found) {
-                                    locationTagger.removeTag(
-                                        existingTags[0].tag_id
-                                    );
-                                }
-                            }}
-                            tiny
-                        >
-                            <Icon fontSize="12pt" type={"star"} />
-                        </GhostButton>
-                    )}
-                </div>
-            </div>
-        );
+    let itemClass = ap_styles.item_normal;
+    if (item.flags.progression) {
+        itemClass = ap_styles.item_prog;
+    } else if (item.flags.useful) {
+        itemClass = ap_styles.item_useful;
+    } else if (item.flags.trap) {
+        itemClass = ap_styles.item_trap;
+    } else if (item.sender === "Archipelago") {
+        itemClass = ap_styles.item_server;
     }
-);
 
-InventoryItemView.displayName = "InventoryItemView";
+    const playerClass =
+        item.senderSlot === multiWorldContext.trackedSlot
+            ? ap_styles.player
+            : multiWorldContext?.trackedSlots?.find(
+                    (slotNumber) => slotNumber === item.senderSlot
+                )
+              ? ap_styles.player_alt
+              : ap_styles.player_other;
+    return (
+        <div
+            className={ap_styles.ap_text_alt + " " + itemClass}
+            style={{
+                ...style,
+            }}
+            ref={ref}
+        >
+            <div
+                style={{
+                    marginLeft: "0.5em",
+                }}
+            >
+                <span
+                    className={[ap_styles.ap_text_alt, ap_styles.location].join(
+                        " "
+                    )}
+                >
+                    {item.location}
+                </span>{" "}
+                <span
+                    className={[ap_styles.ap_text_alt, playerClass].join(" ")}
+                >
+                    {item.sender}
+                </span>
+                {item.flags.local && tagManager && (
+                    <GhostButton
+                        onClick={(event) => {
+                            const locationId = item.locationId;
+                            const existingTags = locationTagger
+                                .queryTags("star", locationId)
+                                .filter((tag) => tag.type_id === "star");
+                            event.stopPropagation();
+                            const found = existingTags.length > 0;
+                            if (!found) {
+                                locationTagger.addTag("star", locationId);
+                            } else if (found) {
+                                locationTagger.removeTag(
+                                    existingTags[0].tag_id
+                                );
+                            }
+                        }}
+                        tiny
+                    >
+                        <Icon fontSize="12pt" type={"star"} />
+                    </GhostButton>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default InventoryItemView;

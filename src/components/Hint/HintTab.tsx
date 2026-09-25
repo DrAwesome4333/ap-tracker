@@ -1,4 +1,4 @@
-import React, { useContext, useId, useState } from "react";
+import { useContext, useId, useState } from "react";
 import PanelHeader from "../shared/PanelHeader";
 import HintTable from "./HintTable";
 import ServiceContext from "../../contexts/serviceContext";

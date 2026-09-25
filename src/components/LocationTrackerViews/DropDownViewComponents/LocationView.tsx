@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext } from "react";
+import React, { useContext } from "react";
 import Icon from "../../icons/icons";
 import { textPrimary } from "../../../constants/colors";
 import { TextButton } from "../../shared/buttons";
@@ -12,115 +12,107 @@ import {
 } from "../../../services/locations/locationSource";
 import SlotContext from "../../../contexts/slotContext";
 
-const LocationView = forwardRef(
-    (
-        {
-            locations,
-            index,
-            style,
-            onLocationSelect,
-            selectedLocation,
-        }: RowComponentProps<{
-            locations: LocationStatus[];
-            onLocationSelect?: (locationId: LocationId) => void;
-            selectedLocation?: LocationId;
-        }>,
-        ref: React.ForwardedRef<HTMLDivElement>
-    ) => {
-        const slotContext = useContext(SlotContext);
-        const tagManager = slotContext.tagManager;
-        const location = locations[index];
+const LocationView = ({
+    locations,
+    index,
+    style,
+    onLocationSelect,
+    selectedLocation,
+    ref,
+}: RowComponentProps<{
+    locations: LocationStatus[];
+    onLocationSelect?: (locationId: LocationId) => void;
+    selectedLocation?: LocationId;
+}> & { ref?: React.Ref<HTMLDivElement> }) => {
+    const slotContext = useContext(SlotContext);
+    const tagManager = slotContext.tagManager;
+    const location = locations[index];
 
-        const tagStatus = {
-            checked: location.checked,
-            ignored: location.ignored,
-        };
-        const tags = useTagList(
-            tagManager,
-            TagEntityType.location,
-            location.locationId
-        );
-        const selected = selectedLocation === location.locationId;
+    const tagStatus = {
+        checked: location.checked,
+        ignored: location.ignored,
+    };
+    const tags = useTagList(
+        tagManager,
+        TagEntityType.location,
+        location.locationId
+    );
+    const selected = selectedLocation === location.locationId;
 
-        const sortedTags = [...(tags ?? [])];
-        sortedTags.sort((a, b) => {
-            const tagA = tagManager.getTagById(a);
-            const tagB = tagManager.getTagById(b);
-            const tagAType = tagManager.getTagType(tagA.type_id, tagStatus);
-            const tagBType = tagManager.getTagType(tagB.type_id, tagStatus);
-            let comparisonValue = tagBType.priority - tagAType.priority;
-            if (comparisonValue === 0) {
-                comparisonValue = naturalSort(
-                    tagAType.display_name,
-                    tagBType.display_name
-                );
-            }
-
-            return comparisonValue;
-        });
-
-        const displayedTag = sortedTags[0]
-            ? tagManager.getTagById(sortedTags[0])
-            : null;
-        const displayedTagType = displayedTag
-            ? tagManager.getTagType(displayedTag.type_id, tagStatus)
-            : null;
-
-        const classes = new Set(["section_check"]);
-        if (location.checked || location.ignored) {
-            classes.add("checked");
-            if (location.ignored) {
-                classes.add("ignored");
-            }
+    const sortedTags = [...(tags ?? [])];
+    sortedTags.sort((a, b) => {
+        const tagA = tagManager.getTagById(a);
+        const tagB = tagManager.getTagById(b);
+        const tagAType = tagManager.getTagType(tagA.type_id, tagStatus);
+        const tagBType = tagManager.getTagType(tagB.type_id, tagStatus);
+        let comparisonValue = tagBType.priority - tagAType.priority;
+        if (comparisonValue === 0) {
+            comparisonValue = naturalSort(
+                tagAType.display_name,
+                tagBType.display_name
+            );
         }
 
-        let iconType = location.checked
-            ? "check_small"
-            : "check_indeterminate_small";
-        let iconColor = textPrimary;
-        let iconSpec = {};
+        return comparisonValue;
+    });
 
-        if (displayedTagType) {
-            iconType = displayedTagType.icon_id;
-            iconColor = displayedTagType.icon_color ?? iconColor;
-            iconSpec = displayedTagType.icon_spec;
+    const displayedTag = sortedTags[0]
+        ? tagManager.getTagById(sortedTags[0])
+        : null;
+    const displayedTagType = displayedTag
+        ? tagManager.getTagType(displayedTag.type_id, tagStatus)
+        : null;
+
+    const classes = new Set(["section_check"]);
+    if (location.checked || location.ignored) {
+        classes.add("checked");
+        if (location.ignored) {
+            classes.add("ignored");
         }
-
-        return (
-            <div
-                ref={ref}
-                style={{
-                    backgroundColor: selected
-                        ? "rgba(128, 128, 128, 0.25)"
-                        : "",
-                    paddingLeft: "1em",
-                    boxSizing: "border-box",
-                    ...style,
-                }}
-            >
-                <span className={[...classes].join(" ")}>
-                    <TextButton
-                        style={{
-                            textDecoration:
-                                classes.has("checked") || classes.has("ignored")
-                                    ? "line-through"
-                                    : "",
-                        }}
-                        onClick={() => onLocationSelect?.(location.locationId)}
-                    >
-                        <Icon
-                            fontSize="14px"
-                            type={iconType}
-                            style={{ color: iconColor }}
-                            iconParams={iconSpec}
-                        />{" "}
-                        {location.name}
-                    </TextButton>
-                </span>
-            </div>
-        );
     }
-);
-LocationView.displayName = "LocationView";
 
+    let iconType = location.checked
+        ? "check_small"
+        : "check_indeterminate_small";
+    let iconColor = textPrimary;
+    let iconSpec = {};
+
+    if (displayedTagType) {
+        iconType = displayedTagType.icon_id;
+        iconColor = displayedTagType.icon_color ?? iconColor;
+        iconSpec = displayedTagType.icon_spec;
+    }
+
+    return (
+        <div
+            ref={ref}
+            style={{
+                backgroundColor: selected ? "rgba(128, 128, 128, 0.25)" : "",
+                paddingLeft: "1em",
+                boxSizing: "border-box",
+                ...style,
+            }}
+        >
+            <span className={[...classes].join(" ")}>
+                <TextButton
+                    style={{
+                        textDecoration:
+                            classes.has("checked") || classes.has("ignored")
+                                ? "line-through"
+                                : "",
+                    }}
+                    onClick={() => onLocationSelect?.(location.locationId)}
+                >
+                    <Icon
+                        fontSize="14px"
+                        type={iconType}
+                        style={{ color: iconColor }}
+                        iconParams={iconSpec}
+                    />{" "}
+                    {location.name}
+                </TextButton>
+            </span>
+        </div>
+    );
+};
 export default LocationView;
