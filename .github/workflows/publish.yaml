@@ -21,7 +21,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   submodules: true
 
@@ -35,7 +35,7 @@ jobs:
             - name: Setup Node.js - Cache dependencies - Install dependencies
               uses: ./.github/workflows/setup-node
 
-            - uses: oven-sh/setup-bun@v1
+            - uses: oven-sh/setup-bun@v2
             - name: Build archipelago.js
               run: |
                   cd external/archipelago.js
@@ -43,7 +43,7 @@ jobs:
                   npm run build
 
             - name: Setup Pages
-              uses: actions/configure-pages@v4
+              uses: actions/configure-pages@v6
               with:
                   static_site_generator: next
 
@@ -66,4 +66,4 @@ jobs:
         steps:
             - name: Publish to GitHub Pages
               id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@v5
