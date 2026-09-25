@@ -75,170 +75,166 @@ const getItemClass = (itemFlags: number) => {
     return special + " " + ap_styles.ap_text;
 };
 
-const HintRow = forwardRef(
-    (
-        { hints, index, style }: RowComponentProps<{ hints: Hint[] }>,
-        ref: React.ForwardedRef<HTMLDivElement>
-    ) => {
-        const hint = hints[index];
-        const odd = index % 2 === 1;
-        const serviceContext = useContext(ServiceContext);
-        const slotContext = useContext(SlotContext);
-        const multiWorldContext = useContext(MultiWorldContext);
-        const canChangeStatus =
-            multiWorldContext &&
-            [SlotRelevance.own, SlotRelevance.own_group].includes(
-                MultiWorldContextHelper.getSlotRelevance(
-                    multiWorldContext,
-                    hint.receivingPlayer
-                )
-            ) &&
-            hint.status !== API.HintStatus.found &&
-            slotContext.liveSlot;
-        const [updateInProgress, setUpdateInProgress] = useState(false);
-        const finishUpdate = useCallback(() => {
-            setUpdateInProgress(false);
-        }, [setUpdateInProgress]);
+const HintRow = ({
+    hints,
+    index,
+    style,
+    ref,
+}: RowComponentProps<{ hints: Hint[] }> & {
+    ref?: React.Ref<HTMLDivElement>;
+}) => {
+    const hint = hints[index];
+    const odd = index % 2 === 1;
+    const serviceContext = useContext(ServiceContext);
+    const slotContext = useContext(SlotContext);
+    const multiWorldContext = useContext(MultiWorldContext);
+    const canChangeStatus =
+        multiWorldContext &&
+        [SlotRelevance.own, SlotRelevance.own_group].includes(
+            MultiWorldContextHelper.getSlotRelevance(
+                multiWorldContext,
+                hint.receivingPlayer
+            )
+        ) &&
+        hint.status !== API.HintStatus.found &&
+        slotContext.liveSlot;
+    const [updateInProgress, setUpdateInProgress] = useState(false);
+    const finishUpdate = useCallback(() => {
+        setUpdateInProgress(false);
+    }, [setUpdateInProgress]);
 
-        return (
+    return (
+        <div
+            ref={ref}
+            style={{
+                ...style,
+                display: "grid",
+                width: "100%",
+                boxSizing: "border-box",
+                gap: "0.25em",
+                padding: "0.5em",
+                background: odd ? "rgba(128, 128, 128, 0.12)" : "",
+                gridTemplateColumns: "5fr 1fr",
+            }}
+        >
             <div
-                ref={ref}
                 style={{
-                    ...style,
                     display: "grid",
-                    width: "100%",
-                    boxSizing: "border-box",
-                    gap: "0.25em",
-                    padding: "0.5em",
-                    background: odd ? "rgba(128, 128, 128, 0.12)" : "",
-                    gridTemplateColumns: "5fr 1fr",
+                    gridTemplateColumns: "auto repeat(2, 1fr)",
+                    alignItems: "center",
+                    columnGap: "0.5em",
                 }}
             >
-                <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "auto repeat(2, 1fr)",
-                        alignItems: "center",
-                        columnGap: "0.5em",
-                    }}
-                >
-                    <div>
-                        <TextButton
-                            onClick={() =>
-                                copyToClipboard(
-                                    hintToText(multiWorldContext, hint)
-                                )
-                            }
-                        >
-                            <Icon type={"content_copy"} />
-                        </TextButton>
-                    </div>
-                    <div>
-                        <span
-                            className={getPlayerClass(
-                                hint.receivingPlayer,
-                                multiWorldContext
-                            )}
-                        >
-                            {MultiWorldContextHelper.getSlotName(
-                                multiWorldContext,
-                                hint.receivingPlayer
-                            )}
-                        </span>
-                        {"'s"}
-                        <br />
-                        <span className={getItemClass(hint.itemFlags)}>
-                            {MultiWorldContextHelper.getItemName(
-                                multiWorldContext,
-                                hint.receivingPlayer,
-                                hint.itemId
-                            )}
-                        </span>
-                    </div>
-                    <div>
-                        <span
-                            className={getPlayerClass(
-                                hint.findingPlayer,
-                                multiWorldContext
-                            )}
-                        >
-                            {MultiWorldContextHelper.getSlotName(
-                                multiWorldContext,
-                                hint.findingPlayer
-                            )}
-                        </span>
-                        <br />
-                        <span
-                            className={
-                                ap_styles.location + " " + ap_styles.ap_text
-                            }
-                        >
-                            {MultiWorldContextHelper.getLocationName(
-                                multiWorldContext,
-                                hint.findingPlayer,
-                                hint.locationId
-                            )}
-                        </span>
-                        {hint.entrance !== "Vanilla" && (
-                            <>
-                                <br />
-                                <span
-                                    className={
-                                        ap_styles.entrance +
-                                        " " +
-                                        ap_styles.ap_text
-                                    }
-                                >
-                                    {hint.entrance}
-                                </span>
-                            </>
-                        )}
-                    </div>
+                <div>
+                    <TextButton
+                        onClick={() =>
+                            copyToClipboard(hintToText(multiWorldContext, hint))
+                        }
+                    >
+                        <Icon type={"content_copy"} />
+                    </TextButton>
                 </div>
-                <div
-                    className={[
-                        ap_styles.ap_text,
-                        hintStatusToClassMap[hint.status],
-                    ].join(" ")}
-                >
-                    {canChangeStatus ? (
-                        <select
-                            value={hint.status}
-                            disabled={updateInProgress}
-                            onChange={(e) => {
-                                if (
-                                    serviceContext.hintManager &&
-                                    serviceContext.hintManager.canUpdate
-                                ) {
-                                    setUpdateInProgress(true);
-                                    serviceContext.hintManager
-                                        .updateHintStatus(
-                                            hint,
-                                            parseInt(e.target.value)
-                                        )
-                                        .then(finishUpdate);
+                <div>
+                    <span
+                        className={getPlayerClass(
+                            hint.receivingPlayer,
+                            multiWorldContext
+                        )}
+                    >
+                        {MultiWorldContextHelper.getSlotName(
+                            multiWorldContext,
+                            hint.receivingPlayer
+                        )}
+                    </span>
+                    {"'s"}
+                    <br />
+                    <span className={getItemClass(hint.itemFlags)}>
+                        {MultiWorldContextHelper.getItemName(
+                            multiWorldContext,
+                            hint.receivingPlayer,
+                            hint.itemId
+                        )}
+                    </span>
+                </div>
+                <div>
+                    <span
+                        className={getPlayerClass(
+                            hint.findingPlayer,
+                            multiWorldContext
+                        )}
+                    >
+                        {MultiWorldContextHelper.getSlotName(
+                            multiWorldContext,
+                            hint.findingPlayer
+                        )}
+                    </span>
+                    <br />
+                    <span
+                        className={ap_styles.location + " " + ap_styles.ap_text}
+                    >
+                        {MultiWorldContextHelper.getLocationName(
+                            multiWorldContext,
+                            hint.findingPlayer,
+                            hint.locationId
+                        )}
+                    </span>
+                    {hint.entrance !== "Vanilla" && (
+                        <>
+                            <br />
+                            <span
+                                className={
+                                    ap_styles.entrance + " " + ap_styles.ap_text
                                 }
-                            }}
-                        >
-                            {statusSelections.map((status) => (
-                                <option value={status} key={status}>
-                                    {statusToText[status]}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        statusToText[hint.status]
-                    )}
-                    {updateInProgress ? (
-                        <Spinner style={{ height: "14px" }} />
-                    ) : (
-                        <></>
+                            >
+                                {hint.entrance}
+                            </span>
+                        </>
                     )}
                 </div>
             </div>
-        );
-    }
-);
+            <div
+                className={[
+                    ap_styles.ap_text,
+                    hintStatusToClassMap[hint.status],
+                ].join(" ")}
+            >
+                {canChangeStatus ? (
+                    <select
+                        value={hint.status}
+                        disabled={updateInProgress}
+                        onChange={(e) => {
+                            if (
+                                serviceContext.hintManager &&
+                                serviceContext.hintManager.canUpdate
+                            ) {
+                                setUpdateInProgress(true);
+                                serviceContext.hintManager
+                                    .updateHintStatus(
+                                        hint,
+                                        parseInt(e.target.value)
+                                    )
+                                    .then(finishUpdate);
+                            }
+                        }}
+                    >
+                        {statusSelections.map((status) => (
+                            <option value={status} key={status}>
+                                {statusToText[status]}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    statusToText[hint.status]
+                )}
+                {updateInProgress ? (
+                    <Spinner style={{ height: "14px" }} />
+                ) : (
+                    <></>
+                )}
+            </div>
+        </div>
+    );
+};
 
 HintRow.displayName = "HintRow";
 

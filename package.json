@@ -12,7 +12,7 @@
         "nextjs": "^0.0.3",
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
-        "react-window": "^2.2.1",
+        "react-window": "^2.3.3",
         "styled-components": "^6.1.11",
         "typescript": "^5.7.3"
     },
