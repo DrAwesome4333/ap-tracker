@@ -437,10 +437,68 @@ class APConnector implements LocationSource, ItemSource {
                     );
                 }
 
+                const players: Record<number, MultiWorldPlayer> = {};
+                const groups: Record<number, MultiWorldGroup> = {};
+                const gamesInMultiWorld: Set<string> = new Set(["Archipelago"]);
+                Object.entries(this.client.players.slots).forEach(
+                    ([slotNumber, slot]) => {
+                        gamesInMultiWorld.add(slot.game);
+                        if (slot.type === slotTypes.player) {
+                            players[parseInt(slotNumber)] = {
+                                name: slot.name,
+                                slot: parseInt(slotNumber),
+                                game: slot.game,
+                                groups: new Set(),
+                                alias: this.client.players.findPlayer(
+                                    parseInt(slotNumber)
+                                ).alias,
+                            };
+                        }
+
+                        if (slot.type === slotTypes.group) {
+                            groups[parseInt(slotNumber)] = {
+                                name: slot.name,
+                                slot: parseInt(slotNumber),
+                                game: slot.game,
+                                players: new Set(slot.group_members),
+                            };
+                        }
+                    }
+                );
+
+                Object.entries(groups).forEach(([slotNumber, group]) => {
+                    group.players.forEach((player) =>
+                        players[player].groups.add(parseInt(slotNumber))
+                    );
+                });
+
+                if (!MultiWorldService.loadedMultiWorld.player_details) {
+                    const playerDetails: Record<
+                        number,
+                        { slot: number; name: string; game: string }
+                    > = Object.values(players).reduce((result, player) => {
+                        result[player.slot] = {
+                            slot: player.slot,
+                            name: player.name,
+                            game: player.game,
+                        };
+                        return result;
+                    }, {});
+                    MultiWorldService.updateMultiWorld(
+                        multiSlot.multi_save_id,
+                        {
+                            player_details: playerDetails,
+                        }
+                    );
+                }
+
                 const dataPackage = this.client.package.exportPackage();
                 const gamePackages: Record<string, GamePackageWrapper> =
                     Object.entries(dataPackage.games).reduce(
                         (packs, [game, gamePackage]) => {
+                            if (!gamesInMultiWorld.has(game)) {
+                                return packs;
+                            }
                             packs[game] = new GamePackageWrapper(
                                 {
                                     checksum: gamePackage.checksum,
@@ -532,58 +590,6 @@ class APConnector implements LocationSource, ItemSource {
                         );
                     })
                     .catch((e) => console.error(e));
-                const players: Record<number, MultiWorldPlayer> = {};
-                const groups: Record<number, MultiWorldGroup> = {};
-                Object.entries(this.client.players.slots).forEach(
-                    ([slotNumber, slot]) => {
-                        if (slot.type === slotTypes.player) {
-                            players[parseInt(slotNumber)] = {
-                                name: slot.name,
-                                slot: parseInt(slotNumber),
-                                game: slot.game,
-                                groups: new Set(),
-                                alias: this.client.players.findPlayer(
-                                    parseInt(slotNumber)
-                                ).alias,
-                            };
-                        }
-
-                        if (slot.type === slotTypes.group) {
-                            groups[parseInt(slotNumber)] = {
-                                name: slot.name,
-                                slot: parseInt(slotNumber),
-                                game: slot.game,
-                                players: new Set(slot.group_members),
-                            };
-                        }
-                    }
-                );
-
-                Object.entries(groups).forEach(([slotNumber, group]) => {
-                    group.players.forEach((player) =>
-                        players[player].groups.add(parseInt(slotNumber))
-                    );
-                });
-
-                if (!MultiWorldService.loadedMultiWorld.player_details) {
-                    const playerDetails: Record<
-                        number,
-                        { slot: number; name: string; game: string }
-                    > = Object.values(players).reduce((result, player) => {
-                        result[player.slot] = {
-                            slot: player.slot,
-                            name: player.name,
-                            game: player.game,
-                        };
-                        return result;
-                    }, {});
-                    MultiWorldService.updateMultiWorld(
-                        multiSlot.multi_save_id,
-                        {
-                            player_details: playerDetails,
-                        }
-                    );
-                }
 
                 const result: ConnectedEventParams = {
                     slotName,

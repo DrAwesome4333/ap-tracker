@@ -45,6 +45,8 @@ const MultiWorldDetails = ({
         setPort(multiWorld?.connection_details.port ?? "");
         setPassword(multiWorld?.connection_details.password ?? "");
         setColor(multiWorld?.color ?? "#888888");
+        setRoomLink("");
+        setLastRoomError("");
     }, [multiWorld]);
 
     const save = () => {
@@ -84,23 +86,15 @@ const MultiWorldDetails = ({
                 const allSlots = MultiWorldService.findAllSlotsForMultiWorld(
                     multiWorld.multi_save_id
                 );
-                // validate some properties for the multi-world match
-                const dataPackageCompare = (
-                    a: [string, unknown],
-                    b: [string, unknown]
-                ) => (a[0] < b[0] ? 1 : -1);
-                const currentPackages = Object.entries(
-                    multiWorld.data_package_details
-                );
-                currentPackages.sort(dataPackageCompare);
+                const currentPackages = multiWorld.data_package_details;
                 const roomPackages = Object.entries(staticTracker.datapackage);
-                roomPackages.sort(dataPackageCompare);
+                // verify all packages in room are covered by the stored packages (due to former a bug, it is possible for more packages to be stored on the room than there should be)
                 if (
-                    currentPackages.length !== roomPackages.length ||
-                    currentPackages.some(
-                        ([_game, checksum], index) =>
-                            roomPackages[index][1].checksum !== checksum
+                    roomPackages.some(
+                        ([game, info]) =>
+                            currentPackages[game] !== info.checksum
                     ) ||
+                    // Verify all (tracked) players are accounted for
                     allSlots.some(
                         (mwSlot) =>
                             roomStatus.players[mwSlot.slot_number - 1][0] !==
