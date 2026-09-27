@@ -298,6 +298,19 @@ const OptionsScreen = () => {
                 </div>
             </OptionBlock>
 
+            <OptionBlock title="Advanced Options">
+                <p>
+                    Enabling this setting will allow you to bookmark a specific
+                    slot and will automatically connect to that slot when
+                    opened. (URL cannot be transferred between devices)
+                </p>
+                <OptionView
+                    option={
+                        baseTrackerOptions["Advanced:AllowSlotDetailsInUrl"]
+                    }
+                />
+            </OptionBlock>
+
             <OptionBlock title="Attributions">
                 <img
                     src="./icon.svg"
@@ -357,6 +370,23 @@ const OptionsScreen = () => {
                 {process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
                     ? `-${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
                     : ""}
+            </div>
+            <div
+                style={{
+                    textAlign: "center",
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: "1em",
+                }}
+            >
+                Find Documentation and more on the
+                <a
+                    href="https://github.com/DrAwesome4333/ap-tracker"
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    GitHub repository
+                </a>
             </div>
             <StickySpacer />
         </div>
