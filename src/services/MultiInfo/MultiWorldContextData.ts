@@ -95,6 +95,15 @@ const MultiWorldContextHelper = {
 
         return SlotRelevance.other_group;
     },
+    getSlotNumber(context: MultiWorldContextData, slotName: string) {
+        return (
+            Object.values(context.players).find((p) => p.name === slotName)
+                ?.slot ??
+            Object.values(context.groups).find((g) => g.name === slotName)
+                ?.slot ??
+            null
+        );
+    },
 };
 export { MultiWorldContextHelper, SlotRelevance };
 export type { MultiWorldPlayer, MultiWorldGroup, MultiWorldContextData };

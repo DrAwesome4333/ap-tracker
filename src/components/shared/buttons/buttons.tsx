@@ -4,11 +4,19 @@ import buttonStyles from "./button.module.css";
 const TextButton = ({
     children,
     className,
+    ref,
     ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }) => {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    className?: string;
+    ref?: React.Ref<HTMLButtonElement>;
+}) => {
     const styles = [className, buttonStyles.button_text];
     return (
-        <button className={styles.filter((x) => x).join(" ")} {...props}>
+        <button
+            ref={ref}
+            className={styles.filter((x) => x).join(" ")}
+            {...props}
+        >
             {children}
         </button>
     );
@@ -20,10 +28,12 @@ const ButtonFactory = (uniqueClass: string, name: string) => {
         tiny,
         small,
         className,
+        ref,
         ...props
     }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
         tiny?: boolean;
         small?: boolean;
+        ref?: React.Ref<HTMLButtonElement>;
     }) => {
         const styles = [className, buttonStyles.button_base, uniqueClass];
         if (tiny) {
@@ -33,7 +43,11 @@ const ButtonFactory = (uniqueClass: string, name: string) => {
             styles.push(buttonStyles.small_button);
         }
         return (
-            <button className={styles.filter((x) => x).join(" ")} {...props}>
+            <button
+                className={styles.filter((x) => x).join(" ")}
+                ref={ref}
+                {...props}
+            >
                 {children}
             </button>
         );
