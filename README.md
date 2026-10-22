@@ -67,7 +67,12 @@ $ git clone https://github.com/DrAwesome4333/ap-tracker.git
 $ cd ./ap-tracker
 ```
 
-4. Now we need to install and build archipelago.js. Navigate to the `external/archipelago.js` folder and follow the instructions listed [here](https://github.com/DrAwesome4333/archipelago.js) to build it.
+4. Now we need to install and build archipelago.js. Navigate to the `external/archipelago.js` folder and run
+
+```sh
+$ npm install
+$ npm run prepack
+```
 
 5. Now it is time to install the app's dependencies, run the command:
 

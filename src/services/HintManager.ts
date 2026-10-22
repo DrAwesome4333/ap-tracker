@@ -6,6 +6,8 @@ import {
 } from "./MultiInfo/MultiWorldContextData";
 import { APIHint, APIOffsets_Hint, APITracker } from "./WebHostAPI/types";
 
+type HintStatus = (typeof API.hintStatuses)[keyof typeof API.hintStatuses];
+
 const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
     let ownerString = `${MultiWorldContextHelper.getSlotName(multiWorldContext, hint.receivingPlayer)}'s`;
     if (hint.receivingPlayer === multiWorldContext.trackedSlot) {
@@ -21,15 +23,15 @@ const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
             ? `(${hint.entrance})`
             : "";
     const priorityString =
-        hint.status === API.HintStatus.unspecified
+        hint.status === API.hintStatuses.unspecified
             ? "Unspecified"
-            : hint.status === API.HintStatus.no_priority
+            : hint.status === API.hintStatuses.noPriority
               ? "No Priority"
-              : hint.status === API.HintStatus.avoid
+              : hint.status === API.hintStatuses.avoid
                 ? "Avoid"
-                : hint.status === API.HintStatus.priority
+                : hint.status === API.hintStatuses.priority
                   ? "Priority"
-                  : hint.status === API.HintStatus.found
+                  : hint.status === API.hintStatuses.found
                     ? "Found"
                     : "Unknown Priority";
     const itemName = MultiWorldContextHelper.getItemName(
@@ -56,7 +58,7 @@ type Hint = {
     locationId: number;
     itemId: number;
     found: boolean;
-    status: API.HintStatus;
+    status: HintStatus;
     itemFlags: number;
     entrance: string;
 };
@@ -194,7 +196,7 @@ export default class HintManager {
         return this.#hintCache;
     }
 
-    updateHintStatus = (hint: Hint, status: API.HintStatus) => {
+    updateHintStatus = (hint: Hint, status: HintStatus) => {
         if (!this.canUpdate) {
             return;
         }

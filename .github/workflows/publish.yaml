@@ -40,7 +40,7 @@ jobs:
               run: |
                   cd external/archipelago.js
                   npm i
-                  npm run build
+                  npm run prepack
 
             - name: Setup Pages
               uses: actions/configure-pages@v6

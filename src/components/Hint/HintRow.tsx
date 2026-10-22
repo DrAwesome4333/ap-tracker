@@ -16,25 +16,27 @@ import MultiWorldContext from "../../contexts/multiWorldContext";
 import ServiceContext from "../../contexts/serviceContext";
 import { copyToClipboard } from "../../utility/clipboard";
 
+type HintStatus = (typeof API.hintStatuses)[keyof typeof API.hintStatuses];
+
 const statusSelections = [
-    API.HintStatus.priority,
-    API.HintStatus.avoid,
-    API.HintStatus.no_priority,
-    API.HintStatus.unspecified,
+    API.hintStatuses.priority,
+    API.hintStatuses.avoid,
+    API.hintStatuses.noPriority,
+    API.hintStatuses.unspecified,
 ];
 const statusToText = {
-    [API.HintStatus.unspecified]: "Unspecified",
-    [API.HintStatus.no_priority]: "No Priority",
-    [API.HintStatus.avoid]: "Avoid",
-    [API.HintStatus.priority]: "Priority",
-    [API.HintStatus.found]: "Found",
+    [API.hintStatuses.unspecified]: "Unspecified",
+    [API.hintStatuses.noPriority]: "No Priority",
+    [API.hintStatuses.avoid]: "Avoid",
+    [API.hintStatuses.priority]: "Priority",
+    [API.hintStatuses.found]: "Found",
 };
 const hintStatusToClassMap: { [status: number]: string } = {
-    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
-    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
-    [API.HintStatus.avoid]: ap_styles.hint_avoid,
-    [API.HintStatus.priority]: ap_styles.hint_priority,
-    [API.HintStatus.found]: ap_styles.hint_found,
+    [API.hintStatuses.noPriority]: ap_styles.hint_no_priority,
+    [API.hintStatuses.unspecified]: ap_styles.hint_unspecified,
+    [API.hintStatuses.avoid]: ap_styles.hint_avoid,
+    [API.hintStatuses.priority]: ap_styles.hint_priority,
+    [API.hintStatuses.found]: ap_styles.hint_found,
 };
 
 const getPlayerClass = (
@@ -96,7 +98,7 @@ const HintRow = ({
                 hint.receivingPlayer
             )
         ) &&
-        hint.status !== API.HintStatus.found &&
+        hint.status !== API.hintStatuses.found &&
         slotContext.liveSlot;
     const [updateInProgress, setUpdateInProgress] = useState(false);
     const finishUpdate = useCallback(() => {
@@ -211,7 +213,7 @@ const HintRow = ({
                                 serviceContext.hintManager
                                     .updateHintStatus(
                                         hint,
-                                        parseInt(e.target.value)
+                                        parseInt(e.target.value) as HintStatus
                                     )
                                     .then(finishUpdate);
                             }

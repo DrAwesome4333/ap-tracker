@@ -4,13 +4,7 @@ import {
 } from "../../../services/MultiInfo/MultiWorldContextData";
 import { parseCommandString } from "./CommandParser";
 import { escapeArg } from "./Escape";
-import {
-    itemSearch,
-    itemSearchAsync,
-    locationSearch,
-    locationSearchAsync,
-    playerSearch,
-} from "./Search";
+import { itemSearchAsync, locationSearchAsync, playerSearch } from "./Search";
 
 const searchCommandFactory = (
     commandText: string,

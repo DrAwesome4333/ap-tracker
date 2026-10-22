@@ -13,11 +13,11 @@ type HintFilter = {
 };
 
 const statusToText = {
-    [API.HintStatus.unspecified]: "Unspecified",
-    [API.HintStatus.no_priority]: "No Priority",
-    [API.HintStatus.avoid]: "Avoid",
-    [API.HintStatus.priority]: "Priority",
-    [API.HintStatus.found]: "Found",
+    [API.hintStatuses.unspecified]: "Unspecified",
+    [API.hintStatuses.noPriority]: "No Priority",
+    [API.hintStatuses.avoid]: "Avoid",
+    [API.hintStatuses.priority]: "Priority",
+    [API.hintStatuses.found]: "Found",
 };
 const optionScope = "HintTab_temp";
 const optionDef: HierarchicalOption = {

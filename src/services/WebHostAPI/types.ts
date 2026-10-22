@@ -43,7 +43,7 @@ type ReceivingPlayer = number;
 type FindingPlayer = number;
 type HintFound = number;
 type Entrance = string;
-type HintStatus = number; // TODO replace with enum
+type HintStatus = 0 | 10 | 20 | 30 | 40; // TODO replace with enum
 enum APIOffsets_Hint {
     receivingPlayer = 0,
     findingPlayer = 1,

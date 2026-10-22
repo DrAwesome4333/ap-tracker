@@ -12,6 +12,8 @@ import {
 } from "./tagManager";
 import { OptionManager } from "../options/optionManager";
 
+type HintStatus = (typeof API.hintStatuses)[keyof typeof API.hintStatuses];
+
 const baseHint: {
     entity_type: TagEntityType;
     priority: number;
@@ -28,7 +30,7 @@ const baseHint: {
 };
 
 const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
-    [API.HintStatus.unspecified]: [
+    [API.hintStatuses.unspecified]: [
         {
             ...baseHint,
             type_id: "hint_unspecified",
@@ -41,7 +43,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             },
         },
     ],
-    [API.HintStatus.no_priority]: [
+    [API.hintStatuses.noPriority]: [
         {
             ...baseHint,
             type_id: "hint_no_priority",
@@ -54,7 +56,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             },
         },
     ],
-    [API.HintStatus.avoid]: [
+    [API.hintStatuses.avoid]: [
         {
             ...baseHint,
             type_id: "hint_avoid",
@@ -64,7 +66,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             counter_id: "hint_avoid",
         },
     ],
-    [API.HintStatus.priority]: [
+    [API.hintStatuses.priority]: [
         {
             ...baseHint,
             type_id: "hint_priority",
@@ -74,7 +76,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             counter_id: "hint_priority",
         },
     ],
-    [API.HintStatus.found]: [
+    [API.hintStatuses.found]: [
         {
             ...baseHint,
             type_id: "hint_found",
@@ -142,23 +144,23 @@ const hintCounter_found: TagCounterV2 = {
 
 const nameToStatus = [
     {
-        status: API.HintStatus.unspecified,
+        status: API.hintStatuses.unspecified,
         name: "unspecified",
     },
     {
-        status: API.HintStatus.no_priority,
+        status: API.hintStatuses.noPriority,
         name: "no_priority",
     },
     {
-        status: API.HintStatus.priority,
+        status: API.hintStatuses.priority,
         name: "priority",
     },
     {
-        status: API.HintStatus.avoid,
+        status: API.hintStatuses.avoid,
         name: "avoid",
     },
     {
-        status: API.HintStatus.found,
+        status: API.hintStatuses.found,
         name: "found",
     },
 ];
@@ -168,11 +170,11 @@ class HintTagger implements TagSource {
     #hintTags: Map<TagId, TagDataV2> = new Map();
     #hints: Map<
         number,
-        { location: number; text: string; status: API.HintStatus }
+        { location: number; text: string; status: HintStatus }
     > = new Map();
     #locationToTag: Map<number, TagId> = new Map();
-    #allowHintTypes: Set<API.HintStatus> = new Set();
-    #countedHintTypes: Set<API.HintStatus> = new Set();
+    #allowHintTypes: Set<HintStatus> = new Set();
+    #countedHintTypes: Set<HintStatus> = new Set();
     #updateCallbacks: Set<
         (tagChanges: { updated?: TagDataV2[]; removed?: TagId[] }) => void
     > = new Set();
@@ -251,7 +253,7 @@ class HintTagger implements TagSource {
     };
 
     addHints = (
-        hints: { location: number; text: string; status: API.HintStatus }[]
+        hints: { location: number; text: string; status: HintStatus }[]
     ) => {
         hints.forEach((hint) => {
             this.#hints.set(hint.location, hint);
@@ -259,7 +261,7 @@ class HintTagger implements TagSource {
         this.#refreshHints();
     };
 
-    addHint = (location: number, text: string, status: API.HintStatus) => {
+    addHint = (location: number, text: string, status: HintStatus) => {
         this.addHints([{ location, text, status }]);
     };
 
