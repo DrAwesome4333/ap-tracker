@@ -27,6 +27,13 @@ type TypeAheadProps = {
     loading?: boolean;
 } & Omit<ComponentProps<"input">, "type" | "onSelect">;
 
+const suggestionCap = 100;
+
+/**
+ * Textbox with suggestions
+ * @param param0
+ * @returns
+ */
 const TypeAhead = ({
     ref,
     loading,
@@ -44,6 +51,9 @@ const TypeAhead = ({
     const [previousSuggestions, setPreviousSuggestions] =
         useState<TypeAheadSuggestion[]>();
     const [suggestionIndex, setSuggestionIndex] = useState<number>(-1);
+    const [hasFocus, setHasFocus] = useState(false);
+    const showSuggestions = (suggestions.length > 0 || loading) && hasFocus;
+    const containerRef = useRef<HTMLDivElement>(null);
 
     if (previousSuggestions !== suggestions) {
         setPreviousSuggestions(suggestions);
@@ -72,12 +82,14 @@ const TypeAhead = ({
 
     const buttonOnKeyDown: KeyboardEventHandler<HTMLButtonElement> = (e) => {
         if (suggestionIndex > 0 && e.key === "ArrowUp") {
+            e.preventDefault();
             setSuggestionIndex(suggestionIndex - 1);
             buttonRefs.current[suggestionIndex - 1]?.focus();
         } else if (
-            suggestionIndex < suggestions.length - 1 &&
+            suggestionIndex < Math.min(suggestions.length, suggestionCap) - 1 &&
             e.key === "ArrowDown"
         ) {
+            e.preventDefault();
             setSuggestionIndex(suggestionIndex + 1);
             buttonRefs.current[suggestionIndex + 1]?.focus();
         }
@@ -91,6 +103,21 @@ const TypeAhead = ({
                     alignItems: "center",
                     position: "relative",
                     ...style,
+                }}
+                ref={containerRef}
+                onBlur={() => {
+                    requestAnimationFrame(() => {
+                        if (
+                            !containerRef.current?.contains(
+                                document.activeElement
+                            )
+                        ) {
+                            setHasFocus(false);
+                        }
+                    });
+                }}
+                onFocus={() => {
+                    setHasFocus(true);
                 }}
             >
                 <div
@@ -133,14 +160,14 @@ const TypeAhead = ({
                         }}
                     />
                 </div>
-                {(suggestions.length > 0 || loading) && (
+                {showSuggestions && (
                     <div
                         style={{
                             position: "absolute",
                             width: "100%",
-                            bottom: "100%",
+                            bottom: "calc(100% + 0.5em)",
                             maxHeight: "10vh",
-                            overflow: "auto",
+                            minHeight: "24px",
                             background: "var(--background-level-2)",
                             boxShadow: "var(--box-shadow)",
                         }}
@@ -150,37 +177,52 @@ const TypeAhead = ({
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "100%",
+                                    height: "100%",
+                                    position: "absolute",
+                                    backdropFilter: "blur(2px)",
                                 }}
                             >
-                                <Spinner style={{ height: "18px" }} />
+                                <Spinner style={{ height: "24px" }} />
                             </div>
                         )}
-                        {suggestions.slice(0, 50).map((s, index) => (
-                            <div key={s.key}>
-                                <TextButton
-                                    ref={(element) => {
-                                        buttonRefs.current[index] =
-                                            element ?? null;
-                                    }}
-                                    onClick={() => {
-                                        onSelect?.(s.value);
-                                        document
-                                            .getElementById(inputId)
-                                            ?.focus();
-                                    }}
-                                    onKeyDown={buttonOnKeyDown}
-                                >
-                                    {s.display ?? s.value}
-                                </TextButton>
-                            </div>
-                        ))}
-                        {suggestions.length > 100 && (
-                            <div>
-                                <i style={{ color: tertiary }}>
-                                    Limit reached, search to refine results
-                                </i>
-                            </div>
-                        )}
+                        <div style={{ overflow: "auto", maxHeight: "10vh" }}>
+                            {suggestions
+                                .slice(0, suggestionCap)
+                                .map((s, index) => (
+                                    <div key={s.key}>
+                                        <TextButton
+                                            ref={(element) => {
+                                                buttonRefs.current[index] =
+                                                    element ?? null;
+                                            }}
+                                            onClick={() => {
+                                                onSelect?.(s.value);
+                                                document
+                                                    .getElementById(inputId)
+                                                    ?.focus();
+                                                setSuggestionIndex(-1);
+                                            }}
+                                            onKeyDown={buttonOnKeyDown}
+                                            style={{
+                                                width: "100%",
+                                                borderBottom:
+                                                    "1px solid var(--background-level-0)",
+                                            }}
+                                        >
+                                            {s.display ?? s.value}
+                                        </TextButton>
+                                    </div>
+                                ))}
+                            {suggestions.length > suggestionCap && (
+                                <div>
+                                    <i style={{ color: tertiary }}>
+                                        Limit reached, search to refine results
+                                    </i>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

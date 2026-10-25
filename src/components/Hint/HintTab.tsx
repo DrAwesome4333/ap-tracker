@@ -120,7 +120,7 @@ const HintTab = () => {
                 height: "100%",
                 display: "grid",
                 gap: "0.25em",
-                gridTemplateRows: "3em 1fr 3em",
+                gridTemplateRows: `3em 1fr ${showNewHintSection ? "3em" : ""}`,
                 overflow: "hidden",
             }}
         >
@@ -187,7 +187,6 @@ const HintTab = () => {
                         onSelect={(value) => {
                             setHintInputText(value);
                             setPredictionsLoading(false);
-                            setHintPredictions([]);
                             predictionAbortController.current?.abort();
                         }}
                         onChange={(e) => {

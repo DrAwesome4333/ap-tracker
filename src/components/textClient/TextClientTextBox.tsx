@@ -117,7 +117,6 @@ const TextClientTextBox = () => {
                 value={inputText}
                 onSelect={(value: string) => {
                     setInputText(value);
-                    setPredictions([]);
                 }}
                 style={{
                     flexGrow: 1,

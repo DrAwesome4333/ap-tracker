@@ -135,7 +135,6 @@ const itemSearchAsync = async (
     signal: AbortSignal
 ) => {
     const itemNames = multiWorldContext.gamePackages[game]?.getAllItemNames();
-    console.log(multiWorldContext.gamePackages[game].getItemGroups());
     if (!includeGroups) {
         return await fuzzyMatchSortAsync(itemNames, input, signal);
     }
