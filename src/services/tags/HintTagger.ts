@@ -1,4 +1,3 @@
-import { API } from "archipelago.js";
 import { randomNumericId } from "../../utility/uuid";
 import {
     TagCounterV2,
@@ -11,8 +10,7 @@ import {
     TagTypeV2Data,
 } from "./tagManager";
 import { OptionManager } from "../options/optionManager";
-
-type HintStatus = (typeof API.hintStatuses)[keyof typeof API.hintStatuses];
+import { HintStatus } from "../../constants/apConstants";
 
 const baseHint: {
     entity_type: TagEntityType;
@@ -29,8 +27,8 @@ const baseHint: {
     ],
 };
 
-const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
-    [API.hintStatuses.unspecified]: [
+const hintTagTypes: Record<HintStatus, TagTypeV2Data[]> = {
+    [HintStatus.unspecified]: [
         {
             ...baseHint,
             type_id: "hint_unspecified",
@@ -43,7 +41,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             },
         },
     ],
-    [API.hintStatuses.noPriority]: [
+    [HintStatus.noPriority]: [
         {
             ...baseHint,
             type_id: "hint_no_priority",
@@ -56,7 +54,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             },
         },
     ],
-    [API.hintStatuses.avoid]: [
+    [HintStatus.avoid]: [
         {
             ...baseHint,
             type_id: "hint_avoid",
@@ -66,7 +64,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             counter_id: "hint_avoid",
         },
     ],
-    [API.hintStatuses.priority]: [
+    [HintStatus.priority]: [
         {
             ...baseHint,
             type_id: "hint_priority",
@@ -76,7 +74,7 @@ const hintTagTypes: { [status: number]: TagTypeV2Data[] } = {
             counter_id: "hint_priority",
         },
     ],
-    [API.hintStatuses.found]: [
+    [HintStatus.found]: [
         {
             ...baseHint,
             type_id: "hint_found",
@@ -144,23 +142,23 @@ const hintCounter_found: TagCounterV2 = {
 
 const nameToStatus = [
     {
-        status: API.hintStatuses.unspecified,
+        status: HintStatus.unspecified,
         name: "unspecified",
     },
     {
-        status: API.hintStatuses.noPriority,
+        status: HintStatus.noPriority,
         name: "no_priority",
     },
     {
-        status: API.hintStatuses.priority,
+        status: HintStatus.priority,
         name: "priority",
     },
     {
-        status: API.hintStatuses.avoid,
+        status: HintStatus.avoid,
         name: "avoid",
     },
     {
-        status: API.hintStatuses.found,
+        status: HintStatus.found,
         name: "found",
     },
 ];

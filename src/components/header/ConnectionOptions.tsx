@@ -18,6 +18,9 @@ import Icon from "../icons/icons";
 import { copyToClipboard } from "../../utility/clipboard";
 import MultiWorldContext from "../../contexts/multiWorldContext";
 import useOption from "../../hooks/optionHook";
+import useRoomOptions from "../../hooks/roomOptionsHook";
+import { PermissionDescription } from "../../constants/apConstants";
+import useHintPoints from "../../hooks/hintPointsHook";
 
 const ConnectionOptions = ({
     open,
@@ -30,6 +33,8 @@ const ConnectionOptions = ({
     const connector = services.connector;
     const connectionStatus = useAPConnectionStatus();
     const currentPage = useCurrentActivity();
+    const roomOptions = useRoomOptions();
+    const hintPoints = useHintPoints();
 
     const slotContext = useContext(SlotContext);
     const multiWorldContext = useContext(MultiWorldContext);
@@ -165,6 +170,51 @@ const ConnectionOptions = ({
                                 {multiWorld?.connection_details.port}{" "}
                                 <Icon type="content_copy" fontSize="1rem" />
                             </TextButton>
+                        </div>
+                        <hr style={{ width: "100%" }} />
+                        <div>
+                            Available Hints:{" "}
+                            {!roomOptions
+                                ? "--"
+                                : roomOptions.hintCost
+                                  ? Math.floor(
+                                        hintPoints / roomOptions.hintCost
+                                    )
+                                  : "unlimited"}
+                        </div>
+                        <div>Hint Points: {hintPoints}</div>
+                        <div>
+                            Hint Cost: {roomOptions?.hintCostPercent ?? "--"}% /{" "}
+                            {roomOptions?.hintCost ?? "--"} points
+                        </div>
+                        <div>
+                            Hint Points Per Location:{" "}
+                            {roomOptions?.locationCheckPoints ?? "--"}
+                        </div>
+                        <hr style={{ width: "100%" }} />
+                        <div>
+                            Release:{" "}
+                            {PermissionDescription[roomOptions?.releaseMode] ??
+                                "--"}
+                        </div>
+                        <div>
+                            Collect:{" "}
+                            {PermissionDescription[roomOptions?.collectMode] ??
+                                "--"}
+                        </div>
+                        <div>
+                            Remaining:{" "}
+                            {PermissionDescription[
+                                roomOptions?.remainingMode
+                            ] ?? "--"}
+                        </div>
+                        <div>
+                            Password:{" "}
+                            {roomOptions
+                                ? roomOptions.password
+                                    ? "yes"
+                                    : "no"
+                                : "--"}
                         </div>
                     </>
                 )}

@@ -1,4 +1,4 @@
-import { MultiWorldContextData } from "../../../services/MultiInfo/MultiWorldContextData";
+import { MultiWorldContextData } from "../MultiInfo/MultiWorldContextData";
 import { fuzzyMatchScore } from "./FuzzyMatcher";
 
 const fuzzyMatchSort = (items: string[], input: string) => {

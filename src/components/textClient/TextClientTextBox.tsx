@@ -12,7 +12,7 @@ import { Input } from "../inputs";
 import { useTextClientHistory } from "../../hooks/textClientHook";
 import Spinner from "../icons/spinner";
 import MultiWorldContext from "../../contexts/multiWorldContext";
-import { autoComplete } from "./AutoComplete/AutoComplete";
+import { autoComplete } from "../../services/AutoComplete/AutoComplete";
 import { TypeAhead } from "../shared/TypeAhead";
 
 const TextClientTextBox = () => {

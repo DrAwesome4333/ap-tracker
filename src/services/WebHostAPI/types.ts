@@ -1,3 +1,5 @@
+import { HintStatus, ClientStatus } from "../../constants/apConstants";
+
 type APIGamePackage = {
     checksum: string;
     item_name_groups: Record<string, string[]>;
@@ -43,7 +45,6 @@ type ReceivingPlayer = number;
 type FindingPlayer = number;
 type HintFound = number;
 type Entrance = string;
-type HintStatus = 0 | 10 | 20 | 30 | 40; // TODO replace with enum
 enum APIOffsets_Hint {
     receivingPlayer = 0,
     findingPlayer = 1,
@@ -64,7 +65,6 @@ type APIHint = [
     ItemFlags,
     HintStatus,
 ];
-type ClientStatus = number; // TODO replace with enum
 
 type APITracker = {
     aliases: {

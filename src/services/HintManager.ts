@@ -1,12 +1,11 @@
-import { Client, Hint as APJS_Hint, API } from "archipelago.js";
+import { Client, Hint as APJS_Hint } from "archipelago.js";
 import HintTagger from "./tags/HintTagger";
 import {
     MultiWorldContextData,
     MultiWorldContextHelper,
 } from "./MultiInfo/MultiWorldContextData";
 import { APIHint, APIOffsets_Hint, APITracker } from "./WebHostAPI/types";
-
-type HintStatus = (typeof API.hintStatuses)[keyof typeof API.hintStatuses];
+import { HintStatus } from "../constants/apConstants";
 
 const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
     let ownerString = `${MultiWorldContextHelper.getSlotName(multiWorldContext, hint.receivingPlayer)}'s`;
@@ -23,15 +22,15 @@ const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
             ? `(${hint.entrance})`
             : "";
     const priorityString =
-        hint.status === API.hintStatuses.unspecified
+        hint.status === HintStatus.unspecified
             ? "Unspecified"
-            : hint.status === API.hintStatuses.noPriority
+            : hint.status === HintStatus.noPriority
               ? "No Priority"
-              : hint.status === API.hintStatuses.avoid
+              : hint.status === HintStatus.avoid
                 ? "Avoid"
-                : hint.status === API.hintStatuses.priority
+                : hint.status === HintStatus.priority
                   ? "Priority"
-                  : hint.status === API.hintStatuses.found
+                  : hint.status === HintStatus.found
                     ? "Found"
                     : "Unknown Priority";
     const itemName = MultiWorldContextHelper.getItemName(

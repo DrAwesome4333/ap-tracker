@@ -1,7 +1,7 @@
 import {
     MultiWorldContextData,
     MultiWorldContextHelper,
-} from "../../../services/MultiInfo/MultiWorldContextData";
+} from "../MultiInfo/MultiWorldContextData";
 import { parseCommandString } from "./CommandParser";
 import { escapeArg } from "./Escape";
 import { itemSearchAsync, locationSearchAsync, playerSearch } from "./Search";
@@ -464,4 +464,13 @@ const autoComplete = async (
         : [];
 };
 
-export { autoComplete };
+const hintAutoComplete = async (
+    input: string,
+    game: string,
+    context: MultiWorldContextData,
+    signal: AbortSignal
+) => {
+    return await itemSearchAsync(input, game, context, true, signal);
+};
+
+export { autoComplete, hintAutoComplete };

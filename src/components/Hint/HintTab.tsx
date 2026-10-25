@@ -1,4 +1,4 @@
-import { useContext, useId, useState } from "react";
+import { useCallback, useContext, useId, useRef, useState } from "react";
 import PanelHeader from "../shared/PanelHeader";
 import HintTable from "./HintTable";
 import ServiceContext from "../../contexts/serviceContext";
@@ -8,9 +8,22 @@ import { PrimaryButton } from "../shared/buttons";
 import Icon from "../icons/icons";
 import { HintFilter, optionScope } from "./HintOptionDef";
 import { Input } from "../inputs";
+import MultiWorldContext, {
+    MultiWorldConnectionMode,
+} from "../../contexts/multiWorldContext";
+import { hintAutoComplete } from "../../services/AutoComplete/AutoComplete";
+import { MultiWorldContextHelper } from "../../services/MultiInfo/MultiWorldContextData";
+import { TypeAhead } from "../shared/TypeAhead";
+import useRoomOptions from "../../hooks/roomOptionsHook";
+import useHintPoints from "../../hooks/hintPointsHook";
+import Spinner from "../icons/spinner";
 
 const HintTab = () => {
     const services = useContext(ServiceContext);
+    const multiWorldContext = useContext(MultiWorldContext);
+    const textClientManager = services.textClientManager;
+    const roomOptions = useRoomOptions();
+    const hintPoints = useHintPoints();
     const filters: HintFilter = useOption(
         services.optionManager,
         "HintTabFilters",
@@ -20,6 +33,84 @@ const HintTab = () => {
     const [searchKey, setSearchKey] = useState("");
     const [searchFilterMode, setSearchFilterMode] = useState("location");
     const dropdownId = useId();
+    const showNewHintSection =
+        multiWorldContext.trackedSlot !== undefined &&
+        textClientManager &&
+        multiWorldContext.connectionMode === MultiWorldConnectionMode.Server;
+    const [hintInputText, setHintInputText] = useState("");
+    const [hintSending, setHintSending] = useState(false);
+    const [hintPredictions, setHintPredictions] = useState<string[]>([]);
+    const predictionAbortController = useRef<AbortController>(null);
+    const [predictionsLoading, setPredictionsLoading] =
+        useState<boolean>(false);
+
+    const sendHint = () => {
+        if (
+            textClientManager &&
+            services.connector &&
+            hintInputText &&
+            !hintSending
+        ) {
+            setHintSending(true);
+            textClientManager
+                .processInput(
+                    `!hint ${hintInputText}`,
+                    services.connector.client
+                )
+                .finally(() => setHintSending(false));
+            setHintInputText("");
+            setHintPredictions([]);
+            setPredictionsLoading(false);
+            predictionAbortController?.current.abort();
+        }
+    };
+
+    const predictHint = (text: string) => {
+        if (predictionAbortController.current) {
+            predictionAbortController.current.abort();
+        }
+        if (!text) {
+            setPredictionsLoading(false);
+            setHintPredictions([]);
+            return;
+        }
+        const abortController = new AbortController();
+        predictionAbortController.current = abortController;
+        setPredictionsLoading(true);
+        hintAutoComplete(
+            text,
+            MultiWorldContextHelper.getSlotGame(
+                multiWorldContext,
+                multiWorldContext.trackedSlot
+            ),
+            multiWorldContext,
+            abortController.signal
+        )
+            .then((results) => {
+                if (!abortController.signal.aborted) {
+                    setHintPredictions(results);
+                }
+            })
+            .catch((e) => {
+                if (
+                    e.message !== "Aborted" &&
+                    !abortController.signal.aborted
+                ) {
+                    console.error(e);
+                }
+            })
+            .finally(() => {
+                if (!abortController.signal.aborted) {
+                    setPredictionsLoading(false);
+                }
+            });
+    };
+
+    const availableHintCount = !roomOptions
+        ? 0
+        : roomOptions?.hintCost
+          ? Math.floor(hintPoints / roomOptions.hintCost)
+          : 1;
 
     return (
         <div
@@ -29,7 +120,7 @@ const HintTab = () => {
                 height: "100%",
                 display: "grid",
                 gap: "0.25em",
-                gridTemplateRows: "3em 1fr",
+                gridTemplateRows: "3em 1fr 3em",
                 overflow: "hidden",
             }}
         >
@@ -64,6 +155,69 @@ const HintTab = () => {
                 searchKey={searchKey}
                 searchFilterMode={searchFilterMode}
             />
+            {showNewHintSection && (
+                <div
+                    style={{
+                        display: "flex",
+                        padding: "0 0.5em 0.25em 0",
+                        alignItems: "center",
+                    }}
+                >
+                    <PrimaryButton
+                        small
+                        onClick={sendHint}
+                        disabled={availableHintCount < 1 || hintSending}
+                    >
+                        {hintSending ? (
+                            <Spinner style={{ height: "18px" }} />
+                        ) : (
+                            "Hint"
+                        )}
+                    </PrimaryButton>
+                    <TypeAhead
+                        style={{
+                            flexGrow: 1,
+                        }}
+                        loading={predictionsLoading}
+                        suggestions={hintPredictions.map((value) => ({
+                            value,
+                            key: value,
+                        }))}
+                        value={hintInputText}
+                        onSelect={(value) => {
+                            setHintInputText(value);
+                            setPredictionsLoading(false);
+                            setHintPredictions([]);
+                            predictionAbortController.current?.abort();
+                        }}
+                        onChange={(e) => {
+                            setHintInputText(e.target.value);
+                            predictHint(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                sendHint();
+                            }
+                        }}
+                    />
+                    <div
+                        style={{
+                            textAlign: "center",
+                            paddingLeft: "0.5em",
+                        }}
+                    >
+                        {" "}
+                        {roomOptions?.hintCost > 0 ? (
+                            <div>
+                                {Math.max(availableHintCount, 0)}
+                                <br /> available
+                            </div>
+                        ) : (
+                            "Free"
+                        )}{" "}
+                    </div>
+                </div>
+            )}
             <HintFilterModal
                 open={showFilterModal}
                 onClose={() => setShowFilterModal(false)}
