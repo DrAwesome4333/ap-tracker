@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
 import { EchoMessageNode } from "../../services/textClientManager";
