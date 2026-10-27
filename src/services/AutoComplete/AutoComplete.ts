@@ -134,7 +134,6 @@ const sendMultipleComplete = async (
         }
     }
     playerSlot = MultiWorldContextHelper.getSlotNumber(context, input[2]);
-    console.log(playerSlot);
     if (playerSlot && playerSlot > 0) {
         const game = MultiWorldContextHelper.getSlotGame(context, playerSlot);
         const itemSearchText = input.slice(3).join(" ") ?? "";

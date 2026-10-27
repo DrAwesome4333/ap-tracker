@@ -194,7 +194,6 @@ class APConnector implements LocationSource, ItemSource {
             Object.freeze(newOptions);
         }
         this.#roomOptions = newOptions;
-        console.log("room refreshed");
         this.#roomOptionCallbacks.forEach((callback) => callback(newOptions));
     };
 
