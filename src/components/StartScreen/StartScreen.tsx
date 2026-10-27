@@ -43,7 +43,7 @@ const StartScreen = () => {
                         const newUrl = window?.location
                             ? new URL(window?.location.href)
                             : null;
-                        console.log(newUrl, connectedEvent, putSlotInfoInUrl);
+                        // console.log(newUrl, connectedEvent, putSlotInfoInUrl);
                         if (
                             newUrl &&
                             connectedEvent.multiWorldId &&

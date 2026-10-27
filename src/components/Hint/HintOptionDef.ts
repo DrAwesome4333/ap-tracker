@@ -1,4 +1,3 @@
-import { API } from "archipelago.js";
 import { HierarchicalOption } from "../../services/options/option";
 import { OptionType } from "../../services/options/optionEnums";
 import { TempDataStore } from "../../services/dataStores";
@@ -6,6 +5,7 @@ import {
     globalOptionManager,
     setOptionDefaults,
 } from "../../services/options/optionManager";
+import { HintStatus } from "../../constants/apConstants";
 type HintFilter = {
     own: string[];
     status: string[];
@@ -13,11 +13,11 @@ type HintFilter = {
 };
 
 const statusToText = {
-    [API.HintStatus.unspecified]: "Unspecified",
-    [API.HintStatus.no_priority]: "No Priority",
-    [API.HintStatus.avoid]: "Avoid",
-    [API.HintStatus.priority]: "Priority",
-    [API.HintStatus.found]: "Found",
+    [HintStatus.unspecified]: "Unspecified",
+    [HintStatus.noPriority]: "No Priority",
+    [HintStatus.avoid]: "Avoid",
+    [HintStatus.priority]: "Priority",
+    [HintStatus.found]: "Found",
 };
 const optionScope = "HintTab_temp";
 const optionDef: HierarchicalOption = {

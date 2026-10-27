@@ -1,6 +1,5 @@
-import { API } from "archipelago.js";
 import { Hint, hintToText } from "../../services/HintManager";
-import React, { forwardRef, useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
 import ap_styles from "../sharedStyles/archipelago.module.css";
@@ -15,26 +14,27 @@ import {
 import MultiWorldContext from "../../contexts/multiWorldContext";
 import ServiceContext from "../../contexts/serviceContext";
 import { copyToClipboard } from "../../utility/clipboard";
+import { HintStatus, ItemClassification } from "../../constants/apConstants";
 
 const statusSelections = [
-    API.HintStatus.priority,
-    API.HintStatus.avoid,
-    API.HintStatus.no_priority,
-    API.HintStatus.unspecified,
+    HintStatus.priority,
+    HintStatus.avoid,
+    HintStatus.noPriority,
+    HintStatus.unspecified,
 ];
 const statusToText = {
-    [API.HintStatus.unspecified]: "Unspecified",
-    [API.HintStatus.no_priority]: "No Priority",
-    [API.HintStatus.avoid]: "Avoid",
-    [API.HintStatus.priority]: "Priority",
-    [API.HintStatus.found]: "Found",
+    [HintStatus.unspecified]: "Unspecified",
+    [HintStatus.noPriority]: "No Priority",
+    [HintStatus.avoid]: "Avoid",
+    [HintStatus.priority]: "Priority",
+    [HintStatus.found]: "Found",
 };
 const hintStatusToClassMap: { [status: number]: string } = {
-    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
-    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
-    [API.HintStatus.avoid]: ap_styles.hint_avoid,
-    [API.HintStatus.priority]: ap_styles.hint_priority,
-    [API.HintStatus.found]: ap_styles.hint_found,
+    [HintStatus.noPriority]: ap_styles.hint_no_priority,
+    [HintStatus.unspecified]: ap_styles.hint_unspecified,
+    [HintStatus.avoid]: ap_styles.hint_avoid,
+    [HintStatus.priority]: ap_styles.hint_priority,
+    [HintStatus.found]: ap_styles.hint_found,
 };
 
 const getPlayerClass = (
@@ -63,13 +63,13 @@ const getPlayerClass = (
 
 const getItemClass = (itemFlags: number) => {
     const special =
-        itemFlags & API.itemClassifications.progression
-            ? itemFlags & API.itemClassifications.useful
+        itemFlags & ItemClassification.progression
+            ? itemFlags & ItemClassification.useful
                 ? ap_styles.item_prog_useful
                 : ap_styles.item_prog
-            : itemFlags & API.itemClassifications.useful
+            : itemFlags & ItemClassification.useful
               ? ap_styles.item_useful
-              : itemFlags & API.itemClassifications.trap
+              : itemFlags & ItemClassification.trap
                 ? ap_styles.item_trap
                 : ap_styles.item_normal;
     return special + " " + ap_styles.ap_text;
@@ -96,7 +96,7 @@ const HintRow = ({
                 hint.receivingPlayer
             )
         ) &&
-        hint.status !== API.HintStatus.found &&
+        hint.status !== HintStatus.found &&
         slotContext.liveSlot;
     const [updateInProgress, setUpdateInProgress] = useState(false);
     const finishUpdate = useCallback(() => {
@@ -211,7 +211,7 @@ const HintRow = ({
                                 serviceContext.hintManager
                                     .updateHintStatus(
                                         hint,
-                                        parseInt(e.target.value)
+                                        parseInt(e.target.value) as HintStatus
                                     )
                                     .then(finishUpdate);
                             }

@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { API, MessageNode } from "archipelago.js";
+import { useContext } from "react";
+import { MessageNode } from "archipelago.js";
 import * as colors from "../../constants/colors";
 import { EchoMessageNode } from "../../services/textClientManager";
 import ap_styles from "../sharedStyles/archipelago.module.css";
@@ -8,12 +8,13 @@ import {
     MultiWorldContextHelper,
     SlotRelevance,
 } from "../../services/MultiInfo/MultiWorldContextData";
-const hintStatusToClassMap: { [status: number]: string } = {
-    [API.HintStatus.no_priority]: ap_styles.hint_no_priority,
-    [API.HintStatus.unspecified]: ap_styles.hint_unspecified,
-    [API.HintStatus.avoid]: ap_styles.hint_avoid,
-    [API.HintStatus.priority]: ap_styles.hint_priority,
-    [API.HintStatus.found]: ap_styles.hint_found,
+import { HintStatus } from "../../constants/apConstants";
+const hintStatusToClassMap: Record<HintStatus, string> = {
+    [HintStatus.noPriority]: ap_styles.hint_no_priority,
+    [HintStatus.unspecified]: ap_styles.hint_unspecified,
+    [HintStatus.avoid]: ap_styles.hint_avoid,
+    [HintStatus.priority]: ap_styles.hint_priority,
+    [HintStatus.found]: ap_styles.hint_found,
 };
 
 const MessagePart = ({ part }: { part: MessageNode | EchoMessageNode }) => {

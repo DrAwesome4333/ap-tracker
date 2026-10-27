@@ -28,6 +28,7 @@ import {
 } from "../MultiInfo/MultiWorldContextData";
 import { globalOptionManager } from "../options/optionManager";
 import { APIRoomStatus, RoomInfo } from "../WebHostAPI/types";
+import { RoomOptions } from "../../contexts/roomOptionsContext";
 
 interface ConnectionConfiguration {
     host?: string;
@@ -113,9 +114,13 @@ class APConnector implements LocationSource, ItemSource {
     #connectedCallbacks: Set<(params: ConnectedEventParams) => void> =
         new Set();
     #locationCallbacks: Set<LocationUpdateCallback> = new Set();
+    #hintPointCallbacks: Set<(points: number) => void> = new Set();
     #itemCallbacks: Set<ItemUpdateCallback> = new Set();
+    #roomOptionCallbacks: Set<(options: RoomOptions) => void> = new Set();
     #locations: Map<LocationId, LocationStatus> = new Map();
     #items: Map<number, Item> = new Map();
+    #roomOptions: RoomOptions = null;
+    #hintPoints = 0;
     #hintManager: HintManager;
 
     constructor({ textClientManager, hintManager }: APConnectorParams) {
@@ -136,7 +141,9 @@ class APConnector implements LocationSource, ItemSource {
         this.#clientUuid = uuid;
         this.client.package.setCache(DataPackageHelper);
         this.client.socket.on("disconnected", this.#disconnectCallback);
+        this.client.socket.on("roomUpdate", this.#refreshRoomOptions);
 
+        this.client.room.on("hintPointsUpdated", this.#refreshHintPoints);
         this.client.room.on("locationsChecked", (locationIds) => {
             const locations: LocationStatusUpdate[] = locationIds.map((id) => ({
                 locationId: id,
@@ -171,6 +178,36 @@ class APConnector implements LocationSource, ItemSource {
         this.#hintManager = hintManager;
     }
 
+    #refreshRoomOptions = () => {
+        let newOptions: RoomOptions = null;
+        if (this.client.socket.connected) {
+            const room = this.client.room;
+            newOptions = {
+                releaseMode: room.permissions.release,
+                collectMode: room.permissions.collect,
+                remainingMode: room.permissions.remaining,
+                hintCost: room.hintCost,
+                hintCostPercent: room.hintCostPercentage,
+                password: room.password,
+                locationCheckPoints: room.locationCheckPoints,
+            };
+            Object.freeze(newOptions);
+        }
+        this.#roomOptions = newOptions;
+        this.#roomOptionCallbacks.forEach((callback) => callback(newOptions));
+    };
+
+    #refreshHintPoints = () => {
+        if (this.client.authenticated) {
+            this.#hintPoints = this.client.room.hintPoints;
+        } else {
+            this.#hintPoints = 0;
+        }
+        this.#hintPointCallbacks.forEach((callback) =>
+            callback(this.#hintPoints)
+        );
+    };
+
     #setStatus = (newStatus: ConnectionStatus) => {
         if (newStatus === this.status) {
             return;
@@ -192,6 +229,24 @@ class APConnector implements LocationSource, ItemSource {
             this.#connectedCallbacks.delete(callback);
         };
     };
+
+    roomOptionUpdateHook = (callback: (options: RoomOptions) => void) => {
+        this.#roomOptionCallbacks.add(callback);
+        return () => {
+            this.#roomOptionCallbacks.delete(callback);
+        };
+    };
+
+    roomOptions = () => this.#roomOptions;
+
+    hintPointUpdateHook = (callback: (points: number) => void) => {
+        this.#hintPointCallbacks.add(callback);
+        return () => {
+            this.#hintPointCallbacks.delete(callback);
+        };
+    };
+
+    hintPoints = () => this.#hintPoints;
 
     connect = async (
         config: ConnectionConfiguration
@@ -409,7 +464,6 @@ class APConnector implements LocationSource, ItemSource {
                     };
                 }
 
-                // resolve(MultiWorldService.getSlot(multiSlot.multi_save_id, slotNumber));
                 // update time stamp
                 MultiWorldService.updateSlot(
                     multiSlot.multi_save_id,
@@ -520,14 +574,12 @@ class APConnector implements LocationSource, ItemSource {
                     item: { [name: string]: string[] };
                     location: { [name: string]: string[] };
                 }> => {
-                    // @ts-expect-error, typing error in archipelago.js
                     const locationGroups: { [groupName: string]: string[] } =
                         await this.client.storage
                             .fetchLocationNameGroups(game)
                             .then(
                                 (a) => a[`_read_location_name_groups_${game}`]
                             );
-                    // @ts-expect-error, typing error in archipelago.js
                     const itemGroups: { [groupName: string]: string[] } =
                         await this.client.storage
                             .fetchItemNameGroups(game)
@@ -618,6 +670,8 @@ class APConnector implements LocationSource, ItemSource {
                     type: MessageType.success,
                     progress: 1,
                 });
+                this.#refreshHintPoints();
+                this.#refreshRoomOptions();
                 return result;
             })
             .catch((error) => {
@@ -694,6 +748,8 @@ ${wssRequired ? "\n\nNote this version of the app requires secure websockets (ws
     #disconnectCallback = () => {
         this.#locations.clear();
         this.#items.clear();
+        this.#refreshHintPoints();
+        this.#refreshRoomOptions();
         this.#setStatus(ConnectionStatus.disconnected);
     };
 
@@ -728,6 +784,7 @@ ${wssRequired ? "\n\nNote this version of the app requires secure websockets (ws
     };
 
     #updateLocations = (updates: LocationStatusUpdate[]) => {
+        let locationCountsUpdated = true;
         updates.forEach((update) => {
             const oldStatus = this.#locations.get(update.locationId) ?? {
                 locationId: update.locationId,
@@ -739,6 +796,12 @@ ${wssRequired ? "\n\nNote this version of the app requires secure websockets (ws
                 ...oldStatus,
                 ...update,
             };
+            if (!oldStatus.checked && newStatus.checked) {
+                locationCountsUpdated = true;
+            }
+            if (!this.#locations.has(newStatus.locationId)) {
+                locationCountsUpdated = true;
+            }
             this.#locations.set(newStatus.locationId, newStatus);
             Object.freeze(newStatus);
         });

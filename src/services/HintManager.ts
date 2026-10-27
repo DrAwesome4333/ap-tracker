@@ -1,10 +1,11 @@
-import { Client, Hint as APJS_Hint, API } from "archipelago.js";
+import { Client, Hint as APJS_Hint } from "archipelago.js";
 import HintTagger from "./tags/HintTagger";
 import {
     MultiWorldContextData,
     MultiWorldContextHelper,
 } from "./MultiInfo/MultiWorldContextData";
 import { APIHint, APIOffsets_Hint, APITracker } from "./WebHostAPI/types";
+import { HintStatus } from "../constants/apConstants";
 
 const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
     let ownerString = `${MultiWorldContextHelper.getSlotName(multiWorldContext, hint.receivingPlayer)}'s`;
@@ -21,15 +22,15 @@ const hintToText = (multiWorldContext: MultiWorldContextData, hint: Hint) => {
             ? `(${hint.entrance})`
             : "";
     const priorityString =
-        hint.status === API.HintStatus.unspecified
+        hint.status === HintStatus.unspecified
             ? "Unspecified"
-            : hint.status === API.HintStatus.no_priority
+            : hint.status === HintStatus.noPriority
               ? "No Priority"
-              : hint.status === API.HintStatus.avoid
+              : hint.status === HintStatus.avoid
                 ? "Avoid"
-                : hint.status === API.HintStatus.priority
+                : hint.status === HintStatus.priority
                   ? "Priority"
-                  : hint.status === API.HintStatus.found
+                  : hint.status === HintStatus.found
                     ? "Found"
                     : "Unknown Priority";
     const itemName = MultiWorldContextHelper.getItemName(
@@ -56,7 +57,7 @@ type Hint = {
     locationId: number;
     itemId: number;
     found: boolean;
-    status: API.HintStatus;
+    status: HintStatus;
     itemFlags: number;
     entrance: string;
 };
@@ -194,7 +195,7 @@ export default class HintManager {
         return this.#hintCache;
     }
 
-    updateHintStatus = (hint: Hint, status: API.HintStatus) => {
+    updateHintStatus = (hint: Hint, status: HintStatus) => {
         if (!this.canUpdate) {
             return;
         }

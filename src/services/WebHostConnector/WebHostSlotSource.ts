@@ -1,4 +1,3 @@
-import { itemClassifications } from "archipelago.js";
 import { Item, ItemSource, ItemUpdateCallback } from "../items/itemSource";
 import {
     LocationSource,
@@ -7,6 +6,7 @@ import {
 } from "../locations/locationSource";
 import { APIOffsets_Item, APITracker } from "../WebHostAPI/types";
 import { MultiWorldContextData } from "../MultiInfo/MultiWorldContextData";
+import { ItemClassification } from "../../constants/apConstants";
 
 class WebHostSlotSource implements LocationSource, ItemSource {
     #context: MultiWorldContextData;
@@ -78,13 +78,13 @@ class WebHostSlotSource implements LocationSource, ItemSource {
                 flags: {
                     progression:
                         apiItem[APIOffsets_Item.itemFlags] &
-                            itemClassifications.progression && true,
+                            ItemClassification.progression && true,
                     useful:
                         apiItem[APIOffsets_Item.itemFlags] &
-                            itemClassifications.useful && true,
+                            ItemClassification.useful && true,
                     trap:
                         apiItem[APIOffsets_Item.itemFlags] &
-                            itemClassifications.trap && true,
+                            ItemClassification.trap && true,
                     local:
                         apiItem[APIOffsets_Item.slotNumber] ===
                         this.#slotNumber,
