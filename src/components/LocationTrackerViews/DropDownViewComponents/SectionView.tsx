@@ -1,21 +1,21 @@
 import React, { useContext, useMemo, useState } from "react";
-import LocationView from "./LocationView";
-import ServiceContext from "../../../contexts/serviceContext";
-import Icon from "../../icons/icons";
-import useOption from "../../../hooks/optionHook";
-import { naturalSort } from "../../../utility/comparisons";
-import { useSection } from "../../../hooks/sectionHooks";
-import { TextButton } from "../../shared/buttons";
-import { LocationTrackerType } from "../../../services/tracker/resourceEnums";
-import { TagEntityType } from "../../../services/tags/tagManager";
-import { useTagCounters } from "../../../hooks/tagHook";
 import { List, useDynamicRowHeight } from "react-window";
-import SlotContext from "../../../contexts/slotContext";
-import { useSlotLocations } from "../../../hooks/locationHook";
+import { LocationTrackerType } from "@/services/tracker/resourceEnums";
+import { TagEntityType } from "@/services/tags/tagManager";
 import {
     LocationId,
     LocationStatus,
-} from "../../../services/locations/locationSource";
+} from "@/services/locations/locationSource";
+import { naturalSort } from "@/utility/comparisons";
+import SlotContext from "@/contexts/slotContext";
+import ServiceContext from "@/contexts/serviceContext";
+import { useTagCounters } from "@/hooks/tagHook";
+import { useSlotLocations } from "@/hooks/locationHook";
+import { useSection } from "@/hooks/sectionHooks";
+import useOption from "@/hooks/optionHook";
+import { TextButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import LocationView from "./LocationView";
 
 /**
  *

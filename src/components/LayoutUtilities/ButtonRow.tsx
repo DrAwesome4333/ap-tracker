@@ -1,24 +1,8 @@
 import React from "react";
+import utility_styles from "./utility.module.css";
 
-const ButtonRow = ({
-    children,
-    padTop,
-}: {
-    children: React.ReactNode;
-    padTop?: boolean;
-}) => {
-    return (
-        <div
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                width: "100%",
-                marginTop: padTop ? "1em" : "0",
-            }}
-        >
-            {children}
-        </div>
-    );
+const ButtonRow = ({ children }: { children: React.ReactNode }) => {
+    return <div className={utility_styles.button_row}>{children}</div>;
 };
 
 export default ButtonRow;

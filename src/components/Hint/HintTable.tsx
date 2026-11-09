@@ -1,16 +1,15 @@
 import { useContext } from "react";
-import ServiceContext from "../../contexts/serviceContext";
-import { useHints } from "../../hooks/hintHook";
-import HintRow from "./HintRow";
-import { naturalSort } from "../../utility/comparisons";
-import { HintFilter } from "./HintOptionDef";
+import { List, useDynamicRowHeight } from "react-window";
+import ServiceContext from "@/contexts/serviceContext";
+import MultiWorldContext from "@/contexts/multiWorldContext";
+import { useHints } from "@/hooks/hintHook";
+import { naturalSort } from "@/utility/comparisons";
 import {
     MultiWorldContextHelper,
     SlotRelevance,
-} from "../../services/MultiInfo/MultiWorldContextData";
-import MultiWorldContext from "../../contexts/multiWorldContext";
-
-import { List, useDynamicRowHeight } from "react-window";
+} from "@/services/MultiInfo/MultiWorldContextData";
+import { HintFilter } from "./HintOptionDef";
+import HintRow from "./HintRow";
 
 const HintTable = ({
     filters,

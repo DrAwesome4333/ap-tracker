@@ -1,11 +1,11 @@
-import { HierarchicalOption } from "../../services/options/option";
-import { OptionType } from "../../services/options/optionEnums";
-import { TempDataStore } from "../../services/dataStores";
+import { HierarchicalOption } from "@/services/options/option";
+import { OptionType } from "@/services/options/optionEnums";
+import { TempDataStore } from "@/services/dataStores";
 import {
     globalOptionManager,
     setOptionDefaults,
-} from "../../services/options/optionManager";
-import { HintStatus } from "../../constants/apConstants";
+} from "@/services/options/optionManager";
+import { HintStatus } from "@/constants/apConstants";
 type HintFilter = {
     own: string[];
     status: string[];

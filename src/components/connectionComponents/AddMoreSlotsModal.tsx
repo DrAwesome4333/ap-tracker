@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton, PrimaryButton } from "../shared/buttons";
-import Modal from "../shared/Modal";
-import { Checkbox, Input } from "../inputs";
+import MultiWorldService from "@/services/MultiInfo/MultiWorldService";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import { GhostButton, PrimaryButton } from "@/components/shared/buttons";
+import Modal from "@/components/shared/Modal";
+import { Checkbox, Input } from "@/components/inputs";
 
 type AddMoreSlotsModalParams = {
     multiSaveId: string;

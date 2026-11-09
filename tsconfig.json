@@ -18,7 +18,16 @@
             }
         ],
         "incremental": true,
-        "module": "esnext"
+        "module": "esnext",
+        "baseUrl": "src/",
+        "paths": {
+            "@/components/*": ["components/*"],
+            "@/constants/*": ["constants/*"],
+            "@/contexts/*": ["contexts/*"],
+            "@/hooks/*": ["hooks/*"],
+            "@/services/*": ["services/*"],
+            "@/utility/*": ["utility/*"]
+        }
     },
     "include": [
         "**/*.ts",

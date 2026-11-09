@@ -1,5 +1,5 @@
 import React from "react";
-import { textPrimary } from "../../constants/colors";
+import { textPrimary } from "@/constants/colors";
 import styled from "styled-components";
 
 const SvgContainer = styled.svg<{ $animate: boolean }>`
@@ -30,7 +30,7 @@ const Spinner = ({
     color?: string;
     style?: React.CSSProperties;
     animate?: boolean;
-}) => {
+} & React.SVGAttributes<SVGElement>) => {
     const radius = size / 2 - 5;
 
     return (

@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import PanelHeader from "../shared/PanelHeader";
+import PanelHeader from "@/components/shared/PanelHeader";
+import StickySpacer from "@/components/shared/StickySpacer";
+import { PrimaryButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
 import SectionView from "./DropDownViewComponents/SectionView";
-import StickySpacer from "../shared/StickySpacer";
-import { PrimaryButton } from "../shared/buttons";
-import Icon from "../icons/icons";
 import DropdownFilterModal from "./DropDownViewComponents/DropdownFilterModal";
 import LocationDetails from "./LocationDetails";
 import styles from "./LocationTracker.module.css";
