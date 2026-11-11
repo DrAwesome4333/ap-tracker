@@ -5,12 +5,8 @@
     "type": "module",
     "packageManager": "npm@12.1.0",
     "dependencies": {
-        "@next/eslint-plugin-next": "^15.2.2",
         "archipelago.js": "file:external/archipelago.js",
-        "eslint-config-next": "^15.4.5",
         "eslint-plugin-react-hooks": "^7.0.1",
-        "next": "^16.2.3",
-        "nextjs": "^0.0.3",
         "react": "^19.2.5",
         "react-dom": "^19.2.5",
         "react-window": "^2.3.3",
@@ -21,8 +17,8 @@
         "predeploy": "npm run build",
         "start": "npx serve@latest ./build",
         "format": "npx prettier . --write",
-        "build": "next build",
-        "dev": "next dev"
+        "build": "tsc && vite build",
+        "dev": "vite"
     },
     "browserslist": {
         "production": [
@@ -41,11 +37,14 @@
         "@types/node": "22.13.5",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^6.3.0",
         "eslint": "^9.22.0",
         "eslint-plugin-react": "^7.37.4",
         "globals": "^16.0.0",
         "prettier": "3.5.3",
-        "typescript-eslint": "^8.26.1"
+        "typescript-eslint": "^8.26.1",
+        "vite": "^8.3.7",
+        "vite-plugin-singlefile": "^2.3.4"
     },
     "allowScripts": {
         "unrs-resolver@1.12.2": true

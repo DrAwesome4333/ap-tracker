@@ -6,26 +6,26 @@ import {
     useRef,
     useState,
 } from "react";
-import SlotContext, { SlotContextData } from "../../contexts/slotContext";
-import { useCurrentGameTracker } from "../../hooks/trackerHooks";
-import HintManager from "../../services/HintManager";
-import ItemRepository from "../../services/items/itemRepository";
-import LocationRepository from "../../services/locations/locationRepository";
-import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldService";
-import HintTagger from "../../services/tags/HintTagger";
-import { LocationTagger } from "../../services/tags/LocationTagger";
-import { TagManager } from "../../services/tags/tagManager";
-import { ResourceType } from "../../services/tracker/resourceEnums";
-import WebHostSlotSource from "../../services/WebHostConnector/WebHostSlotSource";
-import { LocationTracker } from "../../services/tracker/locationTrackers/locationTrackers";
-import { ItemTracker } from "../../services/tracker/itemTrackers/itemTrackers";
-import ServiceContext from "../../contexts/serviceContext";
-import InventoryView from "../inventoryComponents/InventoryView";
+import SlotContext, { SlotContextData } from "@/contexts/slotContext";
+import { useCurrentGameTracker } from "@/hooks/trackerHooks";
+import HintManager from "@/services/HintManager";
+import ItemRepository from "@/services/items/itemRepository";
+import LocationRepository from "@/services/locations/locationRepository";
+import { SavedSlotDetails } from "@/services/MultiInfo/MultiWorldService";
+import HintTagger from "@/services/tags/HintTagger";
+import { LocationTagger } from "@/services/tags/LocationTagger";
+import { TagManager } from "@/services/tags/tagManager";
+import { ResourceType } from "@/services/tracker/resourceEnums";
+import WebHostSlotSource from "@/services/WebHostConnector/WebHostSlotSource";
+import { LocationTracker } from "@/services/tracker/locationTrackers/locationTrackers";
+import { ItemTracker } from "@/services/tracker/itemTrackers/itemTrackers";
+import ServiceContext from "@/contexts/serviceContext";
+import InventoryView from "@/components/inventoryComponents/InventoryView";
 import MultiWorldContext, {
     MultiWorldConnectionMode,
-} from "../../contexts/multiWorldContext";
-import EmptyGamePackageWrapper from "../../services/gamepackage/EmptyGamePackageWrapper";
-import { MultiWorldContextData } from "../../services/MultiInfo/MultiWorldContextData";
+} from "@/contexts/multiWorldContext";
+import EmptyGamePackageWrapper from "@/services/gamepackage/EmptyGamePackageWrapper";
+import { MultiWorldContextData } from "@/services/MultiInfo/MultiWorldContextData";
 
 const useSlotContext = (
     slot: SavedSlotDetails,

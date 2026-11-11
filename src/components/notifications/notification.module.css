@@ -15,4 +15,77 @@
     padding: 0;
     pointer-events: none;
     z-index: 9;
+
+    --notification-index: 0;
+    --box-color: grey;
+    --status-height: 4em;
+    --toast-height: 85px;
+}
+
+.status_notification {
+    display: grid;
+    position: absolute;
+    top: calc(4em + calc(var(--status-height) * var(--notification-index)));
+    right: 10px;
+    column-gap: 5px;
+    grid-template-columns: 40px auto;
+    width: 400px;
+    max-width: 70%;
+    height: 3em;
+    background-color: var(--background-secondary);
+    color: var(--filled-text-primary);
+    box-shadow: 3px 5px 0px var(--box-color);
+    opacity: 1;
+    transition: all 0.25s ease-in-out;
+    pointer-events: all;
+}
+
+.toast_notification {
+    display: grid;
+    position: absolute;
+    bottom: calc(10px + calc(var(--toast-height) * var(--notification-index)));
+    right: 10px;
+    column-gap: 5px;
+    grid-template-columns: 75px auto;
+    width: 600px;
+    max-width: 90%;
+    height: 75px;
+    background-color: var(--background-secondary);
+    color: var(--filled-text-primary);
+    box-shadow: 3px 5px 0px var(--box-color);
+    opacity: 1;
+    transition: all 0.25s ease-in-out;
+    pointer-events: all;
+    cursor: auto;
+}
+
+.toast_notification.details {
+    cursor: pointer;
+}
+
+/* Keep these 2 separate, they don't compile properly otherwise*/
+.status_notification.hidden {
+    right: -600px;
+    opacity: 0;
+}
+
+.toast_notification.hidden {
+    right: -600px;
+    opacity: 0;
+}
+
+.notification_icon {
+    grid-column: 1 / span 1;
+    grid-row: 1 / span 1;
+    justify-self: center;
+    align-self: center;
+    text-align: center;
+}
+
+.notification_content {
+    grid-column: 2 / span 1;
+    justify-self: left;
+    align-self: center;
+    grid-row: 1 / span 1;
+    white-space: pre-wrap;
 }

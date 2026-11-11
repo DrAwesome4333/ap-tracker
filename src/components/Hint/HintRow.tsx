@@ -1,20 +1,20 @@
-import { Hint, hintToText } from "../../services/HintManager";
 import React, { useCallback, useContext, useState } from "react";
-import Spinner from "../icons/spinner";
 import { RowComponentProps } from "react-window";
-import ap_styles from "../sharedStyles/archipelago.module.css";
-import Icon from "../icons/icons";
-import { TextButton } from "../shared/buttons";
-import SlotContext from "../../contexts/slotContext";
+import Spinner from "@/components/icons/spinner";
+import ap_styles from "@/components/sharedStyles/archipelago.module.css";
+import Icon from "@/components/icons/icons";
+import { TextButton } from "@/components/shared/buttons";
+import MultiWorldContext from "@/contexts/multiWorldContext";
+import ServiceContext from "@/contexts/serviceContext";
+import SlotContext from "@/contexts/slotContext";
 import {
     MultiWorldContextData,
     MultiWorldContextHelper,
     SlotRelevance,
-} from "../../services/MultiInfo/MultiWorldContextData";
-import MultiWorldContext from "../../contexts/multiWorldContext";
-import ServiceContext from "../../contexts/serviceContext";
-import { copyToClipboard } from "../../utility/clipboard";
-import { HintStatus, ItemClassification } from "../../constants/apConstants";
+} from "@/services/MultiInfo/MultiWorldContextData";
+import { Hint, hintToText } from "@/services/HintManager";
+import { copyToClipboard } from "@/utility/clipboard";
+import { HintStatus, ItemClassification } from "@/constants/apConstants";
 
 const statusSelections = [
     HintStatus.priority,

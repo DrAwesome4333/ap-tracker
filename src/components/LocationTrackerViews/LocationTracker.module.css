@@ -26,3 +26,12 @@
         grid-template-rows: auto;
     }
 }
+
+.location_details {
+    padding: 1em;
+    box-sizing: border-box;
+    overflow: auto;
+    height: 100%;
+    box-shadow: var(--box-shadow);
+    border: 1px solid black;
+}

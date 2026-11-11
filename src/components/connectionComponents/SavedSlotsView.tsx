@@ -4,19 +4,19 @@ import React, {
     useState,
     useSyncExternalStore,
 } from "react";
-import SlotDetails from "./SlotDetails";
+import Icon from "@/components/icons/icons";
+import { PrimaryButton, SecondaryButton } from "@/components/shared/buttons";
 import MultiWorldService, {
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldService";
+} from "@/services/MultiInfo/MultiWorldService";
+import { ConnectionConfiguration } from "@/services/connector/APConnector";
+import { useAPConnectionStatus } from "@/hooks/connectionStatusHook";
+import ActivityContext from "@/contexts/activityContext";
+import MultiWorldDetails from "./MultiWorldDetails";
+import AddMoreSlotsModal from "./AddMoreSlotsModal";
+import SlotDetails from "./SlotDetails";
 import SavedSlotView from "./SavedSlotView";
 import styles from "./SavedSlots.module.css";
-import { ConnectionConfiguration } from "../../services/connector/APConnector";
-import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
-import { PrimaryButton, SecondaryButton } from "../shared/buttons";
-import ActivityContext from "../../contexts/activityContext";
-import MultiWorldDetails from "./MultiWorldDetails";
-import Icon from "../icons/icons";
-import AddMoreSlotsModal from "./AddMoreSlotsModal";
 
 const SavedSlotsView = ({
     connectToServer,

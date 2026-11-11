@@ -1,8 +1,8 @@
 import React from "react";
-import { MessageType } from "../../services/notifications/notifications";
-import { filledTextPrimary, secondary } from "../../constants/colors";
-import Icon from "../icons/icons";
-const TOAST_HEIGHT_PX = 85;
+import { MessageType } from "@/services/notifications/notifications";
+import Icon from "@/components/icons/icons";
+import styles from "./notification.module.css";
+
 const Toast = ({
     message,
     type,
@@ -59,46 +59,30 @@ const Toast = ({
             break;
         }
     }
-    const bottom = 10 + TOAST_HEIGHT_PX * index;
     const onScreen = !(remainingTime === duration || remainingTime < 0);
-    const right = onScreen ? 10 : -600;
     let timePercent = remainingTime / duration;
     timePercent = timePercent < 0 ? 0 : timePercent;
     const radius = 40;
     return (
         <div
-            style={{
-                display: "grid",
-                bottom: `${bottom}px`,
-                right: `${right}px`,
-                position: "absolute",
-                columnGap: "5px",
-                gridTemplateColumns: "75px auto",
-                width: "600px",
-                maxWidth: "90%",
-                height: "75px",
-                backgroundColor: secondary,
-                color: filledTextPrimary,
-                boxShadow: `3px 5px 0px ${boxColor}`,
-                opacity: onScreen ? 1 : 0,
-                transition: "all 0.25s ease-in-out",
-                pointerEvents: "all",
-                cursor: details ? "pointer" : "auto",
-            }}
+            style={
+                {
+                    "--box-color": boxColor,
+                    "--notification-index": index,
+                } as React.CSSProperties
+            }
+            className={[
+                styles.toast_notification,
+                !onScreen ? styles.hidden : "",
+                details ? styles.details : "",
+            ]
+                .filter((x) => x)
+                .join(" ")}
             onMouseLeave={mouseLeave}
             onMouseEnter={mouseEnter}
             onClick={details ? click : () => {}}
         >
-            <svg
-                viewBox="-50 -50 100 100"
-                style={{
-                    gridColumn: "1 / span 1",
-                    gridRow: "1 /span 1",
-                    justifySelf: "center",
-                    alignSelf: "center",
-                    textAlign: "center",
-                }}
-            >
+            <svg viewBox="-50 -50 100 100" className={styles.notification_icon}>
                 <circle
                     stroke="black"
                     strokeDasharray={`${radius * timePercent * Math.PI * 2} ${7 * radius}`}
@@ -123,15 +107,7 @@ const Toast = ({
                 fontSize="XX-large"
             />
 
-            <div
-                style={{
-                    gridColumn: "2 / span 1",
-                    justifySelf: "left",
-                    alignSelf: "center",
-                    gridRow: "1 /span 1",
-                    whiteSpace: "pre-wrap",
-                }}
-            >
+            <div className={styles.notification_content}>
                 {message}
                 {details ? (
                     <>

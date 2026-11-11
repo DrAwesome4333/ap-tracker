@@ -4,16 +4,16 @@ import NotificationManager, {
     MessageType,
     StatusNotification,
     ToastNotification,
-} from "../../services/notifications/notifications";
+} from "@/services/notifications/notifications";
+import { readThemeValue } from "@/services/theme/theme";
+import ServiceContext from "@/contexts/serviceContext";
+import useOption from "@/hooks/optionHook";
+import { PrimaryButton, SecondaryButton } from "@/components/shared/buttons";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import Modal from "@/components/shared/Modal";
+import StatusNotificationView from "./statusNotification";
 import Toast from "./toastNotification";
 import styles from "./notification.module.css";
-import { PrimaryButton, SecondaryButton } from "../shared/buttons";
-import Modal from "../shared/Modal";
-import ServiceContext from "../../contexts/serviceContext";
-import useOption from "../../hooks/optionHook";
-import { readThemeValue } from "../../services/theme/theme";
-import StatusNotificationView from "./statusNotification";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
 
 interface ToastNotificationData {
     notification: ToastNotification;
