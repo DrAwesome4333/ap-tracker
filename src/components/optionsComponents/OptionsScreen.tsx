@@ -335,8 +335,8 @@ const OptionsScreen = () => {
                     React
                 </a>{" "}
                 and{" "}
-                <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-                    NextJS
+                <a href="https://vite.dev/" target="_blank" rel="noreferrer">
+                    Vite
                 </a>{" "}
                 with{" "}
                 <a
@@ -366,9 +366,9 @@ const OptionsScreen = () => {
                     padding: "1em",
                 }}
             >
-                Version: {process.env.NEXT_PUBLIC_APP_VERSION}
-                {process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
-                    ? `-${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+                Version: {import.meta.env.VITE_APP_VERSION}
+                {import.meta.env.VITE_ENVIRONMENT_NAME
+                    ? `-${import.meta.env.VITE_ENVIRONMENT_NAME}`
                     : ""}
             </div>
             <div
@@ -379,7 +379,7 @@ const OptionsScreen = () => {
                     padding: "1em",
                 }}
             >
-                Find Documentation and more on the
+                Find Documentation and more on the{" "}
                 <a
                     href="https://github.com/DrAwesome4333/ap-tracker"
                     target="_blank"

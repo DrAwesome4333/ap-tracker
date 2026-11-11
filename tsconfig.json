@@ -12,11 +12,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "jsx": "react-jsx",
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
+        "plugins": [{ "name": "typescript-plugin-css-modules" }],
         "incremental": true,
         "module": "esnext",
         "baseUrl": "src/",
@@ -33,10 +29,8 @@
         "**/*.ts",
         "**/*.tsx",
         "build/types/**/*.ts",
-        "next-env.d.ts",
-        ".next/types/**/*.ts",
-        "build/dev/types/**/*.ts",
-        ".next/dev/types/**/*.ts"
+        "src/vite-env.d.ts",
+        "build/dev/types/**/*.ts"
     ],
     "exclude": ["node_modules", "external"]
 }

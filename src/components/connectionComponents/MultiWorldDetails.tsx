@@ -9,7 +9,6 @@ import {
     PrimaryButton,
 } from "@/components/shared/buttons";
 import { Input } from "@/components/inputs";
-import Link from "next/link";
 import Spinner from "@/components/icons/spinner";
 
 const MultiWorldDetails = ({
@@ -221,12 +220,12 @@ const MultiWorldDetails = ({
                                     : "not configured"}
                                 .{" "}
                                 {roomConfigured && (
-                                    <Link
+                                    <a
                                         target="blank"
                                         href={`${room?.origin}/room/${room.room_suuid}`}
                                     >
                                         Open Room
-                                    </Link>
+                                    </a>
                                 )}
                             </p>
                         </div>

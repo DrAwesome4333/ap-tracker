@@ -7,8 +7,8 @@ import {
 import { baseTrackerOptions } from "./trackerOptions";
 import { OptionType } from "./optionEnums";
 import { TrackerOption } from "./option";
-const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
-    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+const environment = import.meta.env.VITE_ENVIRONMENT_NAME
+    ? `_${import.meta.env.VITE_ENVIRONMENT_NAME}`
     : "";
 const OPTION_LOCAL_STORAGE_ITEM_NAME: string = `AP_CHECKLIST_TRACKER_OPTIONS${environment}`;
 const DEBUG: boolean = false;

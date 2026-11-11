@@ -77,7 +77,7 @@ const MainHeader = ({
                                   : "purple",
                     }}
                 ></Icon>{" "}
-                {(slotContext?.slotName ?? onMultiTrackerScreen) && (
+                {(slotContext?.slotName || onMultiTrackerScreen) && (
                     <TextButton
                         style={{
                             textOverflow: "ellipsis",
