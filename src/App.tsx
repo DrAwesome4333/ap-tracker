@@ -42,7 +42,6 @@ const optionManager = globalOptionManager;
 const environment = import.meta.env.VITE_ENVIRONMENT_NAME
     ? `_${import.meta.env.VITE_ENVIRONMENT_NAME}`
     : "";
-console.log(environment);
 const mainTrackerManagerStore = new LocalStorageDataStore(
     `AP_ChecklistTracker_TrackerChoices${environment}`
 );
@@ -68,7 +67,7 @@ const App = (): React.ReactNode => {
         activityContext.stack.length > 0
             ? activityContext.stack[activityContext.stack.length - 1]
             : null;
-    const optionWindowOpen = activityContext.stack.includes("options");
+    const optionWindowOpen = currentActivityName === "options";
     const themeValue = useOption(optionManager, "Theme:base", "global") as
         | "light"
         | "dark"
@@ -224,7 +223,7 @@ const App = (): React.ReactNode => {
                             <MainHeader
                                 optionsCallback={() => {
                                     if (optionWindowOpen) {
-                                        activityContext.drop("options");
+                                        activityContext.remove("options");
                                     } else {
                                         activityContext.add("options");
                                     }

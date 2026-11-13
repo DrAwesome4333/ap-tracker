@@ -59,7 +59,7 @@ const ConnectionOptions = ({
         : null;
 
     const disconnect = () => {
-        activityContext.drop("slot-tracker");
+        activityContext.remove("slot-tracker");
         connector.disconnect();
         const newUrl = window?.location ? new URL(window?.location.href) : null;
         if (newUrl) {
@@ -95,7 +95,7 @@ const ConnectionOptions = ({
             {onMultiTracker ? (
                 <SecondaryButton
                     onClick={() => {
-                        activityContext.drop(
+                        activityContext.remove(
                             activityContext.stack.find((act) =>
                                 act.startsWith("multi-world-tracker")
                             )
@@ -112,7 +112,7 @@ const ConnectionOptions = ({
                     {connectionStatus.disconnected && onSlotTracker && (
                         <SecondaryButton
                             onClick={() => {
-                                activityContext.drop("slot-tracker");
+                                activityContext.remove("slot-tracker");
                                 onClose();
                             }}
                         >
