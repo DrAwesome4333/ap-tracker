@@ -34,7 +34,9 @@
     height: 3em;
     background-color: var(--background-secondary);
     color: var(--filled-text-primary);
-    box-shadow: 3px 5px 0px var(--box-color);
+    box-shadow:
+        3px 5px 0px var(--box-color),
+        var(--box-shadow);
     opacity: 1;
     transition: all 0.25s ease-in-out;
     pointer-events: all;
@@ -52,7 +54,9 @@
     height: 75px;
     background-color: var(--background-secondary);
     color: var(--filled-text-primary);
-    box-shadow: 3px 5px 0px var(--box-color);
+    box-shadow:
+        3px 5px 0px var(--box-color),
+        var(--box-shadow);
     opacity: 1;
     transition: all 0.25s ease-in-out;
     pointer-events: all;

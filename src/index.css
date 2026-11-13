@@ -90,7 +90,6 @@ a {
     margin: 0;
     padding: 0;
     display: grid;
-    overflow: auto;
     justify-items: stretch;
     align-items: stretch;
     color: light-dark(black, white);

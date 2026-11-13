@@ -5,12 +5,15 @@
     width: 100%;
     grid-template-rows: 3em auto;
     container-type: inline-size;
+    overflow: auto;
 }
 
 .dropdown_container {
     display: grid;
     min-width: 0;
     min-height: 0;
+    height: 100%;
+    width: 100%;
     grid-template-columns: auto;
     grid-template-rows: auto;
 }
