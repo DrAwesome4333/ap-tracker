@@ -1,9 +1,9 @@
 import * as HintOptionDef from "./HintOptionDef";
-import Modal from "../shared/Modal";
-import OptionView from "../optionsComponents/OptionView";
-import { globalOptionManager } from "../../services/options/optionManager";
-import { GhostButton } from "../shared/buttons";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
+import Modal from "@/components/shared/Modal";
+import OptionView from "@/components/optionsComponents/OptionView";
+import { globalOptionManager } from "@/services/options/optionManager";
+import { GhostButton } from "@/components/shared/buttons";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
 
 const HintFilterModal = ({
     open,

@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
-import WebHostAPIHandler from "../../services/WebHostAPI";
-import Modal from "../shared/Modal";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
-import { Input } from "../inputs";
-import Link from "next/link";
-import Spinner from "../icons/spinner";
+import MultiWorldService from "@/services/MultiInfo/MultiWorldService";
+import WebHostAPIHandler from "@/services/WebHostAPI";
+import Modal from "@/components/shared/Modal";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import {
+    DangerButton,
+    GhostButton,
+    PrimaryButton,
+} from "@/components/shared/buttons";
+import { Input } from "@/components/inputs";
+import Spinner from "@/components/icons/spinner";
 
 const MultiWorldDetails = ({
     multiSaveId,
@@ -217,12 +220,12 @@ const MultiWorldDetails = ({
                                     : "not configured"}
                                 .{" "}
                                 {roomConfigured && (
-                                    <Link
+                                    <a
                                         target="blank"
                                         href={`${room?.origin}/room/${room.room_suuid}`}
                                     >
                                         Open Room
-                                    </Link>
+                                    </a>
                                 )}
                             </p>
                         </div>

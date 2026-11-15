@@ -95,8 +95,8 @@ type MultiWorldWithSlotDetails = {
     slots: SavedSlotDetails[];
     last_used_timestamp: number;
 } & SavedMultiWorldDetails;
-const environment = process.env.NEXT_PUBLIC_ENVIRONMENT_NAME
-    ? `_${process.env.NEXT_PUBLIC_ENVIRONMENT_NAME}`
+const environment = import.meta.env.VITE_ENVIRONMENT_NAME
+    ? `_${import.meta.env.VITE_ENVIRONMENT_NAME}`
     : "";
 const multiLocalStorageKey = `ap_checklist_multi_details${environment}`;
 const multiDataStore = new LocalStorageDataStore(multiLocalStorageKey);

@@ -1,16 +1,16 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { useTag } from "../../../hooks/tagHook";
-import { textPrimary } from "../../../constants/colors";
-import Icon from "../../icons/icons";
-import { LocationStatus } from "../../../services/locations/locationSource";
-import { Input } from "../../inputs";
+import { useTag } from "@/hooks/tagHook";
+import { textPrimary } from "@/constants/colors";
+import Icon from "@/components/icons/icons";
+import { LocationStatus } from "@/services/locations/locationSource";
+import { Input } from "@/components/inputs";
 import {
     DangerButton,
     PrimaryButton,
     SecondaryButton,
-} from "../../shared/buttons";
-import { TagId } from "../../../services/tags/tagManager";
-import SlotContext from "../../../contexts/slotContext";
+} from "@/components/shared/buttons";
+import { TagId } from "@/services/tags/tagManager";
+import SlotContext from "@/contexts/slotContext";
 
 const LocationTagView = ({
     tagId,
@@ -57,7 +57,6 @@ const LocationTagView = ({
                 marginLeft: "1rem",
                 color: tagType?.text_color ?? textPrimary,
                 textDecoration: "none",
-                // display: "inline-block",
             }}
         >
             <Icon

@@ -1,14 +1,14 @@
-import React, { useContext, useSyncExternalStore } from "react";
-import Modal from "../shared/Modal";
-import InventorySettings from "../optionsComponents/InventorySettings";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../shared/buttons";
-import ServiceContext from "../../contexts/serviceContext";
-import OptionView from "../optionsComponents/OptionView";
-import { JSONValue } from "../../services/dataStores";
-import TrackerDropdown from "../optionsComponents/TrackerDropdown";
-import { ResourceType } from "../../services/tracker/resourceEnums";
-import SlotContext from "../../contexts/slotContext";
+import { useContext, useSyncExternalStore } from "react";
+import Modal from "@/components/shared/Modal";
+import InventorySettings from "@/components/optionsComponents/InventorySettings";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import { GhostButton } from "@/components/shared/buttons";
+import OptionView from "@/components/optionsComponents/OptionView";
+import TrackerDropdown from "@/components/optionsComponents/TrackerDropdown";
+import ServiceContext from "@/contexts/serviceContext";
+import SlotContext from "@/contexts/slotContext";
+import { ResourceType } from "@/services/tracker/resourceEnums";
+import { JSONValue } from "@/services/dataStores";
 const InventoryFilterOptionsModal = ({
     open,
     onClose,

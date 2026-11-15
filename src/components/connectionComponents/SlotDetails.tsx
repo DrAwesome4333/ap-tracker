@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import MultiWorldService, {
     SavedMultiWorldDetails,
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldService";
-import Modal from "../shared/Modal";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { DangerButton, GhostButton, PrimaryButton } from "../shared/buttons";
-import { Input } from "../inputs";
+} from "@/services/MultiInfo/MultiWorldService";
+import Modal from "@/components/shared/Modal";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import {
+    DangerButton,
+    GhostButton,
+    PrimaryButton,
+} from "@/components/shared/buttons";
+import { Input } from "@/components/inputs";
 
 /** Shows information about the slot */
 const SlotDetails = ({

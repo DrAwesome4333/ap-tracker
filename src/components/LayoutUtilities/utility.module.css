@@ -1,0 +1,69 @@
+.button_row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.flex_resizer {
+    flex: 0 0 0.5em;
+    background-color: var(--primary-accent);
+    opacity: 0.5;
+    transition: opacity 0.1s ease-in;
+    box-sizing: border-box;
+}
+
+.flex_resizer:hover {
+    opacity: 1;
+}
+
+.flex_resizer.row {
+    cursor: ew-resize;
+}
+
+.flex_resizer.column {
+    cursor: ns-resize;
+}
+
+.flex {
+    display: flex;
+    --flex-ratio: 100%; /* overridden in app code*/
+}
+
+.flex.row {
+    flex-direction: row;
+}
+
+.flex.column {
+    flex-direction: column;
+}
+
+.flex.child {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.flex_item {
+    overflow: hidden;
+    flex: 1 1 var(--flex-ratio);
+}
+
+.tab_container {
+    cursor: pointer;
+    padding: 0.5em;
+    background-color: var(--primary-accent);
+    color: var(--filled-text-primary);
+    border-left: 1px solid var(--secondary-accent);
+    border-right: 1px solid var(--secondary-accent);
+    box-shadow: var(--box-shadow);
+    flex: 1 1 100%;
+    text-align: center;
+    line-height: 100%;
+}
+
+.tab_container.selected {
+    background-color: var(--background-level-2);
+    color: var(--text-primary);
+    box-shadow: inset var(--box-shadow);
+    border-bottom: none;
+}

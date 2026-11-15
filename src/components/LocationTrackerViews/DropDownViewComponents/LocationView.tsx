@@ -1,16 +1,16 @@
 import React, { useContext } from "react";
-import Icon from "../../icons/icons";
-import { textPrimary } from "../../../constants/colors";
-import { TextButton } from "../../shared/buttons";
-import { useTagList } from "../../../hooks/tagHook";
-import { TagEntityType } from "../../../services/tags/tagManager";
-import { naturalSort } from "../../../utility/comparisons";
 import { RowComponentProps } from "react-window";
+import { TextButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import { useTagList } from "@/hooks/tagHook";
+import { TagEntityType } from "@/services/tags/tagManager";
 import {
     LocationId,
     LocationStatus,
-} from "../../../services/locations/locationSource";
-import SlotContext from "../../../contexts/slotContext";
+} from "@/services/locations/locationSource";
+import SlotContext from "@/contexts/slotContext";
+import { naturalSort } from "@/utility/comparisons";
+import { textPrimary } from "@/constants/colors";
 
 const LocationView = ({
     locations,

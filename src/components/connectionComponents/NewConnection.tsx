@@ -1,11 +1,11 @@
 import { KeyboardEventHandler, useState } from "react";
-import { GhostButton, PrimaryButton } from "../shared/buttons";
+import { GhostButton, PrimaryButton } from "@/components/shared/buttons";
+import { Input } from "@/components/inputs";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import Modal from "@/components/shared/Modal";
+import { ConnectionConfiguration } from "@/services/connector/APConnector";
+import { useAPConnectionStatus } from "@/hooks/connectionStatusHook";
 import styles from "./SavedSlots.module.css";
-import { Input } from "../inputs";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { ConnectionConfiguration } from "../../services/connector/APConnector";
-import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
-import Modal from "../shared/Modal";
 
 const NewConnection = ({
     onClose,

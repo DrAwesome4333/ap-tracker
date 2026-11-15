@@ -3,10 +3,12 @@ import ActivityContext from "../contexts/activityContext";
 
 const useActivityContext = () => {
     const [stack, setStack] = useState([]);
+
     const add = useCallback((activityName: string) => {
         setStack((old) => [...old, activityName]);
         //console.info("New Activity", activityName);
     }, []);
+
     const drop = useCallback((activityName?: string) => {
         if (!activityName) {
             setStack((old) => old.slice(0, -1));
@@ -19,7 +21,11 @@ const useActivityContext = () => {
         //console.info("Drop Activity", activityName ?? "(drop)");
     }, []);
     //console.log("Stack", stack)
-    return { add, drop, stack };
+
+    const remove = useCallback((activityName: string) => {
+        setStack((old) => old.filter((x) => x !== activityName));
+    }, []);
+    return { add, drop, remove, stack };
 };
 
 const useCurrentActivity = () => {

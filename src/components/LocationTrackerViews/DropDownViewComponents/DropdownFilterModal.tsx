@@ -1,13 +1,13 @@
 import { useContext } from "react";
-import Modal from "../../shared/Modal";
-import ChecklistSettings from "../../optionsComponents/ChecklistSettings";
-import ServiceContext from "../../../contexts/serviceContext";
-import ButtonRow from "../../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../../shared/buttons";
-import TrackerDropdown from "../../optionsComponents/TrackerDropdown";
-import { ResourceType } from "../../../services/tracker/resourceEnums";
-import HintSettings from "../../optionsComponents/HintTagSettings";
-import useCurrentMultiworldSlot from "../../../hooks/useCurrentMultiworldSlot";
+import Modal from "@/components/shared/Modal";
+import ChecklistSettings from "@/components/optionsComponents/ChecklistSettings";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import { GhostButton } from "@/components/shared/buttons";
+import TrackerDropdown from "@/components/optionsComponents/TrackerDropdown";
+import { ResourceType } from "@/services/tracker/resourceEnums";
+import HintSettings from "@/components/optionsComponents/HintTagSettings";
+import ServiceContext from "@/contexts/serviceContext";
+import SlotContext from "@/contexts/slotContext";
 
 const DropdownFilterModal = ({
     open,
@@ -17,7 +17,7 @@ const DropdownFilterModal = ({
     onClose: () => void;
 }) => {
     const services = useContext(ServiceContext);
-    const slot = useCurrentMultiworldSlot();
+    const slotContext = useContext(SlotContext);
 
     return (
         <Modal
@@ -31,7 +31,7 @@ const DropdownFilterModal = ({
         >
             Tracker: &nbsp;
             <TrackerDropdown
-                game={slot.game}
+                game={slotContext?.game}
                 type={ResourceType.locationTracker}
             />
             <br />

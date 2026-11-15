@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 David Mendenhall
+Copyright (c) 2026 [DrAwesome4333](https://github.com/DrAwesome4333)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@ SOFTWARE.
 License Exceptions:
 Some assets are distributed under a separate License.
 
-The Archipelago Logos used by this app are the modified works of 
-Krista Corkos and Christopher Wilson (© 2022) and is licensed under 
-Attribution-NonCommercial 4.0 International. To view a copy of this license,
-visit http://creativecommons.org/licenses/by-nc/4.0/
+In those cases a LICENSE.md or LICENSE.txt file will be provided in the relevant directories.
+
+- [Archipelago Logo License](./public/LICENSE.md)

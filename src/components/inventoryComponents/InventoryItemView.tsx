@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
-import { Item } from "../../services/items/itemSource";
-import { GhostButton } from "../shared/buttons";
-import Icon from "../icons/icons";
 import { RowComponentProps } from "react-window";
-import ap_styles from "../sharedStyles/archipelago.module.css";
-import SlotContext from "../../contexts/slotContext";
-import MultiWorldContext from "../../contexts/multiWorldContext";
+import { Item } from "@/services/items/itemSource";
+import { GhostButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import ap_styles from "@/components/sharedStyles/archipelago.module.css";
+import SlotContext from "@/contexts/slotContext";
+import MultiWorldContext from "@/contexts/multiWorldContext";
 
 const InventoryItemView = ({
     items,

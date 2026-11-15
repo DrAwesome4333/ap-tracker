@@ -3,6 +3,7 @@ import {
     useContext,
     useEffect,
     useEffectEvent,
+    useMemo,
     useState,
 } from "react";
 import NewConnection from "../connectionComponents/NewConnection";
@@ -16,7 +17,6 @@ import NotificationManager, {
     MessageType,
 } from "../../services/notifications/notifications";
 import { ConnectionConfiguration } from "../../services/connector/APConnector";
-import { useSearchParams } from "next/navigation";
 import useOption from "../../hooks/optionHook";
 
 let hasAttemptedAutoConnect = false;
@@ -25,7 +25,10 @@ const StartScreen = () => {
     const [newModalOpen, setNewModalOpen] = useState(false);
     const serviceContext = useContext(ServiceContext);
     const activityContext = useContext(ActivityContext);
-    const params = useSearchParams();
+    const params = useMemo(
+        () => new URLSearchParams(window.location.search),
+        []
+    );
     const putSlotInfoInUrl = useOption(
         serviceContext.optionManager,
         "Advanced:AllowSlotDetailsInUrl",

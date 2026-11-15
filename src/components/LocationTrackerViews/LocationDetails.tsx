@@ -1,14 +1,15 @@
-import React, { useContext, useRef } from "react";
-import { useTagList } from "../../hooks/tagHook";
-import { TagEntityType, TagId } from "../../services/tags/tagManager";
-import { useLocationStatus } from "../../hooks/sectionHooks";
-import { naturalSort } from "../../utility/comparisons";
+import { useContext, useRef } from "react";
+import { useTagList } from "@/hooks/tagHook";
+import { useLocationStatus } from "@/hooks/sectionHooks";
+import { TagEntityType, TagId } from "@/services/tags/tagManager";
+import { LocationId } from "@/services/locations/locationSource";
+import SlotContext from "@/contexts/slotContext";
+import { naturalSort } from "@/utility/comparisons";
+import TagBar from "@/components/tags/TagBar";
+import ButtonRow from "@/components//LayoutUtilities/ButtonRow";
+import { GhostButton } from "@/components/shared/buttons";
 import LocationTagView from "./DropDownViewComponents/LocationTagView";
-import TagBar from "../tags/TagBar";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { GhostButton } from "../shared/buttons";
-import { LocationId } from "../../services/locations/locationSource";
-import SlotContext from "../../contexts/slotContext";
+import styles from "./LocationTracker.module.css";
 
 const LocationDetails = ({
     locationId,
@@ -48,16 +49,7 @@ const LocationDetails = ({
     const title = locationStatus?.name;
 
     return (
-        <div
-            style={{
-                padding: "1em",
-                boxSizing: "border-box",
-                overflow: "auto",
-                height: "100%",
-                boxShadow: "3px 4px 0px rgba(0, 0, 0, 0.5)",
-                border: "1px solid black",
-            }}
-        >
+        <div className={styles.location_details}>
             {title}
             <br />
             <TagBar

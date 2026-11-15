@@ -1,17 +1,17 @@
 import React, { useContext, useState } from "react";
-import { PrimaryButton, SecondaryButton, TextButton } from "../shared/buttons";
-import Icon from "../icons/icons";
-import NotePad from "../NotePad/NotePad";
-import ConnectionOptions from "./ConnectionOptions";
-import useCurrentMultiworldSlot from "../../hooks/useCurrentMultiworldSlot";
-import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
 import {
-    useActivityContext,
-    useCurrentActivity,
-} from "../../hooks/activityHook";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
-import SlotContext from "../../contexts/slotContext";
-import ActivityContext from "../../contexts/activityContext";
+    PrimaryButton,
+    SecondaryButton,
+    TextButton,
+} from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import NotePad from "@/components/NotePad/NotePad";
+import ConnectionOptions from "./ConnectionOptions";
+import { useAPConnectionStatus } from "@/hooks/connectionStatusHook";
+import { useCurrentActivity } from "@/hooks/activityHook";
+import MultiWorldService from "@/services/MultiInfo/MultiWorldService";
+import SlotContext from "@/contexts/slotContext";
+import ActivityContext from "@/contexts/activityContext";
 
 const MainHeader = ({
     optionsCallback,
@@ -22,7 +22,6 @@ const MainHeader = ({
     const connectionStatus = useAPConnectionStatus();
     const [notePadOpen, setNotePadOpen] = useState(false);
     const [connectionModalOpen, setConnectionModalOpen] = useState(false);
-    const slot = useCurrentMultiworldSlot();
 
     const currentPage = useCurrentActivity();
     const activityContext = useContext(ActivityContext);
@@ -35,6 +34,8 @@ const MainHeader = ({
     const onMultiTrackerScreen = !!activityContext.stack?.find((act) =>
         act.startsWith("multi-world-tracker")
     );
+    const slotDisplayName =
+        slotContext?.slotAlias || slotContext?.slotName || "";
 
     return (
         <div
@@ -76,9 +77,7 @@ const MainHeader = ({
                                   : "purple",
                     }}
                 ></Icon>{" "}
-                {(slot?.slot_alias ||
-                    slot?.slot_name ||
-                    onMultiTrackerScreen) && (
+                {(slotContext?.slotName || onMultiTrackerScreen) && (
                     <TextButton
                         style={{
                             textOverflow: "ellipsis",
@@ -89,7 +88,7 @@ const MainHeader = ({
                     >
                         {onMultiTrackerScreen
                             ? multiWorld?.title
-                            : (slot.slot_alias ?? slot.slot_name)}
+                            : slotDisplayName}
                     </TextButton>
                 )}
                 <ConnectionOptions

@@ -53,5 +53,4 @@ const fuzzyMatchScore = (a: string, b: string) => {
     );
 };
 
-
 export { fuzzyMatchScore };

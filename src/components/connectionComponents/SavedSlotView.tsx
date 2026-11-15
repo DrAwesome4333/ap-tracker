@@ -1,7 +1,7 @@
+import { SavedSlotDetails } from "@/services/MultiInfo/MultiWorldService";
+import { PrimaryButton, SecondaryButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
 import styles from "./SavedSlots.module.css";
-import { SavedSlotDetails } from "../../services/MultiInfo/MultiWorldService";
-import { PrimaryButton, SecondaryButton } from "../shared/buttons";
-import Icon from "../icons/icons";
 
 const SavedSlotView = ({
     slot,

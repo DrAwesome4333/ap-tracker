@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Item } from "../../services/items/itemSource";
-import CollectionContainer from "./CollectionContainer";
-import { TextButton } from "../shared/buttons";
+import { useState } from "react";
+import { Item } from "@/services/items/itemSource";
+import { TextButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import ap_styles from "@/components/sharedStyles/archipelago.module.css";
+import inv_styles from "./inventory.module.css";
 import InventoryItemListView from "./InventoryItemListView";
-import Icon from "../icons/icons";
-import ap_styles from "../sharedStyles/archipelago.module.css";
 
 const InventoryItemGroupView = ({
     name,
@@ -42,7 +42,10 @@ const InventoryItemGroupView = ({
     }
     return (
         <div>
-            <CollectionContainer onClick={() => setDetailsOpen((x) => !x)}>
+            <div
+                className={inv_styles.collection_container}
+                onClick={() => setDetailsOpen((x) => !x)}
+            >
                 <TextButton
                     className={ap_styles.ap_text_alt + " " + itemClass}
                     style={{ fontWeight: "bold" }}
@@ -68,7 +71,7 @@ const InventoryItemGroupView = ({
                         />
                     }
                 </TextButton>
-            </CollectionContainer>
+            </div>
             {detailsOpen && (
                 <div
                     style={{

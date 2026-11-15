@@ -6,24 +6,24 @@ import {
     useRef,
     useState,
 } from "react";
-import { useCurrentActivity } from "../../hooks/activityHook";
+import { useCurrentActivity } from "@/hooks/activityHook";
 import MultiWorldService, {
     SavedSlotDetails,
-} from "../../services/MultiInfo/MultiWorldService";
-import WebHostSlotSource from "../../services/WebHostConnector/WebHostSlotSource";
-import WebHostAPIHandler from "../../services/WebHostAPI";
-import SlotTracker from "./SlotTracker";
-import Spinner from "../icons/spinner";
+} from "@/services/MultiInfo/MultiWorldService";
+import WebHostSlotSource from "@/services/WebHostConnector/WebHostSlotSource";
+import WebHostAPIHandler from "@/services/WebHostAPI";
 import NotificationManager, {
     MessageType,
-} from "../../services/notifications/notifications";
-import Tabs, { Tab } from "../LayoutUtilities/Tabs";
-import { MultiWorldContextData } from "../../services/MultiInfo/MultiWorldContextData";
+} from "@/services/notifications/notifications";
+import { MultiWorldContextData } from "@/services/MultiInfo/MultiWorldContextData";
 import MultiWorldContext, {
     MultiWorldConnectionMode,
-} from "../../contexts/multiWorldContext";
-import HintTab from "../Hint/HintTab";
-import ServiceContext from "../../contexts/serviceContext";
+} from "@/contexts/multiWorldContext";
+import ServiceContext from "@/contexts/serviceContext";
+import Spinner from "@/components/icons/spinner";
+import Tabs, { Tab } from "@/components/LayoutUtilities/Tabs";
+import HintTab from "@/components/Hint/HintTab";
+import SlotTracker from "./SlotTracker";
 
 const useWebHostSlots = (multiSaveId: string) => {
     const initialized = useRef(false);
@@ -71,10 +71,19 @@ const useWebHostSlots = (multiSaveId: string) => {
             return;
         }
 
+        const loadingNotificationHandle = NotificationManager.createStatus({
+            type: MessageType.info,
+            message: "Getting tracker data",
+            progress: -1,
+        });
+
         apiHandlerRef.current = new WebHostAPIHandler(multiWorld.room_details);
         // TODO parallelize
         const roomStatus = await apiHandlerRef.current.getRoomStatus();
         const staticTracker = await apiHandlerRef.current.getStaticTracker();
+        loadingNotificationHandle.update({
+            message: "Loading data packages",
+        });
         const contextData = await WebHostAPIHandler.buildMultiWorldContext(
             roomStatus,
             staticTracker,
@@ -92,6 +101,12 @@ const useWebHostSlots = (multiSaveId: string) => {
         setHostSources(sources);
         serviceContext.hintManager?.setMultiWorldContext(contextData, true);
         loaded.current = true;
+        loadingNotificationHandle.update({
+            message: "Tracker data loaded",
+            type: MessageType.success,
+            progress: 1,
+            duration: 3,
+        });
     };
 
     if (!initialized.current) {
@@ -125,7 +140,6 @@ const MultiWorldTracker = () => {
     const currentActivityName = useCurrentActivity();
     const multiWorldId = currentActivityName?.split(".")[1];
     const contexts = useWebHostSlots(multiWorldId);
-    const multiWorld = MultiWorldService.getMultiWorld(multiWorldId);
     const multiWorldContext = useMemo<
         MultiWorldContextData & { connectionMode: MultiWorldConnectionMode }
     >(

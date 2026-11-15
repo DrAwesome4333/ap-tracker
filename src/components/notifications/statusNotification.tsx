@@ -1,8 +1,9 @@
-import { MessageType } from "../../services/notifications/notifications";
-import { filledTextPrimary, secondary } from "../../constants/colors";
-import Spinner from "../icons/spinner";
-import Icon from "../icons/icons";
-const STATUS_HEIGHT_EM = 4;
+import React from "react";
+import { MessageType } from "@/services/notifications/notifications";
+import Spinner from "@/components/icons/spinner";
+import Icon from "@/components/icons/icons";
+import styles from "./notification.module.css";
+
 const StatusNotificationView = ({
     message,
     type,
@@ -61,41 +62,26 @@ const StatusNotificationView = ({
             break;
         }
     }
-    const top = 4 + STATUS_HEIGHT_EM * index;
-    const onScreen = !hide;
-    const right = onScreen ? 10 : -600;
 
     return (
         <div
-            style={{
-                display: "grid",
-                top: `${top}em`,
-                right: `${right}px`,
-                position: "absolute",
-                columnGap: "5px",
-                gridTemplateColumns: "40px auto",
-                width: "400px",
-                maxWidth: "70%",
-                height: "3em",
-                backgroundColor: secondary,
-                color: filledTextPrimary,
-                boxShadow: `3px 5px 0px ${boxColor}`,
-                opacity: onScreen ? 1 : 0,
-                transition: "all 0.25s ease-in-out",
-                pointerEvents: "all",
-            }}
+            style={
+                {
+                    "--box-color": boxColor,
+                    "--notification-index": index,
+                } as React.CSSProperties
+            }
+            className={[
+                styles.status_notification,
+                hide ? styles.hidden : "",
+            ].join(" ")}
+            key="test"
         >
             <Spinner
                 size={50}
                 arc={progress < 0 ? 2 : Math.PI * 2 * progress}
                 color="black"
-                style={{
-                    gridColumn: "1 / span 1",
-                    gridRow: "1 /span 1",
-                    justifySelf: "center",
-                    alignSelf: "center",
-                    textAlign: "center",
-                }}
+                className={styles.notification_icon}
             />
             {icon && (
                 <Icon
@@ -112,17 +98,7 @@ const StatusNotificationView = ({
                 />
             )}
 
-            <div
-                style={{
-                    gridColumn: "2 / span 1",
-                    justifySelf: "left",
-                    alignSelf: "center",
-                    gridRow: "1 /span 1",
-                    whiteSpace: "pre-wrap",
-                }}
-            >
-                {message}
-            </div>
+            <div className={styles.notification_content}>{message}</div>
         </div>
     );
 };

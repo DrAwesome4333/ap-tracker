@@ -1,26 +1,26 @@
+import { useContext } from "react";
 import {
     DangerButton,
     GhostButton,
     PrimaryButton,
     SecondaryButton,
     TextButton,
-} from "../shared/buttons";
-import Modal from "../shared/Modal";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
-import { useContext } from "react";
-import ServiceContext from "../../contexts/serviceContext";
-import { useCurrentActivity } from "../../hooks/activityHook";
-import ActivityContext from "../../contexts/activityContext";
-import { useAPConnectionStatus } from "../../hooks/connectionStatusHook";
-import SlotContext from "../../contexts/slotContext";
-import MultiWorldService from "../../services/MultiInfo/MultiWorldService";
-import Icon from "../icons/icons";
-import { copyToClipboard } from "../../utility/clipboard";
-import MultiWorldContext from "../../contexts/multiWorldContext";
-import useOption from "../../hooks/optionHook";
-import useRoomOptions from "../../hooks/roomOptionsHook";
-import { PermissionDescription } from "../../constants/apConstants";
-import useHintPoints from "../../hooks/hintPointsHook";
+} from "@/components/shared/buttons";
+import Modal from "@/components/shared/Modal";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import ServiceContext from "@/contexts/serviceContext";
+import Icon from "@/components/icons/icons";
+import ActivityContext from "@/contexts/activityContext";
+import SlotContext from "@/contexts/slotContext";
+import MultiWorldContext from "@/contexts/multiWorldContext";
+import { useCurrentActivity } from "@/hooks/activityHook";
+import { useAPConnectionStatus } from "@/hooks/connectionStatusHook";
+import useOption from "@/hooks/optionHook";
+import useHintPoints from "@/hooks/hintPointsHook";
+import useRoomOptions from "@/hooks/roomOptionsHook";
+import MultiWorldService from "@/services/MultiInfo/MultiWorldService";
+import { copyToClipboard } from "@/utility/clipboard";
+import { PermissionDescription } from "@/constants/apConstants";
 
 const ConnectionOptions = ({
     open,
@@ -59,7 +59,7 @@ const ConnectionOptions = ({
         : null;
 
     const disconnect = () => {
-        activityContext.drop("slot-tracker");
+        activityContext.remove("slot-tracker");
         connector.disconnect();
         const newUrl = window?.location ? new URL(window?.location.href) : null;
         if (newUrl) {
@@ -95,7 +95,7 @@ const ConnectionOptions = ({
             {onMultiTracker ? (
                 <SecondaryButton
                     onClick={() => {
-                        activityContext.drop(
+                        activityContext.remove(
                             activityContext.stack.find((act) =>
                                 act.startsWith("multi-world-tracker")
                             )
@@ -112,7 +112,7 @@ const ConnectionOptions = ({
                     {connectionStatus.disconnected && onSlotTracker && (
                         <SecondaryButton
                             onClick={() => {
-                                activityContext.drop("slot-tracker");
+                                activityContext.remove("slot-tracker");
                                 onClose();
                             }}
                         >

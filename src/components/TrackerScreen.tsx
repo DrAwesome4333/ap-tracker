@@ -46,7 +46,17 @@ const TrackerScreen = () => {
         if (showTextClient) {
             tabs.unshift(new Tab("Text Client", textClient));
         }
-        return <Tabs tabs={tabs} style={{ width: "100%", height: "100%" }} />;
+        return (
+            <Tabs
+                tabs={tabs}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    minWidth: "0",
+                    minHeight: "0",
+                }}
+            />
+        );
     }, [showTextClient]);
     const clientAndList = (
         <Flex direction="column" child1={checklist} child2={hintsAndClient} />
@@ -67,7 +77,12 @@ const TrackerScreen = () => {
         return (
             <Tabs
                 tabs={tabs}
-                style={{ width: "100%", height: "100%", overflow: "scroll" }}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    minWidth: "0",
+                    minHeight: "0",
+                }}
             />
         );
     }

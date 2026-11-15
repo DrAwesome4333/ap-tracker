@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { tertiary } from "../../constants/colors";
-import styled from "styled-components";
-import { randomUUID } from "../../utility/uuid";
-import { TextButton } from "../shared/buttons";
+import styles from "./utility.module.css";
+import { tertiary } from "@/constants/colors";
+import { randomUUID } from "@/utility/uuid";
+import { TextButton } from "@/components/shared/buttons";
 
 class Tab {
     name: string;
@@ -15,24 +15,6 @@ class Tab {
     }
 }
 
-const TabContainer = styled(TextButton)<{ $selected: boolean }>`
-    cursor: pointer;
-    padding: 0.5em;
-    background-color: ${(props) =>
-        props.$selected
-            ? "var(--background-level-2)"
-            : "var(--primary-accent)"};
-    color: ${(props) =>
-        props.$selected ? "var(--text-primary)" : "var(--filled-text-primary)"};
-    border-left: 1px solid var(--secondary-accent);
-    border-right: 1px solid var(--secondary-accent);
-    box-shadow: ${(props) => (props.$selected ? "inset" : "")} var(--box-shadow);
-    flex: 1 1 100%;
-    text-align: center;
-    line-height: 100%;
-    ${(props) => (props.$selected ? "border-bottom: none;" : "")}
-`;
-
 const TabTab = ({
     name,
     selected,
@@ -43,9 +25,15 @@ const TabTab = ({
     onClick: React.MouseEventHandler;
 }) => {
     return (
-        <TabContainer $selected={selected} onClick={onClick}>
+        <TextButton
+            className={[
+                styles.tab_container,
+                selected ? styles.selected : "",
+            ].join(" ")}
+            onClick={onClick}
+        >
             {name}
-        </TabContainer>
+        </TextButton>
     );
 };
 

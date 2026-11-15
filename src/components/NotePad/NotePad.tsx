@@ -1,13 +1,17 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import { PrimaryButton, GhostButton, SecondaryButton } from "../shared/buttons";
-import styles from "./NotePad.module.css";
-import { saveNote, loadNote } from "../../services/connector/remoteSync";
+import { useRef, useEffect, useState, useCallback } from "react";
+import {
+    PrimaryButton,
+    GhostButton,
+    SecondaryButton,
+} from "@/components/shared/buttons";
+import Spinner from "@/components/icons/spinner";
+import Modal from "@/components/shared/Modal";
+import ButtonRow from "@/components/LayoutUtilities/ButtonRow";
+import { saveNote, loadNote } from "@/services/connector/remoteSync";
 import NotificationManager, {
     MessageType,
-} from "../../services/notifications/notifications";
-import Spinner from "../icons/spinner";
-import Modal from "../shared/Modal";
-import ButtonRow from "../LayoutUtilities/ButtonRow";
+} from "@/services/notifications/notifications";
+import styles from "./NotePad.module.css";
 
 const MAX_NOTE_LENGTH = 1024;
 

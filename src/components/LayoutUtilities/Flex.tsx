@@ -1,5 +1,6 @@
 // Based on https://jsfiddle.net/6j10L3x2/1/
 import React, { createContext, useContext, useRef, useState } from "react";
+import styles from "./utility.module.css";
 const FlexContext: React.Context<"root" | "row" | "column"> =
     createContext("root");
 
@@ -14,13 +15,16 @@ const FlexItem = ({
     style?: React.CSSProperties;
     ref?: React.Ref<HTMLDivElement>;
 }) => {
-    const myStyle: React.CSSProperties = {
-        overflow: "hidden",
-        flex: `1 1 ${Math.floor(ratio * 100)}%`,
+    const myStyle = {
+        "--flex-ratio": `${Math.floor(ratio * 100)}%`,
         ...style,
     };
     return (
-        <div ref={ref} style={myStyle}>
+        <div
+            ref={ref}
+            className={styles.flex_item}
+            style={myStyle as React.CSSProperties}
+        >
             {children}
         </div>
     );
@@ -33,16 +37,11 @@ const FlexResizer = ({
     onTouchStart: React.TouchEventHandler;
 }) => {
     const flexParent = useContext(FlexContext);
-    const style: React.CSSProperties = {
-        flex: "0 0 0.5em",
-        cursor: flexParent === "row" ? "ew-resize" : "ns-resize",
-        backgroundColor: "rgba(128, 128, 128, 0.5)",
-    };
     return (
         <div
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}
-            style={style}
+            className={[styles.flex_resizer, styles[flexParent]].join(" ")}
         ></div>
     );
 };
@@ -67,11 +66,7 @@ const Flex = ({
     const mousePosRef = useRef({ x: 0, y: 0 });
     const mouseDownRef = useRef(false);
 
-    const myStyle: React.CSSProperties = {
-        display: "flex",
-        flexDirection: direction,
-        ...style,
-    };
+    const classes = [styles.flex, styles[direction]];
 
     const onMouseMove: React.MouseEventHandler = (event) => {
         if (mouseDownRef.current) {
@@ -124,14 +119,13 @@ const Flex = ({
     };
 
     if (flexParent !== "root") {
-        myStyle.position = "relative";
-        myStyle.width = "100%";
-        myStyle.height = "100%";
+        classes.push(styles.child);
     }
     return (
         <FlexContext.Provider value={direction}>
             <div
-                style={myStyle}
+                className={classes.join(" ")}
+                style={style}
                 onMouseUp={(event) => {
                     mouseDownRef.current = false;
                     event.preventDefault();

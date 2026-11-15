@@ -5,7 +5,6 @@
 This project primarily uses these libraries to function:
 
 - ReactJS: For creating the UI
-- NextJS: For building and deploying the app
 - Archipelago.js: For communicating with archipelago servers
 
 The app is primarily written in Typescript.

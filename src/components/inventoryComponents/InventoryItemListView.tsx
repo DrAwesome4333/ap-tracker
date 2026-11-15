@@ -1,11 +1,11 @@
 import { useState } from "react";
-import CollectionContainer from "./CollectionContainer";
-import InventoryItemView from "./InventoryItemView";
-import { TextButton } from "../shared/buttons";
-import { Item } from "../../services/items/itemSource";
-import Icon from "../icons/icons";
 import { List, useDynamicRowHeight } from "react-window";
-import ap_styles from "../sharedStyles/archipelago.module.css";
+import { Item } from "@/services/items/itemSource";
+import { TextButton } from "@/components/shared/buttons";
+import Icon from "@/components/icons/icons";
+import ap_styles from "@/components/sharedStyles/archipelago.module.css";
+import InventoryItemView from "./InventoryItemView";
+import inv_styles from "./inventory.module.css";
 const InventoryItemListView = ({ items }: { items: Item[] }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
     const count = items.length;
@@ -37,7 +37,10 @@ const InventoryItemListView = ({ items }: { items: Item[] }) => {
 
     return (
         <div>
-            <CollectionContainer onClick={() => setDetailsOpen((x) => !x)}>
+            <div
+                className={inv_styles.collection_container}
+                onClick={() => setDetailsOpen((x) => !x)}
+            >
                 <TextButton className={ap_styles.ap_text_alt + " " + itemClass}>
                     {count} - {name}
                     {
@@ -60,7 +63,7 @@ const InventoryItemListView = ({ items }: { items: Item[] }) => {
                         />
                     }
                 </TextButton>
-            </CollectionContainer>
+            </div>
             {detailsOpen && (
                 <div
                     style={{
