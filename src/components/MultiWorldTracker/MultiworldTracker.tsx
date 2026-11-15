@@ -71,10 +71,19 @@ const useWebHostSlots = (multiSaveId: string) => {
             return;
         }
 
+        const loadingNotificationHandle = NotificationManager.createStatus({
+            type: MessageType.info,
+            message: "Getting tracker data",
+            progress: -1,
+        });
+
         apiHandlerRef.current = new WebHostAPIHandler(multiWorld.room_details);
         // TODO parallelize
         const roomStatus = await apiHandlerRef.current.getRoomStatus();
         const staticTracker = await apiHandlerRef.current.getStaticTracker();
+        loadingNotificationHandle.update({
+            message: "Loading data packages",
+        });
         const contextData = await WebHostAPIHandler.buildMultiWorldContext(
             roomStatus,
             staticTracker,
@@ -92,6 +101,12 @@ const useWebHostSlots = (multiSaveId: string) => {
         setHostSources(sources);
         serviceContext.hintManager?.setMultiWorldContext(contextData, true);
         loaded.current = true;
+        loadingNotificationHandle.update({
+            message: "Tracker data loaded",
+            type: MessageType.success,
+            progress: 1,
+            duration: 3,
+        });
     };
 
     if (!initialized.current) {
